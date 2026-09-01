@@ -9,14 +9,20 @@ public class Menu { // Classes em Java devem começar com letra maiúscula
     // class used for input handling
     Scanner scanner = new Scanner(System.in);
 
-    void start() {
-        while(runing) {
-            showmenu();
+    public String start() {
+        String showmenu_return = "null";
+        while (runing) {
+            showmenu_return = showmenu();
+            if (showmenu_return!="null")
+                runing=false;
         }
-        scanner.close(); //close to prevent memory leaks
+        System.out.format(showmenu_return );
+        System.out.println("\n");
+        return showmenu_return;
+
     }
 
-    void showmenu(){
+     public String showmenu(){
         System.out.println("\n----MENU INICIAL----");
         System.out.println("W para subir S para Descer e E para confirmar");
 
@@ -48,19 +54,21 @@ public class Menu { // Classes em Java devem começar com letra maiúscula
             if(selectedoption==0)
             {
                 System.out.printf("iniciando jogo....\n");
-                runing=false;
+                return "jogar";
+
             }
             else if (selectedoption==1)
             {
                 System.out.printf("mostrando creditos...\n");
                 System.out.printf("pressione enter para voltar ao menu\n");
-                scanner.nextLine();
+                return "creditos";
             }
             else if (selectedoption==2)
             {
                 System.out.printf("saindo...\n");
                 runing=false;
+                return "sair";
             }
         }
-    }
+    return "null";}
 }
