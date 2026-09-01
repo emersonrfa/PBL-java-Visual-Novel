@@ -1,7 +1,6 @@
 import java.util.Scanner;
 
-public class Menu { // Classes em Java devem começar com letra maiúscula
-    //argumentos
+public class Menu { 
     String[] options={"Jogar","Creditos","Sair"};
     int selectedoption=0;
     boolean runing = true;
