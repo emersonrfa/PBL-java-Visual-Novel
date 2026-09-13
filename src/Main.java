@@ -4,8 +4,16 @@ void main() {
     Menu menu= new Menu();//creates a new inatance
     System.out.printf("inicializando jogo...\n");
 
-    menu.start();//calls the method start
+    String menuresponse  =menu.start();//calls the method start
+    if (menuresponse == "jogar"){
+        //metodo para inicializar jogo
+    } else if (menuresponse == "creditos") {
+        //metodo para inicializar os criditos
 
-    System.out.printf("finalizando sistema...");
+    }
+    else {
+        System.out.printf("finalizando sistema...");
+    }
+
 
 }
