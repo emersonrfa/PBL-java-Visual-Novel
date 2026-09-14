@@ -1,4 +1,5 @@
 package Model;
+import java.util.Scanner;
 
 public class Player extends Character {
     private String bloodType;
@@ -7,7 +8,13 @@ public class Player extends Character {
     private Boolean isReveled;
 
     //constructor method
-    public Player(String name, String gender, int age, String description){
+    public Player(Scanner scanner){
+        String name = "Emily";
+        int age =22;
+        // Limpa o '\n' pendente deixado pelo nextInt()
+        scanner.nextLine();
+        String description = "aaa";
+        String gender = "Feminino";
         super(name,gender,age,description);
         this.bloodType="default";
         this.isReveled=false;

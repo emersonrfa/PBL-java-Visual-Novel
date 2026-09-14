@@ -14,5 +14,7 @@ public class NPC extends Character {
         super(name,gender,age,description);
     }
 
-
+    public void setVampire(Boolean vampire) {
+        isVampire = vampire;
+    }
 }
