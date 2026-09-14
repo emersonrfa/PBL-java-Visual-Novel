@@ -2,19 +2,28 @@ package Model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Chapter {
     private String id;
+    private int chapterNumber;
     private String title;
-    private Map<String, Scene> sceneMap = new HashMap<>();
     private String initialSceneld;
+    private List<Scene> scenes;
 
-    public Scene getScene(String sceneld) {
-        return sceneMap.get(sceneld);
+    public Chapter(int chapterNumber, String title) {
+
+        this.chapterNumber = chapterNumber;
+        this.title = title;
+        this.scenes = new ArrayList<>();
     }
 
-    // tem que ver como saber se chegou na ultima cana
-//    public boolean isCompleted(){
-//
-//    }
+    public void addScene(Scene scene) {
+        this.scenes.add(scene);
+    }
+
+    public int getChapterNumber() { return chapterNumber; }
+    public String getTitle() { return title; }
+    public List<Scene> getScenes() { return scenes; }
 }

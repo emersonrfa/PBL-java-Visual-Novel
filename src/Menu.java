@@ -1,19 +1,22 @@
 import java.util.Scanner;
 
+import Controller.GameManager;
+import Model.Player;
+
 public class Menu { 
     String[] options={"Jogar","Creditos","Sair"};
     int selectedoption=0;
-    boolean runing = true;
+    boolean running = true;
 
     // class used for input handling
     Scanner scanner = new Scanner(System.in);
 
     public String start() {
         String showmenu_return = "null";
-        while (runing) {
+        while (running) {
             showmenu_return = showmenu();
-            if (showmenu_return!="null")
-                runing=false;
+            if (!showmenu_return.equals("null"))
+                running=false;
         }
         System.out.format(showmenu_return );
         System.out.println("\n");
@@ -65,7 +68,7 @@ public class Menu {
             else if (selectedoption==2)
             {
                 System.out.printf("saindo...\n");
-                runing=false;
+                running=false;
                 return "sair";
             }
         }

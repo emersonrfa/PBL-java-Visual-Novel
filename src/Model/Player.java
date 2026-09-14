@@ -12,7 +12,6 @@ public class Player extends Character {
         String name = "Emily";
         int age =22;
         // Limpa o '\n' pendente deixado pelo nextInt()
-        scanner.nextLine();
         String description = "aaa";
         String gender = "Feminino";
         super(name,gender,age,description);
@@ -20,6 +19,14 @@ public class Player extends Character {
         this.isReveled=false;
         this.suspectionLevel=0;
 
+    }
+
+    public String getBloodType() {
+        return bloodType;
+    }
+
+    public void setBloodType(String bloodType) {
+        this.bloodType = bloodType;
     }
 
     public int getEnergy() {
