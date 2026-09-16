@@ -18,7 +18,7 @@ public class GameManager {
 
         Chapter prologue = StoryBuilder.buildPrologue(player);
 
-        dialogueController.startScene(prologue.getScenes().get(0));
+        dialogueController.playChapter(prologue);
 
         return true;
     }

@@ -1,8 +1,7 @@
 package Controller;
 
 import Model.Dialogue;
-import Model.Options;
-import Model.Player;
+import Model.Chapter;
 import Model.Scene;
 import java.util.Scanner;
 
@@ -53,6 +52,43 @@ public class DialogueController {
     public void advanceDialogue() {
         System.out.print("\n[Pressione ENTER para continuar]");
         scanner.nextLine();
+    }
+
+    public void playChapter(Chapter chapter) {
+        String currentId = "d1.1"; // primeiro dialogo de todos
+        Scene currentScene = null;
+
+        while (currentId != null && !currentId.isEmpty()) {
+            // localiza a cena que tem o dialogo atual
+            Scene nextScene = chapter.getSceneByDialogueId(currentId);
+
+            if (nextScene == null) {
+                break; // da break se nn encontrar nenhum
+            }
+
+            // exibe sempre as caracteristicas da cena atual:
+            currentScene = nextScene;
+            System.out.println("\n<--------------------------->");
+            System.out.println("  CENA: " + currentScene.getTitle().toUpperCase());
+            System.out.println("  DESCRIÇÃO: " + currentScene.getDescription());
+            System.out.println("<--------------------------->");
+
+
+            Dialogue current = currentScene.getDialogueById(currentId);
+            displayDialogue(current);
+
+            if (current.getOptions().isEmpty()) {
+                break;
+            }
+
+            if (current.getOptions().size() == 1 && current.getOptions().get(0).getText().equals("...")) {
+                advanceDialogue();
+                currentId = current.getOptions().get(0).getNextDialogueId();
+            } else {
+                int choiceIndex = processinput(current);
+                currentId = current.getOptions().get(choiceIndex).getNextDialogueId();
+            }
+        }
     }
 
     // Adaptado para receber o Dialogue atual e retornar o índice escolhido

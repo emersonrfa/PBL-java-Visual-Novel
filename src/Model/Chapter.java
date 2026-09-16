@@ -23,6 +23,18 @@ public class Chapter {
         this.scenes.add(scene);
     }
 
+
+    // métod para buscar próximo dialogo com o nextdialogueid e identificar qnd achou um
+    public Scene getSceneByDialogueId(String dialogueId) {
+        if (dialogueId == null) return null;
+        for (Scene scene : this.scenes) { // busca o dialogo com aquela id dentro do conjunto de dialogos daquela cena utilizando GetDialoguebyid
+            if (scene.getDialogueById(dialogueId) != null) {
+                return scene;
+            }
+        }
+        return null;
+    }
+
     public int getChapterNumber() { return chapterNumber; }
     public String getTitle() { return title; }
     public List<Scene> getScenes() { return scenes; }
