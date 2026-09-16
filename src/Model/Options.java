@@ -9,6 +9,13 @@ public class Options {
     private int suspectionCost;
     private int maxSuspectionAllowed;
 
+    // nao precisava fazer o construtor completo toda vez, dava pra simplificar assim:
+
+    private int energyChange = 0;
+    private double moneyChange = 0.0;
+    private int affinityChange = 0;
+    private String requiredFlag = null; // isso é para determinar se ela conseguiu um item importante ou viu alguma coisa
+
     // construtor completo
     public Options(String id, String text, String nextDialogueId, String requiredItem,
                    int affinityCost, int suspectionCost, int maxSuspectionAllowed) {
@@ -30,6 +37,28 @@ public class Options {
     public Options(String nextDialogueId) {
         this("", "...", nextDialogueId, "", 0, 0, 0);
     }
+
+    // fiz com set pq descobri q vai facilitar no StoryBuilder
+
+    public Options setEnergyChange(int amount) {
+        this.energyChange = amount;
+        return this;
+    }
+    public Options setMoneyChange(double amount) {
+        this.moneyChange = amount;
+        return this;
+    }
+    public Options setAffinityChange(int amount) {
+        this.affinityChange = amount;
+        return this;
+    }
+
+    // exemplo: Dialogue d
+    // d.addOption(new Options("texto", "id").setEnergyChange(-x));
+    // d.addOption(new Options("text", "id").setMoneyChange(-y));
+
+    public int getEnergyChange() { return energyChange; }
+    public double getMoneyChange() { return moneyChange; }
 
     public String getText() { return text; }
     public String getNextDialogueId() { return nextDialogueId; }

@@ -1,24 +1,39 @@
 package Model;
+import java.util.Scanner;
 
-//refatorei a classe player para tirar o scanner e a logica de consumir energia, a logica de consumir energia estara
-//parte do service
 public class Player extends Character {
     private String bloodType;
     private int energy;
-    private int suspectionLevel;
-    private Boolean isReveled;
+    private double money;
+    private Inventory inventory;
 
-    // Construtor parametrizado (limpo, apenas recebe dados)
-    public Player(String name, String gender, int age, String description, int initialEnergy) {
-        super(name, gender, age, description);
-        this.bloodType = "default";
-        this.isReveled = false;
-        this.suspectionLevel = 0;
-        this.energy = initialEnergy;
+    //constructor method
+    public Player(String bloodType) {
+        super("Emily", "Feminino", 22, "Protagonista");
+        this.energy = 100;
+        this.money = 20.0;
+        this.inventory = new Inventory();
+        this.bloodType = bloodType;
+    }
+
+    public double getMoney() {
+        return money;
+    }
+
+    public void addMoney(double amount) {
+        this.money += amount;
     }
 
     public String getBloodType() {
         return bloodType;
+    }
+
+    public boolean spendMoney(double amount) {
+        if (this.money >= amount) {
+            this.money -= amount;
+            return true;
+        }
+        return false; // ta liso
     }
 
     public void setBloodType(String bloodType) {
@@ -29,24 +44,15 @@ public class Player extends Character {
         return energy;
     }
 
-    // Apenas define a energia, sem fazer cálculos
-    public void setEnergy(int energy) {
-        this.energy = energy;
+    public void addEnergy(int amount) {
+        this.energy += amount;
+
+        if (this.energy > 100)
+            this.energy = 100; //encapsulamento
     }
 
-    public int getSuspectionLevel() {
-        return suspectionLevel;
-    }
-
-    public void setSuspectionLevel(int suspectionLevel) {
-        this.suspectionLevel = suspectionLevel;
-    }
-
-    public Boolean getIsReveled() {
-        return isReveled;
-    }
-
-    public void setIsReveled(Boolean isReveled) {
-        this.isReveled = isReveled;
+    public int ConsumeEnergy(int amount){
+        int Energy = getEnergy();
+        return Energy - amount;
     }
 }

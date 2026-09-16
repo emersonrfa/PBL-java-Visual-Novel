@@ -1,6 +1,7 @@
 import Controller.GameManager;
 import Model.NPC;
 import Model.Player;
+import Model.Chapter;
 import java.util.Scanner;
 
 void main() {
@@ -18,13 +19,9 @@ void main() {
         System.out.print("> ");
         String tipoSanguineo = scanner.nextLine();
 
-        //  Criando o Player usando o novo construtor limpo
-
-        Player player = new Player("Emily", "Feminino", 22, "aaa", 100);
-        player.setBloodType(tipoSanguineo);
+        Player player = new Player(tipoSanguineo);
 
         System.out.println("\nTipo sanguíneo [" + player.getBloodType() + "] registrado com sucesso.\n"); // AFIM DE TESTES
-
 
         NPC arthur = new NPC("Vizinho e amigo de Emily","Casa de Arthur","Arthur",
                 "Cabelo cacheado, bigode fino, moreno. Meio desajeitado, já é um amigo de Emily de longa data",
@@ -34,7 +31,6 @@ void main() {
                 "Santo Pedro ","homem grande, forte, mais velho e que dá uma sensação de caçador",
                 "Masculino",54);
 
-        // Passa o player recém-criado para o GameManager iniciar o fluxo
         gameManager.startGame(player);
     }
     else if (menuresponse.equals("créditos")) {
