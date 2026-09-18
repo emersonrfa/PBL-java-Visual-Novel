@@ -1,5 +1,6 @@
 package Testes;
 import Model.Chapter;
+import Model.Player;
 import Repository.InMemoryStoryRepository;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,8 +14,9 @@ public class InMemoryStoryRepositoryTest {
         //criando o objeto
         InMemoryStoryRepository repo = new InMemoryStoryRepository();
 
+
         //construindo o capitulo, indo ate o repositorio e buscando as informacoes
-        Chapter prologue = repo.loadPrologue();
+        Chapter prologue = repo.buildPrologue();
         //verifiaca se o prologue nao e null
         assertNotNull(prologue);
         //verifica se o numero so capitulo esta certo

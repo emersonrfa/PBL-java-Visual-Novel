@@ -14,6 +14,30 @@ public class Scene {
         this.dialogues = new ArrayList<>();
     }
 
+    // para adicionar dialogo simples direto (os que estao entre dialogos e basta clicar pra passar)
+    public void addSimpleDialogue(String id, String text, String nextDialogueId) {
+        this.dialogues.add(new Dialogue(id, text, nextDialogueId));
+    }
+
+    public void addSimpleDialogue(String id, String speaker, String expression, String text, String nextDialogueId) {
+        this.dialogues.add(new Dialogue(id, speaker, expression, text, nextDialogueId));
+    }
+
+    public Dialogue getDialogueById(String id) {
+        if (id == null) {
+            return null;
+        }
+
+        for (Dialogue d : this.dialogues) {
+            if (d.getId().equals(id)) {
+                return d;
+            }
+        }
+
+        // Retorna null se não encontrar o ID ou se a cena chegou ao fim
+        return null;
+    }
+
     public void addDialogue(Dialogue dialogue) {
         this.dialogues.add(dialogue);
     }
@@ -22,7 +46,4 @@ public class Scene {
     public String getDescription() { return description; }
     public List<Dialogue> getDialogues() { return dialogues; }
 
-    public void setDialogues(List<Dialogue> dialogues) {
-        this.dialogues = dialogues;
-    }
 }

@@ -27,4 +27,14 @@ public class Chapter {
     public void setScenes(List<Scene> scenes) {
         this.scenes = scenes;
     }
+
+    public Scene getSceneByDialogueId(String dialogueId) {
+        if (dialogueId == null) return null;
+        for (Scene scene : this.scenes) {
+            if (scene.getDialogueById(dialogueId) != null) {
+                return scene;
+            }
+        }
+        return null;
+    }
 }

@@ -11,7 +11,9 @@ public class PlayerService {
         int currentEnergy = player.getEnergy();
         int newEnergy = currentEnergy - amount;
 
-
+        if (newEnergy < 0) {
+            newEnergy = 0;
+        }
         player.setEnergy(newEnergy);
     }
 }

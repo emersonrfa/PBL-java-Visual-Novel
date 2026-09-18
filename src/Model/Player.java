@@ -51,8 +51,19 @@ public class Player extends Character {
             this.energy = 100; //encapsulamento
     }
 
-    public int ConsumeEnergy(int amount){
-        int Energy = getEnergy();
-        return Energy - amount;
+    public int consumeEnergy(int amount){
+
+        if (this.energy - amount < 0) {
+            this.energy = 0;
+            return 0;
+        }
+        else {
+            this.energy -= amount;
+            return this.energy - amount;
+        }
+    }
+
+    public void setEnergy(int i) {
+        this.energy = i;
     }
 }

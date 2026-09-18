@@ -1,6 +1,6 @@
 package Controller;
 
-import Service.AfinityTraker;
+import Service.AffinityTracker;
 import Model.Ending;
 import Model.Player;
 import Model.StoryState;
@@ -11,7 +11,7 @@ import java.util.List;
 public class EndingManager {
     private List<Ending> avaliableEndings = new ArrayList<>();
 
-    public Ending evaluateConditions(StoryState state, AfinityTraker afinity){
+    public Ending evaluateConditions(StoryState state, AffinityTracker afinity){
         //tem que ver
         return null;
     }

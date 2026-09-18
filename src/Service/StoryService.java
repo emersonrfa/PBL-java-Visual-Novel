@@ -7,8 +7,8 @@ import Model.Dialogue;
 
 public class StoryService {
 
-    // metodo que estava dentro de scene
-    public Dialogue findDialogueById(Scene scene, String dialogueId) {
+    // metodo para encontrar o proximo dialogo dentro da mesma cena pelo id do proximo dialogo
+    public static Dialogue findDialogueById(Scene scene, String dialogueId) {
         if (dialogueId == null) return null;
 
         for (Dialogue d : scene.getDialogues()) {
@@ -19,8 +19,8 @@ public class StoryService {
         return null;
     }
 
-    // metodo que estava dentro de Chapter
-    public Scene findSceneByDialogueId(Chapter chapter, String dialogueId) {
+    // metodo utilizado para procurar a proxima cena pelo id do proximo dialogo
+    public static Scene findSceneByDialogueId(Chapter chapter, String dialogueId) {
         if (dialogueId == null) return null;
 
         for (Scene scene : chapter.getScenes()) {
