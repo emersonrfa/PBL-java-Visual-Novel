@@ -3,6 +3,7 @@ package Controller;
 import Model.StoryState;
 import Model.Player;
 import Model.Chapter;
+import Repository.InMemoryStoryRepository; // Importando o novo repositório!
 
 public class GameManager {
     private StoryState currentState;
@@ -16,8 +17,11 @@ public class GameManager {
     public boolean startGame(Player player) {
         this.isRunning = true;
 
-        Chapter prologue = StoryBuilder.buildPrologue(player);
+        // Usamos o Repository em vez do antigo StoryBuilder
+        InMemoryStoryRepository storyRepo = new InMemoryStoryRepository();
+        Chapter prologue = storyRepo.loadPrologue();
 
+        // O DialogueController assume o controle para exibir a cena
         dialogueController.playChapter(prologue);
 
         return true;
@@ -26,5 +30,4 @@ public class GameManager {
     public void gameLoop(){
 
     }
-
 }

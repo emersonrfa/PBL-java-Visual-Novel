@@ -1,6 +1,6 @@
 package Controller;
 
-import Model.AfinityTraker;
+import Service.AfinityTraker;
 import Model.Ending;
 import Model.Player;
 import Model.StoryState;

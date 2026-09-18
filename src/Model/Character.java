@@ -17,16 +17,5 @@ public class Character {
     }
 
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
 
 }

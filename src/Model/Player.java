@@ -1,24 +1,20 @@
 package Model;
-import java.util.Scanner;
 
+//refatorei a classe player para tirar o scanner e a logica de consumir energia, a logica de consumir energia estara
+//parte do service
 public class Player extends Character {
     private String bloodType;
     private int energy;
     private int suspectionLevel;
     private Boolean isReveled;
 
-    //constructor method
-    public Player(Scanner scanner){
-        String name = "Emily";
-        int age =22;
-        // Limpa o '\n' pendente deixado pelo nextInt()
-        String description = "aaa";
-        String gender = "Feminino";
-        super(name,gender,age,description);
-        this.bloodType="default";
-        this.isReveled=false;
-        this.suspectionLevel=0;
-
+    // Construtor parametrizado (limpo, apenas recebe dados)
+    public Player(String name, String gender, int age, String description, int initialEnergy) {
+        super(name, gender, age, description);
+        this.bloodType = "default";
+        this.isReveled = false;
+        this.suspectionLevel = 0;
+        this.energy = initialEnergy;
     }
 
     public String getBloodType() {
@@ -33,22 +29,24 @@ public class Player extends Character {
         return energy;
     }
 
-    public int ConsumeEnergy(int amount){
-        int Energy=getEnergy();
-        return Energy - amount;
+    // Apenas define a energia, sem fazer cálculos
+    public void setEnergy(int energy) {
+        this.energy = energy;
     }
 
-    // setSuspectionLevel does the same thing as modifySuspection
-    public void setSuspectionLevel(int suspectionLevel) {
-        this.suspectionLevel = suspectionLevel;
-    }
-    // getsuspectionLevel does the same thing as checkExposure
     public int getSuspectionLevel() {
         return suspectionLevel;
     }
 
+    public void setSuspectionLevel(int suspectionLevel) {
+        this.suspectionLevel = suspectionLevel;
+    }
 
+    public Boolean getIsReveled() {
+        return isReveled;
+    }
 
-
+    public void setIsReveled(Boolean isReveled) {
+        this.isReveled = isReveled;
+    }
 }
-

@@ -8,73 +8,48 @@ import java.util.Scanner;
 public class DialogueController {
     private Scanner scanner = new Scanner(System.in);
 
-    public Scene startScene(Scene scene) {
-        // capitulos começam em 1.1
-        String currentId = "d1.1";
-
-        while (currentId != null && !currentId.isEmpty()) {
-            Dialogue current = scene.getDialogueById(currentId);
-
-            //fim da cena se a ID não for encontrada
-            if (current == null) {
-                break;
-            }
-
-            displayDialogue(current);
-
-            // se não houver opções cadastradas, encerra por precaucao
-            if (current.getOptions().isEmpty()) {
-                break;
-            }
-
-            // verifica se é apenas um avanço linear (opção única "...")
-            if (current.getOptions().size() == 1 && current.getOptions().get(0).getText().equals("...")) {
-                advanceDialogue();
-                currentId = current.getOptions().get(0).getNextDialogueId();
-            }
-            // se for um menu de varias escolhas
-            else {
-                int choiceIndex = processinput(current);
-                currentId = current.getOptions().get(choiceIndex).getNextDialogueId();
+    // Lógica de busca que foi removida da Entidade Chapter
+    private Scene findSceneByDialogueId(Chapter chapter, String dialogueId) {
+        if (dialogueId == null) return null;
+        for (Scene scene : chapter.getScenes()) {
+            if (findDialogueById(scene, dialogueId) != null) {
+                return scene;
             }
         }
-        return scene;
+        return null;
     }
 
-    public void displayDialogue(Dialogue dialogue) {
-        System.out.println("\n--------------------------------------------------");
-        if (!dialogue.getSpeaker().equals("Narrador")) {
-            System.out.println("[" + dialogue.getSpeaker() + "]:");
+    // Lógica de busca que foi removida da Entidade Scene
+    private Dialogue findDialogueById(Scene scene, String id) {
+        if (id == null) return null;
+        for (Dialogue d : scene.getDialogues()) {
+            if (d.getId().equals(id)) {
+                return d;
+            }
         }
-        System.out.println(dialogue.getText());
-    }
-
-    public void advanceDialogue() {
-        System.out.print("\n[Pressione ENTER para continuar]");
-        scanner.nextLine();
+        return null;
     }
 
     public void playChapter(Chapter chapter) {
-        String currentId = "d1.1"; // primeiro dialogo de todos
+        String currentId = "d1.1";
         Scene currentScene = null;
 
         while (currentId != null && !currentId.isEmpty()) {
-            // localiza a cena que tem o dialogo atual
-            Scene nextScene = chapter.getSceneByDialogueId(currentId);
+            // Usa o novo método auxiliar de busca
+            Scene nextScene = findSceneByDialogueId(chapter, currentId);
 
             if (nextScene == null) {
-                break; // da break se nn encontrar nenhum
+                break;
             }
 
-            // exibe sempre as caracteristicas da cena atual:
             currentScene = nextScene;
             System.out.println("\n<--------------------------->");
             System.out.println("  CENA: " + currentScene.getTitle().toUpperCase());
             System.out.println("  DESCRIÇÃO: " + currentScene.getDescription());
             System.out.println("<--------------------------->");
 
-
-            Dialogue current = currentScene.getDialogueById(currentId);
+            // Usa o novo método auxiliar de busca
+            Dialogue current = findDialogueById(currentScene, currentId);
             displayDialogue(current);
 
             if (current.getOptions().isEmpty()) {
@@ -91,7 +66,19 @@ public class DialogueController {
         }
     }
 
-    // Adaptado para receber o Dialogue atual e retornar o índice escolhido
+    public void displayDialogue(Dialogue dialogue) {
+        System.out.println("\n--------------------------------------------------");
+        if (!dialogue.getSpeaker().equals("Narrador")) {
+            System.out.println("[" + dialogue.getSpeaker() + "]:");
+        }
+        System.out.println(dialogue.getText());
+    }
+
+    public void advanceDialogue() {
+        System.out.print("\n[Pressione ENTER para continuar]");
+        scanner.nextLine();
+    }
+
     public int processinput(Dialogue currentDialogue) {
         System.out.println();
         for (int i = 0; i < currentDialogue.getOptions().size(); i++) {
@@ -110,6 +97,6 @@ public class DialogueController {
                 System.out.println("Por favor, digite apenas números.");
             }
         }
-        return choice - 1; // Retorna o índice correto da List (0-based)
+        return choice - 1;
     }
 }
