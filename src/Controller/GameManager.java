@@ -4,6 +4,7 @@ import Model.StoryState;
 import Model.Player;
 import Model.Chapter;
 import Repository.InMemoryStoryRepository;
+import Service.AffinityTracker;
 
 public class GameManager {
     private StoryState currentState;
@@ -12,7 +13,8 @@ public class GameManager {
 
 
     public GameManager(Player player, InputManager inputManager) {
-        this.dialogueController = new DialogueController(player, inputManager);
+        AffinityTracker tracker = new AffinityTracker();
+        this.dialogueController = new DialogueController(player, inputManager, tracker);
     }
 
     public void startGame() {

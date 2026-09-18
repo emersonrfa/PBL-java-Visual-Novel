@@ -6,14 +6,24 @@ import Model.Chapter;
 import Model.Scene;
 import Model.Player;
 import Service.StoryService;
+import Service.AffinityTracker;
+
+import java.util.List;
 
 public class DialogueController {
     private InputManager inputManager;
     private Player player;
+    private AffinityTracker affinityTracker;
 
     public DialogueController(Player player, InputManager inputManager) {
         this.player = player;
         this.inputManager = inputManager; // Atribui a instância recebida
+    }
+
+    public DialogueController(Player player, InputManager inputManager, AffinityTracker affinityTracker) {
+        this.player = player;
+        this.inputManager = inputManager;
+        this.affinityTracker = affinityTracker;
     }
 
     public void displayDialogue(Dialogue dialogue) {
@@ -72,27 +82,67 @@ public class DialogueController {
     // e depois processa alteração de valores de player (pode ser que troque de local que faz isso no futuro)
     public int processinput(Dialogue currentDialogue) {
         System.out.println();
+        var options = currentDialogue.getOptions();
 
-        for (int i = 0; i < currentDialogue.getOptions().size(); i++) {
-            System.out.println((i + 1) + " - " + currentDialogue.getOptions().get(i).getText());
+        // EXIBIÇÃO DAS OPÇÕES
+        for (int i = 0; i < options.size(); i++) {
+            Options opt = options.get(i);
+
+            if (opt.isAvailable(player)) {
+                System.out.println((i + 1) + " - " + opt.getText());
+            } else {
+                // caso a opção esteja bloqueada
+                String motivo = "";
+
+                if (opt.getMoneyChange() < 0 && player.getMoney() < Math.abs(opt.getMoneyChange())) {
+                    motivo = " [Trocos insuficientes]";
+                }
+
+                else if (opt.getRequiredFlag() != null && !player.getFlag(opt.getRequiredFlag())) {
+                    motivo = " [???]";
+                }
+
+                else if (opt.getEnergyChange() < 0 && player.getEnergy() < Math.abs(opt.getEnergyChange())) {
+                    motivo = " [Energia Insuficiente]";
+                }
+
+                System.out.println((i + 1) + " - [BLOQUEADA] " + opt.getText() + motivo);
+            }
         }
 
-        int choice = inputManager.readValidChoice(1, currentDialogue.getOptions().size());
+        // VALIDAÇÃO DA ESCOLHA DA OPÇÃO
+        int choice = -1;
+        boolean validChoice = false;
+
+        while (!validChoice) {
+            choice = inputManager.readValidChoice(1, options.size());
+            Options chosenOption = options.get(choice - 1);
+
+            if (!chosenOption.isAvailable(player)) {
+                System.out.println("Você não cumpre os requisitos para essa opção. Escolha outra.");
+            } else {
+                validChoice = true;
+            }
+        }
 
         int chosenIndex = choice - 1;
-        Options chosenOption = currentDialogue.getOptions().get(chosenIndex);
+        Options chosenOption = options.get(chosenIndex);
 
         // consequencia de escolha: (tem q ve um jeito de pegar o objeto player e trazer aqui)
-        if (chosenOption.getEnergyChange() < 0) { // variando energia
-            player.consumeEnergy(Math.abs(chosenOption.getEnergyChange())); // math.abs é módulo!!! deixa assim
-        } else if (chosenOption.getEnergyChange() > 0) {
-            player.addEnergy(chosenOption.getEnergyChange());
+        if (chosenOption.getEnergyChange() < 0) player.consumeEnergy(Math.abs(chosenOption.getEnergyChange()));
+        else if (chosenOption.getEnergyChange() > 0) player.addEnergy(chosenOption.getEnergyChange());
+
+        if (chosenOption.getMoneyChange() < 0) player.spendMoney(Math.abs(chosenOption.getMoneyChange()));
+        else if (chosenOption.getMoneyChange() > 0) player.addMoney(chosenOption.getMoneyChange());
+
+        // Ativação de Flags
+        if (chosenOption.getFlagToSet() != null) {
+            player.setFlag(chosenOption.getFlagToSet(), true);
         }
 
-        if (chosenOption.getMoneyChange() < 0) { // variando dinheiro
-            player.spendMoney(Math.abs(chosenOption.getMoneyChange()));
-        } else if (chosenOption.getMoneyChange() > 0) {
-            player.addMoney(chosenOption.getMoneyChange());
+        // Alteração de Afinidade
+        if (chosenOption.getAffinityChange() != 0 && chosenOption.getTargetNpc() != null) {
+            affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
         }
 
         return chosenIndex;

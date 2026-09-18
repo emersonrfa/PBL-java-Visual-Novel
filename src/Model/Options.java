@@ -9,6 +9,10 @@ public class Options {
     private int suspectionCost;
     private int maxSuspectionAllowed;
 
+    // atributos para controle de flags e afinidades:
+    private String flagToSet = null; // flag alterada
+    private String targetNpc = null; // npc afetado
+
     // nao precisava fazer o construtor completo toda vez, dava pra simplificar assim:
 
     private int energyChange = 0;
@@ -51,6 +55,49 @@ public class Options {
     public Options setAffinityChange(int amount) {
         this.affinityChange = amount;
         return this;
+    }
+
+    // setters e getters de flag e afinidades:
+
+    public Options setRequiredFlag(String flag) {
+        this.requiredFlag = flag;
+        return this;
+    }
+
+    public Options setFlagToSet(String flag) {
+        this.flagToSet = flag;
+        return this;
+    }
+
+    public Options setAffinityChange(String npcName, int amount) {
+        this.targetNpc = npcName;
+        this.affinityChange = amount;
+        return this;
+    }
+
+    public String getTargetNpc() { return targetNpc; }
+    public String getFlagToSet() { return flagToSet; }
+    public String getRequiredFlag() { return requiredFlag; }
+    public int getAffinityChange() { return affinityChange; }
+
+    // meotodo para verificar se opção esta disponivel
+
+    public boolean isAvailable(Player player) {
+        if (this.moneyChange < 0 && player.getMoney() < Math.abs(this.moneyChange)) {
+            return false;
+        }
+
+        if (this.requiredFlag != null && !player.getFlag(this.requiredFlag)) {
+            return false;
+        }
+
+        if ((this.energyChange) < 0 && player.getEnergy() < Math.abs(this.energyChange)) {
+            return false;
+        }
+
+        // dps criar logica do inventario
+
+        return true;
     }
 
     // exemplo: Dialogue d

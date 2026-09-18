@@ -24,14 +24,14 @@ public class PlayerServiceTest {
 
 
     @Test
-    //NAO ESTA FUNCIONANDO
+    //agora esta corrigido viu
     //TESTE DE BORDA
     public void  testeNegativeEnergy(){
         //criando os objetos necessarios
         Player player = new Player("test");
         PlayerService service = new PlayerService();
         //tentar consumir mais energia do que a quantidade existente
-        service.consumeEnergy(player, 50);
+        service.consumeEnergy(player, 150);
         // a energia tem que ficar 0 e nao assumir valores negarivos
         assertEquals(0, player.getEnergy());
 

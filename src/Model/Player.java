@@ -1,5 +1,7 @@
 package Model;
-import java.util.Scanner;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Player extends Character {
     private String bloodType;
@@ -7,13 +9,16 @@ public class Player extends Character {
     private double money;
     private Inventory inventory;
 
-    //constructor method
+    private Map<String, Boolean> flags;
+
+
     public Player(String bloodType) {
         super("Emily", "Feminino", 22, "Protagonista");
         this.energy = 100;
         this.money = 20.0;
         this.inventory = new Inventory();
         this.bloodType = bloodType;
+        this.flags = new HashMap<>();
     }
 
     public double getMoney() {
@@ -65,5 +70,15 @@ public class Player extends Character {
 
     public void setEnergy(int i) {
         this.energy = i;
+    }
+
+    // Métodos para as flags:
+
+    public void setFlag(String flagName, boolean value) {
+        this.flags.put(flagName, value);
+    }
+
+    public boolean getFlag(String flagName) {
+        return this.flags.getOrDefault(flagName, false);
     }
 }
