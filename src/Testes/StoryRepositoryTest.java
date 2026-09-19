@@ -1,18 +1,17 @@
 package Testes;
 import Model.Chapter;
-import Model.Player;
-import Repository.InMemoryStoryRepository;
+import Repository.StoryRepository;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 //Classe para testar a camada repository
 
-public class InMemoryStoryRepositoryTest {
+public class StoryRepositoryTest {
 
     @Test
     public void  testLoadPrologue(){
         //criando o objeto
-        InMemoryStoryRepository repo = new InMemoryStoryRepository();
+        StoryRepository repo = new StoryRepository();
 
 
         //construindo o capitulo, indo ate o repositorio e buscando as informacoes

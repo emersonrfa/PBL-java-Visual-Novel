@@ -15,7 +15,7 @@ void main() {
 
         System.out.println("\nQual seu tipo sanguíneo, Emily? (Ex: A+, O-, AB+):");
         System.out.print("> ");
-        String tipoSanguineo = inputManager.readString();
+        String tipoSanguineo = inputManager.readBloodType();
 
         Player player = new Player(tipoSanguineo);
 

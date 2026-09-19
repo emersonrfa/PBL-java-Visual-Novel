@@ -42,6 +42,7 @@ public class DialogueController {
     public void playChapter(Chapter chapter) {
         String currentId = "d1.1"; // primeiro dialogo de todos
         Scene currentScene = null;
+        EndingManager endingManager = new EndingManager();
 
         while (currentId != null && !currentId.isEmpty()) {
             // localiza a cena que tem o dialogo atual
@@ -50,6 +51,11 @@ public class DialogueController {
             if (nextScene == null) {
                 System.out.println("> AVISO DEBUG: JOGO ENCERRADO POR NÃO TER ACHADO ID DE PRÓXIMA CENA (" + currentId + ")");
                 break; // da break se nn encontrar nenhum
+            }
+
+            if (endingManager.isEndingCode(currentId)) {
+                endingManager.triggerEnding(currentId);
+                break; // Encerra o laço e o jogo
             }
 
             if (currentScene != nextScene) {
@@ -88,7 +94,7 @@ public class DialogueController {
         for (int i = 0; i < options.size(); i++) {
             Options opt = options.get(i);
 
-            if (opt.isAvailable(player)) {
+            if (opt.isAvailable(player, affinityTracker)) {
                 System.out.println((i + 1) + " - " + opt.getText());
             } else {
                 // caso a opção esteja bloqueada
@@ -106,6 +112,17 @@ public class DialogueController {
                     motivo = " [Energia Insuficiente]";
                 }
 
+                else if (opt.getRequiredItemName() != null && !player.getInventory().hasItem(opt.getRequiredItemName())) {
+                    motivo = " [Requer: " + opt.getRequiredItemName() + "]"; // NOVO: Avisa qual item falta
+                }
+
+                else if (opt.getTargetNpc() != null) {
+                    if (affinityTracker.getAffinity(opt.getTargetNpc()) < opt.getRequiredAffinity())
+                        motivo = "[Afinidade Insuficiente com " + opt.getTargetNpc() + "]";
+                    else if (affinityTracker.getSuspicion(opt.getTargetNpc()) > opt.getMaxSuspicionAllowed())
+                        motivo = "[Você é suspeita demais para esta opção]";
+                }
+
                 System.out.println((i + 1) + " - [BLOQUEADA] " + opt.getText() + motivo);
             }
         }
@@ -118,8 +135,8 @@ public class DialogueController {
             choice = inputManager.readValidChoice(1, options.size());
             Options chosenOption = options.get(choice - 1);
 
-            if (!chosenOption.isAvailable(player)) {
-                System.out.println("Você não cumpre os requisitos para essa opção. Escolha outra.");
+            if (!chosenOption.isAvailable(player, affinityTracker)) {
+                System.out.println("Você não cumpre os requisitos para essa opção.");
             } else {
                 validChoice = true;
             }
@@ -143,6 +160,27 @@ public class DialogueController {
         // Alteração de Afinidade
         if (chosenOption.getAffinityChange() != 0 && chosenOption.getTargetNpc() != null) {
             affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
+        }
+
+        // Consumir item
+        if (chosenOption.getRequiredItemName() != null && chosenOption.isConsumeRequiredItem()) {
+            player.getInventory().removeItem(chosenOption.getRequiredItemName());
+            System.out.println("\n[ -1 " + chosenOption.getRequiredItemName() + "]");
+        }
+
+        // Recebendo item
+        if (chosenOption.getItemToGive() != null) {
+            player.getInventory().addItem(chosenOption.getItemToGive());
+            System.out.println("\n[ +1 " + chosenOption.getItemToGive() + "]");
+        }
+
+        if (chosenOption.getTargetNpc() != null) {
+            if (chosenOption.getAffinityChange() != 0) {
+                affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
+            }
+            if (chosenOption.getSuspicionChange() != 0) {
+                affinityTracker.modifySuspicion(chosenOption.getTargetNpc(), chosenOption.getSuspicionChange());
+            }
         }
 
         return chosenIndex;

@@ -4,8 +4,12 @@ import Model.Chapter;
 import Model.Scene;
 import Model.Dialogue;
 import Model.Options;
+import Repository.ItemRepository;
+import Repository.NpcRepository;
 
-public class InMemoryStoryRepository {
+public class StoryRepository {
+    private ItemRepository itemRepo = new ItemRepository();
+    private NpcRepository npcRepo = new NpcRepository();
 
     public Chapter buildPrologue() { // CAPÍTULO 1 CAP1
 

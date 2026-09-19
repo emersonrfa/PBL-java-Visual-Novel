@@ -81,4 +81,10 @@ public class Player extends Character {
     public boolean getFlag(String flagName) {
         return this.flags.getOrDefault(flagName, false);
     }
+
+    // Para inventário e itens:
+
+    public Inventory getInventory() {
+        return this.inventory;
+    }
 }

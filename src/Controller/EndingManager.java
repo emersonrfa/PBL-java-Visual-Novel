@@ -1,27 +1,35 @@
 package Controller;
 
-import Service.AffinityTracker;
 import Model.Ending;
-import Model.Player;
-import Model.StoryState;
-
-import java.util.ArrayList;
-import java.util.List;
+import Repository.EndingRepository;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EndingManager {
-    private List<Ending> avaliableEndings = new ArrayList<>();
+    private EndingRepository endingRepo;
 
-    public Ending evaluateConditions(StoryState state, AffinityTracker afinity){
-        //tem que ver
-        return null;
+    public EndingManager() {
+        this.endingRepo = new EndingRepository();
     }
 
-    public void triggerEnding(Ending ending){
-        //tem que ver
+    // se o jogo for identificar se é o momento de ir para um final pela opção, ele usa esse metodo
+
+    public boolean isEndingCode(String dialogueId) {
+        return dialogueId != null && dialogueId.startsWith("FINAL_");
     }
 
-    public boolean checkGameOver(Player player){
-        //tem que ver
-        return false;
+    public void triggerEnding(String endingId) {
+        Ending ending = endingRepo.getEnding(endingId);
+
+        if (ending != null) {
+            System.out.println("\n==================================================");
+            System.out.println("                   FIM DE JOGO                    ");
+            System.out.println("==================================================");
+            System.out.println(" [" + ending.getTitle() + "] ");
+            System.out.println("\n " + ending.getDescription());
+            System.out.println("==================================================\n");
+        } else {
+            System.out.println("\n> AVISO DE DEBUG: id de final não encontrado: " + endingId);
+        }
     }
 }

@@ -36,7 +36,25 @@ public class InputManager {
         return choice;
     }
 
-    public void clode() {
+    // para verificar se o tipo de sangue de emily existe
+
+    public String readBloodType() {
+        String[] validTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
+
+        while (true) {
+            String input = scanner.nextLine().trim().toUpperCase();
+
+            for (String type : validTypes) {
+                if (type.equals(input)) {
+                    return input;
+                }
+            }
+            System.out.println("Não, diga-me um sangue que realmente exista. (Ex: A+, O-, AB+, B-):");
+            System.out.print("> ");
+        }
+    }
+
+    public void close() {
         scanner.close();
     }
 

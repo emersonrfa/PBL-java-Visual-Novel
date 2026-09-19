@@ -3,7 +3,7 @@ package Controller;
 import Model.StoryState;
 import Model.Player;
 import Model.Chapter;
-import Repository.InMemoryStoryRepository;
+import Repository.StoryRepository;
 import Service.AffinityTracker;
 
 public class GameManager {
@@ -21,7 +21,7 @@ public class GameManager {
         this.isRunning = true;
 
         // Usamos o Repository em vez do antigo StoryBuilder
-        InMemoryStoryRepository storyRepo = new InMemoryStoryRepository();
+        StoryRepository storyRepo = new StoryRepository();
         Chapter prologue = storyRepo.buildPrologue();
 
         // O DialogueController assume o controle para exibir a cena

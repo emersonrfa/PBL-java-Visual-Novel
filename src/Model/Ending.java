@@ -4,17 +4,23 @@ public class Ending {
     private String id;
     private String title;
     private String description;
-    private String endingType;
 
-    //constructor method
-    public Ending(String id,String description,String endingType,String title){
-        this.description=description;
-        this.endingType=endingType;
-        this.id=id;
-        this.title=title;
+    public Ending(String id,String description,String title){
+        this.description = description;
+        this.id= id;
+        this.title = title;
     }
 
-    public void displayEndingSummary(){
-        // tem que ver
+    public String getId() {
+        return id;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
 }
