@@ -2,18 +2,18 @@ package Controller;
 
 import Model.Ending;
 import Repository.EndingRepository;
-import java.util.HashMap;
-import java.util.Map;
+import View.EndingView;
 
 public class EndingManager {
     private EndingRepository endingRepo;
+    private EndingView view; // Adicionamos a View
 
     public EndingManager() {
         this.endingRepo = new EndingRepository();
+        this.view = new EndingView(); // Inicializa a View
     }
 
     // se o jogo for identificar se é o momento de ir para um final pela opção, ele usa esse metodo
-
     public boolean isEndingCode(String dialogueId) {
         return dialogueId != null && dialogueId.startsWith("FINAL_");
     }
@@ -22,14 +22,9 @@ public class EndingManager {
         Ending ending = endingRepo.getEnding(endingId);
 
         if (ending != null) {
-            System.out.println("\n==================================================");
-            System.out.println("                   FIM DE JOGO                    ");
-            System.out.println("==================================================");
-            System.out.println(" [" + ending.getTitle() + "] ");
-            System.out.println("\n " + ending.getDescription());
-            System.out.println("==================================================\n");
+            view.printEnding(ending); // Delega para a View
         } else {
-            System.out.println("\n> AVISO DE DEBUG: id de final não encontrado: " + endingId);
+            view.printEndingNotFoundWarning(endingId); // Delega para a View
         }
     }
 }

@@ -23,7 +23,8 @@ public class AffinityTracker {
         else if (newAffinity > 100)
             newAffinity = 100;
 
-        npcAffinities.put(npcName, current + newAffinity);
+        //Passar apenas o newAffinity, pois ele já contém a soma correta
+        npcAffinities.put(npcName, newAffinity);
     }
 
     public int getAffinity(String npcName) {

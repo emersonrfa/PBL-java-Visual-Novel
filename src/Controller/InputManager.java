@@ -1,12 +1,15 @@
 package Controller;
 
+import View.InputView;
 import java.util.Scanner;
 
 public class InputManager {
     private Scanner scanner;
+    private InputView view; // Adicionamos a View aqui
 
     public InputManager() {
         this.scanner = new Scanner(System.in);
+        this.view = new InputView(); // Inicializa a View
     }
 
     // pra avançar dialogo
@@ -23,21 +26,20 @@ public class InputManager {
     public int readValidChoice(int min, int max) {
         int choice = -1;
         while (choice < min || choice > max) {
-            System.out.print("\nSua escolha: ");
+            view.printChoicePrompt(); // Delega para a View
             try {
-                choice = Integer.parseInt(scanner.nextLine()); // parseInt transforma texto em numero
+                choice = Integer.parseInt(scanner.nextLine());
                 if (choice < min || choice > max) {
-                    System.out.println("Opção inválida, escolha uma opção entre " + min + " e " + max + ".");
-                    }
-                } catch (NumberFormatException error) {
-                System.out.println("Digite apenas números");
+                    view.printInvalidChoice(min, max); // Delega para a View
+                }
+            } catch (NumberFormatException error) {
+                view.printNumberFormatError(); // Delega para a View
             }
         }
         return choice;
     }
 
     // para verificar se o tipo de sangue de emily existe
-
     public String readBloodType() {
         String[] validTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
 
@@ -49,13 +51,11 @@ public class InputManager {
                     return input;
                 }
             }
-            System.out.println("Não, diga-me um sangue que realmente exista. (Ex: A+, O-, AB+, B-):");
-            System.out.print("> ");
+            view.printInvalidBloodType(); // Delega o erro para a View
         }
     }
 
     public void close() {
         scanner.close();
     }
-
 }

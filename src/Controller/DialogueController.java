@@ -7,35 +7,29 @@ import Model.Scene;
 import Model.Player;
 import Service.StoryService;
 import Service.AffinityTracker;
-
-import java.util.List;
+import View.DialogueView;
 
 public class DialogueController {
     private InputManager inputManager;
     private Player player;
     private AffinityTracker affinityTracker;
+    private DialogueView view; // Nova View adicionada
 
     public DialogueController(Player player, InputManager inputManager) {
         this.player = player;
-        this.inputManager = inputManager; // Atribui a instância recebida
+        this.inputManager = inputManager;
+        this.view = new DialogueView(); // Inicializa a View
     }
 
     public DialogueController(Player player, InputManager inputManager, AffinityTracker affinityTracker) {
         this.player = player;
         this.inputManager = inputManager;
         this.affinityTracker = affinityTracker;
-    }
-
-    public void displayDialogue(Dialogue dialogue) {
-        System.out.println("\n--------------------------------------------------");
-        if (!dialogue.getSpeaker().equals("Narrador")) {
-            System.out.println("[" + dialogue.getSpeaker() + "]:");
-        }
-        System.out.println(dialogue.getText());
+        this.view = new DialogueView(); // Inicializa a View
     }
 
     public void advanceDialogue() {
-        System.out.print("\n[Pressione ENTER para continuar]");
+        view.printAdvancePrompt();
         inputManager.waitEnter();
     }
 
@@ -49,8 +43,8 @@ public class DialogueController {
             Scene nextScene = StoryService.findSceneByDialogueId(chapter, currentId);
 
             if (nextScene == null) {
-                System.out.println("> AVISO DEBUG: JOGO ENCERRADO POR NÃO TER ACHADO ID DE PRÓXIMA CENA (" + currentId + ")");
-                break; // da break se nn encontrar nenhum
+                view.printDebugWarning("JOGO ENCERRADO POR NÃO TER ACHADO ID DE PRÓXIMA CENA (" + currentId + ")");
+                break;
             }
 
             if (endingManager.isEndingCode(currentId)) {
@@ -60,17 +54,14 @@ public class DialogueController {
 
             if (currentScene != nextScene) {
                 currentScene = nextScene;
-                System.out.println("\n<--------------------------->");
-                System.out.println("  CENA: " + currentScene.getTitle().toUpperCase());
-                System.out.println("  DESCRIÇÃO: " + currentScene.getDescription());
-                System.out.println("<--------------------------->");
+                view.printSceneHeader(currentScene); // Delega para a View
             }
 
             Dialogue current = currentScene.getDialogueById(currentId);
-            displayDialogue(current);
+            view.printDialogue(current); // Delega para a View
 
             if (current.getOptions().isEmpty()) {
-                System.out.println("> AVISO DEBUG: JOGO ENCERRADO POR NÃO TER ACHADO NENHUMA OPÇÃO DE DIÁLOGO (" + currentId + ")");
+                view.printDebugWarning("JOGO ENCERRADO POR NÃO TER ACHADO NENHUMA OPÇÃO DE DIÁLOGO (" + currentId + ")");
                 break;
             }
 
@@ -84,10 +75,8 @@ public class DialogueController {
         }
     }
 
-    // mostra as opções do diálogo, utiliza o inputManager para identificar qual foi escolhida
-    // e depois processa alteração de valores de player (pode ser que troque de local que faz isso no futuro)
     public int processinput(Dialogue currentDialogue) {
-        System.out.println();
+        view.printOptionsHeader();
         var options = currentDialogue.getOptions();
 
         // EXIBIÇÃO DAS OPÇÕES
@@ -95,27 +84,23 @@ public class DialogueController {
             Options opt = options.get(i);
 
             if (opt.isAvailable(player, affinityTracker)) {
-                System.out.println((i + 1) + " - " + opt.getText());
+                view.printOption(i, opt.getText(), "");
             } else {
-                // caso a opção esteja bloqueada
+                // Controller descobre o motivo lógico do bloqueio
                 String motivo = "";
 
                 if (opt.getMoneyChange() < 0 && player.getMoney() < Math.abs(opt.getMoneyChange())) {
-                    motivo = " [Trocos insuficientes]";
+                    motivo = "[Trocos insuficientes]";
                 }
-
                 else if (opt.getRequiredFlag() != null && !player.getFlag(opt.getRequiredFlag())) {
-                    motivo = " [???]";
+                    motivo = "[???]";
                 }
-
                 else if (opt.getEnergyChange() < 0 && player.getEnergy() < Math.abs(opt.getEnergyChange())) {
-                    motivo = " [Energia Insuficiente]";
+                    motivo = "[Energia Insuficiente]";
                 }
-
                 else if (opt.getRequiredItemName() != null && !player.getInventory().hasItem(opt.getRequiredItemName())) {
-                    motivo = " [Requer: " + opt.getRequiredItemName() + "]"; // NOVO: Avisa qual item falta
+                    motivo = "[Requer: " + opt.getRequiredItemName() + "]";
                 }
-
                 else if (opt.getTargetNpc() != null) {
                     if (affinityTracker.getAffinity(opt.getTargetNpc()) < opt.getRequiredAffinity())
                         motivo = "[Afinidade Insuficiente com " + opt.getTargetNpc() + "]";
@@ -123,7 +108,7 @@ public class DialogueController {
                         motivo = "[Você é suspeita demais para esta opção]";
                 }
 
-                System.out.println((i + 1) + " - [BLOQUEADA] " + opt.getText() + motivo);
+                view.printOption(i, opt.getText(), motivo); // View imprime o motivo
             }
         }
 
@@ -136,7 +121,7 @@ public class DialogueController {
             Options chosenOption = options.get(choice - 1);
 
             if (!chosenOption.isAvailable(player, affinityTracker)) {
-                System.out.println("Você não cumpre os requisitos para essa opção.");
+                view.printRequirementWarning(); // Delega para a View
             } else {
                 validChoice = true;
             }
@@ -145,36 +130,33 @@ public class DialogueController {
         int chosenIndex = choice - 1;
         Options chosenOption = options.get(chosenIndex);
 
-        // consequencia de escolha: (tem q ve um jeito de pegar o objeto player e trazer aqui)
+        // CONSEQUÊNCIAS DE ESCOLHA LOGICA:
         if (chosenOption.getEnergyChange() < 0) player.consumeEnergy(Math.abs(chosenOption.getEnergyChange()));
         else if (chosenOption.getEnergyChange() > 0) player.addEnergy(chosenOption.getEnergyChange());
 
         if (chosenOption.getMoneyChange() < 0) player.spendMoney(Math.abs(chosenOption.getMoneyChange()));
         else if (chosenOption.getMoneyChange() > 0) player.addMoney(chosenOption.getMoneyChange());
 
-        // Ativação de Flags
         if (chosenOption.getFlagToSet() != null) {
             player.setFlag(chosenOption.getFlagToSet(), true);
         }
 
-        // Alteração de Afinidade
         if (chosenOption.getAffinityChange() != 0 && chosenOption.getTargetNpc() != null) {
             affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
         }
 
-        // Consumir item
         if (chosenOption.getRequiredItemName() != null && chosenOption.isConsumeRequiredItem()) {
             player.getInventory().removeItem(chosenOption.getRequiredItemName());
-            System.out.println("\n[ -1 " + chosenOption.getRequiredItemName() + "]");
+            view.printConsequence("[ -1 " + chosenOption.getRequiredItemName() + "]"); // View exibe texto
         }
 
-        // Recebendo item
         if (chosenOption.getItemToGive() != null) {
             player.getInventory().addItem(chosenOption.getItemToGive());
-            System.out.println("\n[ +1 " + chosenOption.getItemToGive() + "]");
+            view.printConsequence("[ +1 " + chosenOption.getItemToGive().getName() + "]"); // View exibe texto
         }
 
         if (chosenOption.getTargetNpc() != null) {
+            // (Nota: Esta lógica já estava levemente duplicada no código original e foi mantida como estava)
             if (chosenOption.getAffinityChange() != 0) {
                 affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
             }
