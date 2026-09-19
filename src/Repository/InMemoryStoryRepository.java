@@ -27,7 +27,7 @@ public class InMemoryStoryRepository {
         // diálogo com múltiplas escolhas (usa-se o construtor de opções simples)
         Dialogue d1_4 = new Dialogue("d1.4", "Mas algo lhe incomoda, você não consegue dormir.");
         d1_4.addOption(new Options("Esticar-se e buscar seu celular", "d2.1"));
-        d1_4.addOption(new Options("Vislumbrar a vista de sua janela", "d4.1"));
+        d1_4.addOption(new Options("Vislumbrar a vista de sua janela", "d4.1").setFlagToSet("JANELAARTHUR"));
         cenaQuartoIntro.addDialogue(d1_4);
 
         cap1.addScene(cenaQuartoIntro);
@@ -137,5 +137,59 @@ public class InMemoryStoryRepository {
         cap1.addScene(cenaFimIntro);
 
         return cap1;
+    }
+
+    public Chapter buildEntrevista() {
+
+        Chapter cap2 = new Chapter(2, "A Entrevista de Emprego.");
+
+        //----------------------------------------------------------------------------------------------------------//
+        // AMANHECER
+
+        Scene cenaQuartoManha = new Scene("Amanhecer no quarto", "A luz do sol atinge sua janela");
+
+        cenaQuartoManha.addSimpleDialogue("d1.1", "O dia amanheceu, você escuta o canto do pássaros vindos de lá de fora.",
+                "d1.2");
+        cenaQuartoManha.addSimpleDialogue("d1.2", "Emily", "Cansada", "* Boceja e se espreguiça" +
+                "ainda na cama, após um sono tranqulo *", "d1.3");
+        cenaQuartoManha.addSimpleDialogue("d1.3", "Você se levanta de sua cama, acordando aos poucos." +
+                "Então, troca de roupa e segue para a cozinha, procurando o que comer.", "d1.4");
+
+        Dialogue d1_1 = new Dialogue("d1.4", "Emily", "O que eu deveria comer?", "Normal");
+        d1_1.addOption(new Options("Eu deveria tomar um café para aguentar o dia.", "d2.1.1").setEnergyChange(100));
+        d1_1.addOption(new Options("Um pãozinho com manteiga já está bom.", "d2.1.2"));
+        d1_1.addOption(new Options("Acho que vou ficar de jejum hoje...", "d2.1.3"));
+        cenaQuartoManha.addDialogue(d1_1);
+
+        cap2.addScene(cenaQuartoManha);
+
+        //----------------------------------------------------------------------------------------------------------//
+        // TOMANDO OU NÃO CAFÉ
+
+        Scene cenaTomandoCafe = new Scene("Cozinha", "Uma cozinha simples mas suficiente para suas necessidades");
+
+        cenaTomandoCafe.addSimpleDialogue("d2.1.1", "Você checa sua cafeteira, ainda tem um pouco de café." +
+                " Então você o esquenta novamente e o toma com leite e açúcar.", "d2.2");
+        cenaTomandoCafe.addSimpleDialogue("d2.1.2", "Você procura por um pedaço de pão que deixou no outro dia" +
+                " por não estar com fome. Ele lhe é útil agora.", "d2.2");
+        cenaTomandoCafe.addSimpleDialogue("2.1.3", "Você vai até sua cozinha, observa se não tem nada fora do" +
+                " lugar e não decide comer nada.", "d2.2");
+        cenaTomandoCafe.addSimpleDialogue("d2.2", "Após isso, você para um pouco e observa seu quadro de anotações, " +
+                "perto da porta de seu apartamento.", "d2.3");
+        cenaTomandoCafe.addSimpleDialogue("d2.3", "Emily", "Surpresa", "Ah! É verdade.", "d2.4");
+        cenaTomandoCafe.addSimpleDialogue("d2.4", "Emily", "Surpresa", "Meu auxílio acabou e preciso" +
+                " procurar outro emprego.", "d2.5");
+
+        Dialogue d2_1 = new Dialogue("d2.5", "Emily", "...", "Pensando");
+        d2_1.addOption(new Options("Checar o celular para ver as notícias", "d2.7").setFlagToSet("NOTICIAS"));
+        d2_1.addOption(new Options("Descer o apartamento (sair de casa)", "d2.8"));
+        cenaTomandoCafe.addDialogue(d2_1);
+
+        cenaTomandoCafe.addSimpleDialogue("d2.7", "Você checa seu celular, descobrindo que hoje é 15 de dezembro, " +
+                "uma terça feira. Recentemente uma loja de conveniências abriu em sua cidade.", "d2.8");
+        cenaTomandoCafe.addSimpleDialogue("d2.8", "Então você decide sair. Logo busca seu casaco e a chave de " +
+                "casa.", "d3.1");
+
+        return cap2;
     }
 }
