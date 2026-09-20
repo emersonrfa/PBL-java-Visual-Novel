@@ -5,7 +5,6 @@ public class Character {
     private String gender;
     private int age;
     private String description;
-    private String grup;
 
     //constructor method
     public Character(String name,String gender,int age,String description) {
@@ -13,7 +12,6 @@ public class Character {
         this.name=name;
         this.description=description;
         this.gender=gender;
-        this.grup="default";
     }
 
 

@@ -5,6 +5,7 @@ import Model.Dialogue;
 import Model.Chapter;
 import Model.Scene;
 import Model.Player;
+import Service.PlayerService;
 import Service.StoryService;
 import Service.AffinityTracker;
 import View.DialogueView;
@@ -13,19 +14,16 @@ public class DialogueController {
     private InputManager inputManager;
     private Player player;
     private AffinityTracker affinityTracker;
-    private DialogueView view; // Nova View adicionada
+    private DialogueView view;
+    private PlayerService playerService;
 
-    public DialogueController(Player player, InputManager inputManager) {
-        this.player = player;
-        this.inputManager = inputManager;
-        this.view = new DialogueView(); // Inicializa a View
-    }
 
     public DialogueController(Player player, InputManager inputManager, AffinityTracker affinityTracker) {
         this.player = player;
         this.inputManager = inputManager;
         this.affinityTracker = affinityTracker;
-        this.view = new DialogueView(); // Inicializa a View
+        this.view = new DialogueView();
+        this.playerService = new PlayerService();
     }
 
     public void advanceDialogue() {
@@ -83,10 +81,20 @@ public class DialogueController {
         for (int i = 0; i < options.size(); i++) {
             Options opt = options.get(i);
 
-            if (opt.isAvailable(player, affinityTracker)) {
-                view.printOption(i, opt.getText(), "");
-            } else {
-                // Controller descobre o motivo lógico do bloqueio
+            boolean validPlayer = playerService.validatePlayerRequirements(player, opt);
+            boolean validAffinity = true;
+
+            if (opt.getTargetNpc() != null) {
+                if (affinityTracker.getAffinity(opt.getTargetNpc()) < opt.getRequiredAffinity())
+                    validAffinity = false;
+                if (affinityTracker.getSuspicion(opt.getTargetNpc()) > opt.getMaxSuspicionAllowed())
+                    validAffinity = false;
+            }
+
+            if (validPlayer && validAffinity) {
+                System.out.println((i + 1) + " - " + opt.getText());
+            }
+            else {
                 String motivo = "";
 
                 if (opt.getMoneyChange() < 0 && player.getMoney() < Math.abs(opt.getMoneyChange())) {
@@ -108,7 +116,7 @@ public class DialogueController {
                         motivo = "[Você é suspeita demais para esta opção]";
                 }
 
-                view.printOption(i, opt.getText(), motivo); // View imprime o motivo
+                view.printOption(i, opt.getText(), motivo);
             }
         }
 
@@ -120,8 +128,8 @@ public class DialogueController {
             choice = inputManager.readValidChoice(1, options.size());
             Options chosenOption = options.get(choice - 1);
 
-            if (!chosenOption.isAvailable(player, affinityTracker)) {
-                view.printRequirementWarning(); // Delega para a View
+            if (!playerService.validatePlayerRequirements(player, chosenOption)) {
+                view.printRequirementWarning();
             } else {
                 validChoice = true;
             }
@@ -131,38 +139,11 @@ public class DialogueController {
         Options chosenOption = options.get(chosenIndex);
 
         // CONSEQUÊNCIAS DE ESCOLHA LOGICA:
-        if (chosenOption.getEnergyChange() < 0) player.consumeEnergy(Math.abs(chosenOption.getEnergyChange()));
-        else if (chosenOption.getEnergyChange() > 0) player.addEnergy(chosenOption.getEnergyChange());
-
-        if (chosenOption.getMoneyChange() < 0) player.spendMoney(Math.abs(chosenOption.getMoneyChange()));
-        else if (chosenOption.getMoneyChange() > 0) player.addMoney(chosenOption.getMoneyChange());
-
-        if (chosenOption.getFlagToSet() != null) {
-            player.setFlag(chosenOption.getFlagToSet(), true);
-        }
-
-        if (chosenOption.getAffinityChange() != 0 && chosenOption.getTargetNpc() != null) {
-            affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
-        }
-
-        if (chosenOption.getRequiredItemName() != null && chosenOption.isConsumeRequiredItem()) {
-            player.getInventory().removeItem(chosenOption.getRequiredItemName());
-            view.printConsequence("[ -1 " + chosenOption.getRequiredItemName() + "]"); // View exibe texto
-        }
-
-        if (chosenOption.getItemToGive() != null) {
-            player.getInventory().addItem(chosenOption.getItemToGive());
-            view.printConsequence("[ +1 " + chosenOption.getItemToGive().getName() + "]"); // View exibe texto
-        }
+        playerService.applyOptionConsequences(player, chosenOption);
 
         if (chosenOption.getTargetNpc() != null) {
-            // (Nota: Esta lógica já estava levemente duplicada no código original e foi mantida como estava)
-            if (chosenOption.getAffinityChange() != 0) {
-                affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
-            }
-            if (chosenOption.getSuspicionChange() != 0) {
-                affinityTracker.modifySuspicion(chosenOption.getTargetNpc(), chosenOption.getSuspicionChange());
-            }
+            affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
+            affinityTracker.modifySuspicion(chosenOption.getTargetNpc(), chosenOption.getSuspicionChange());
         }
 
         return chosenIndex;

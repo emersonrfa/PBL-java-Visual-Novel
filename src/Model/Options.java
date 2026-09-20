@@ -110,33 +110,6 @@ public class Options {
 
     // meotodo para verificar se opção esta disponivel
 
-    public boolean isAvailable(Player player, AffinityTracker tracker) {
-        if (this.moneyChange < 0 && player.getMoney() < Math.abs(this.moneyChange)) {
-            return false;
-        }
-
-        if (this.requiredFlag != null && !player.getFlag(this.requiredFlag)) {
-            return false;
-        }
-
-        if (this.energyChange < 0 && player.getEnergy() < Math.abs(this.energyChange)) {
-            return false;
-        }
-
-        if (this.requiredItemName != null && !player.getInventory().hasItem(this.requiredItemName)) {
-            return false;
-        }
-
-        if (this.targetNpc != null) {
-            if (tracker.getAffinity(this.targetNpc) < this.requiredAffinity)
-                return false;
-            if (tracker.getSuspicion(this.targetNpc) > this.maxSuspicionAllowed)
-                return false;
-        }
-
-        return true;
-    }
-
     // exemplo: Dialogue d
     // d.addOption(new Options("texto", "id").setEnergyChange(-x));
     // d.addOption(new Options("text", "id").setMoneyChange(-y));
