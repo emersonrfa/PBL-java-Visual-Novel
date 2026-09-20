@@ -3,6 +3,8 @@ package Repository;
 import Model.Ending;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EndingRepository {
     private Map<String, Ending> endings;
@@ -35,7 +37,7 @@ public class EndingRepository {
                 " deleita em seu sucesso de encontrar onde estavam escondidas todas as criaturas malignas que mais os" +
                 " atormentavam. Graças à Emily, seu bom disfarce e seu bom trabalho, as criaturas das trevas são dizi" +
                 "madas, e as ruas tornam-se mais seguras. Após isso, Emily continua trabalhando na organização, como" +
-                "uma experiente e natural caçadora de vampiros.", "A glória de Santa Prata"));
+                " uma experiente e natural caçadora de vampiros.", "A glória de Santa Prata"));
 
         // Acontece se Emily conseguir se passar como vampira em todos os capítulos e no final decidir não contar tudo para
         // os vampiros, e então, de forma planejada, se encontrar com a organização para entregar a localização do ritual
@@ -45,5 +47,9 @@ public class EndingRepository {
 
     public Ending getEnding(String key) {
         return endings.get(key);
+    }
+
+    public List<Ending> getAllEndings() {
+        return new ArrayList<>(endings.values());
     }
 }

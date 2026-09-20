@@ -3,6 +3,7 @@ package Controller;
 import Model.Ending;
 import Repository.EndingRepository;
 import View.EndingView;
+import java.util.List;
 
 public class EndingManager {
     private EndingRepository endingRepo;
@@ -26,5 +27,9 @@ public class EndingManager {
         } else {
             view.printEndingNotFoundWarning(endingId); // Delega para a View
         }
+    }
+
+    public List<Ending> getAllEndings() {
+        return endingRepo.getAllEndings();
     }
 }

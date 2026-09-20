@@ -167,4 +167,8 @@ public class DialogueController {
 
         return chosenIndex;
     }
+
+    public InputManager getInputManager() {
+        return inputManager;
+    }
 }

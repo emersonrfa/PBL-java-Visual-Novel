@@ -51,7 +51,7 @@ public class NpcRepository {
         gabriel.addBloodPreference("A+");
         gabriel.setSuspicionThreshold(80);
 
-        Vampire miguel = new Vampire("O Comandante", "Salão Principal", "Miguel Toinroskv",
+        Vampire miguel = new Vampire("O Comandante", "Salão Principal", "Miguel Tointoskv",
                 "Miguel ou Toin, podendo ser chamado das duas maneiras, é o segundo vampiro mais velho da " +
                         "casa. Ele é muito interessado em esgrima e combate, sendo o combatente da linha de frente " +
                         "quado há algum problema delicado com caçadores de vampiros. Charmoso e rigoroso, Miguel ou Toin " +

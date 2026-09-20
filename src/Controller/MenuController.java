@@ -1,9 +1,7 @@
 package Controller;
 
-
-
 import View.MenuView;
-
+import java.util.List;
 
 //agora em vem de usar o Scanner ele usa o inputMagager
 public class MenuController {
@@ -48,7 +46,7 @@ public class MenuController {
                 else if (selectedOption == 1) {
                     view.printCredits();
                     inputManager.waitEnter(); // Pausa até dar Enter
-                    // Não encerramos o loop, assim ele redesenha o menu!
+                    // não encerra o loop, assim ele redesenha o menu
                 }
                 else if (selectedOption == 2) {
                     view.printMessage("saindo...\n");
@@ -58,5 +56,15 @@ public class MenuController {
             }
         }
         return "sair";
+    }
+
+    public int chapterSelection() {
+        view.displayChapterSelection();
+        return inputManager.readValidChoice(0, 11);
+    }
+
+    public int endingSelection(List<String> endingTitles) {
+        view.displayEndingSelection(endingTitles);
+        return inputManager.readValidChoice(0, endingTitles.size());
     }
 }
