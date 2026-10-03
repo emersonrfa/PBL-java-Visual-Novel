@@ -121,7 +121,10 @@ public class StoryRepository {
                         " e envolveram-se num acidente em um ritual.", "dLORE.4");
         cenaLoreIntro.addSimpleDialogue("dLORE.4", "Você passou grande parte da sua vida em um orfanato." +
                         " Quando cresceu, conseguiu uma bolsa em uma universidade não muito longe de sua cidade natal." +
-                        " E então se formou num curso de Biologia e Criaturas Mágicas.", "dFIM.1");
+                        " E então se formou num curso de Biologia e Criaturas Mágicas.", "dLORE.5");
+        cenaLoreIntro.addSimpleDialogue("dLORE.5", "Essa foi sua vida desde então. Há alguns meses estava" +
+                " trabalhando em uma lojinha de acessórios, mas foi demitida… Você não se lembra exatamente o" +
+                " porquê. E logo pega no sono.", "dFIM.1");
 
         cap1.addScene(cenaLoreIntro);
 
@@ -161,8 +164,8 @@ public class StoryRepository {
 
         Dialogue d1_1 = new Dialogue("d1.4", "Emily", "O que eu deveria comer?", "Normal");
         d1_1.addOption(new Options("Eu deveria tomar um café para aguentar o dia.", "d2.1.1").setEnergyChange(100));
-        d1_1.addOption(new Options("Um pãozinho com manteiga já está bom.", "d2.1.2"));
-        d1_1.addOption(new Options("Acho que vou ficar de jejum hoje...", "d2.1.3"));
+        d1_1.addOption(new Options("Um pãozinho com manteiga já está bom.", "d2.1.2").setEnergyChange(50));
+        d1_1.addOption(new Options("Acho que vou ficar de jejum hoje...", "d2.1.3").setEnergyChange(50));
         cenaQuartoManha.addDialogue(d1_1);
 
         cap2.addScene(cenaQuartoManha);
@@ -193,6 +196,41 @@ public class StoryRepository {
                 "uma terça feira. Recentemente uma loja de conveniências abriu em sua cidade.", "d2.8");
         cenaTomandoCafe.addSimpleDialogue("d2.8", "Então você decide sair. Logo busca seu casaco e a chave de " +
                 "casa.", "d3.1");
+
+        cap2.addScene(cenaTomandoCafe);
+
+        //----------------------------------------------------------------------------------------------------------//
+        // FORA DO APARTAMENTO
+
+        Scene cenaRuaMural = new Scene("Frente do Apartamento", "Uma rua residencial de baixa classe, um" +
+                "pouco movimentada.");
+
+        cenaRuaMural.addSimpleDialogue("d3.1", "Emily desce as escadas de seu apartamento, observando" +
+                " como as coisas estão todas no mesmo lugar.", "d3.2");
+        cenaRuaMural.addSimpleDialogue("d3.2", "Emily", "Normal", "Parece que nada muda muito nessa parte da cidade.",
+                "d3.3");
+        cenaRuaMural.addSimpleDialogue("d3.3", "Emily", "Normal", "Antes de sair, irei dar uma " +
+                "olhada no mural da rua.", "d4.1");
+
+        cap2.addScene(cenaRuaMural);
+
+        //----------------------------------------------------------------------------------------------------------//
+        // MURAL
+
+        Scene cenaMuralArthur = new Scene("No Mural da Rua", "Um mural com vários papéis pendurados com" +
+                " objetivos diferentes.");
+
+        cenaMuralArthur.addSimpleDialogue("d4.1", "Ao se aproximar do mural da rua, antes mesmo de você conseguir " +
+                "ler uma palavra sequer do que está pendurado hoje, você nota uma pessoa familiar.", "d4.2");
+        cenaMuralArthur.addSimpleDialogue("d4.2", "Arthur", "Normal", "Oooh, Oi Emily!! *diz enquanto " +
+                "acena para você*", "d4.3");
+
+        Dialogue d4_3 = new Dialogue("d4.3", "Arthur", "Normal", "Quanto tempo que não te vejo, " +
+                "como você está?");
+        d4_3.addOption(new Options("Oii! Estou bem e você?", "d4.4").setTargetNpc("Arthur").setAffinityChange(10));
+        d4_3.addOption(new Options("Ah oi, Arthur...", "d4.5").setTargetNpc("Arthur").setAffinityChange(5));
+        d4_3.addOption(new Options("Agora não Arthur, estou com pressa.", "?").setTargetNpc("Arthur").setAffinityChange(-5));
+
 
         return cap2;
     }
