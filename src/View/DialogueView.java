@@ -12,12 +12,24 @@ public class DialogueView {
         System.out.println("<--------------------------->");
     }
 
-    public void printDialogue(Dialogue dialogue) {
+    public void printDialogue(Dialogue dialogue, int textSpeedMs) {
         System.out.println("\n--------------------------------------------------");
         if (!dialogue.getSpeaker().equals("Narrador")) {
             System.out.println("[" + dialogue.getSpeaker() + "]:");
         }
-        System.out.println(dialogue.getText());
+
+        String text = dialogue.getText();
+        if (textSpeedMs <= 0) {
+            System.out.println(text);
+        } else {
+            for (char c : text.toCharArray()) {
+                System.out.print(c);
+                try {
+                    Thread.sleep(textSpeedMs);
+                } catch (InterruptedException ignored) {}
+            }
+            System.out.println();
+        }
     }
 
     public void printAdvancePrompt() {

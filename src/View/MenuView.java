@@ -1,12 +1,14 @@
 package View;
 
+import Model.GameConfig;
+
 import java.util.List;
 
 //classe responsavel por fazer os prints do menu
 public class MenuView {
 
     public void printMenu(String[] options, int selectedOption) {
-        System.out.println("\n----MENU INICIAL----");
+        System.out.println("\n---- MENU INICIAL ----");
         System.out.println("W para subir, S para descer e E para confirmar");
 
         for (int i = 0; i < options.length; i++) {
@@ -39,6 +41,39 @@ public class MenuView {
         }
         System.out.println(" 0 - Voltar para Seleção de Capítulos");
         System.out.println("==================================================");
+    }
+
+    public void printConfigMenu(String[] options, int selectedOption, GameConfig config) {
+        System.out.println("\n---- CONFIGURAÇÕES ----");
+        System.out.println("W para subir, S para descer e E para alterar/confirmar\n");
+
+        for (int i = 0; i < options.length; i++) {
+            String valorAtual = "";
+            switch (i) {
+                case 0:
+                    valorAtual = " [" + (config.getTextSpeedMs() == 0 ? "Instantâneo" : config.getTextSpeedMs() + "ms") + "]";
+                    break;
+                case 1:
+                    valorAtual = " [" + (config.isConfirmChoices() ? "Ativado" : "Desativado") + "]";
+                    break;
+                case 2:
+                    valorAtual = " [" + (config.isTurnMusic() ? "Ligada" : "Desligada") + "]";
+                    break;
+                case 3:
+                    valorAtual = " [" + (config.isTurnAutoSave() ? "Ativado" : "Desativado") + "]";
+                    break;
+                default:
+                    valorAtual = "";
+                    break;
+            }
+
+            if (i == selectedOption) {
+                System.out.println("-> " + options[i] + valorAtual);
+            } else {
+                System.out.println("   " + options[i] + valorAtual);
+            }
+        }
+        System.out.print("Esperando entrada:\n> ");
     }
 
     public void printMessage(String message) {

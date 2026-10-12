@@ -1,10 +1,7 @@
 package Controller;
 
-import Model.Options;
-import Model.Dialogue;
-import Model.Chapter;
-import Model.Scene;
-import Model.Player;
+import Model.*;
+import Repository.ConfigRepository;
 import Service.PlayerService;
 import Service.StoryService;
 import Service.AffinityTracker;
@@ -16,14 +13,16 @@ public class DialogueController {
     private AffinityTracker affinityTracker;
     private DialogueView view;
     private PlayerService playerService;
+    private GameConfig config;
 
 
-    public DialogueController(Player player, InputManager inputManager, AffinityTracker affinityTracker) {
+    public DialogueController(Player player, InputManager inputManager, AffinityTracker affinityTracker, GameConfig config) {
         this.player = player;
         this.inputManager = inputManager;
         this.affinityTracker = affinityTracker;
         this.view = new DialogueView();
         this.playerService = new PlayerService();
+        this.config = config;
     }
 
     public void advanceDialogue() {
@@ -56,7 +55,7 @@ public class DialogueController {
             }
 
             Dialogue current = currentScene.getDialogueById(currentId);
-            view.printDialogue(current); // Delega para a View
+            view.printDialogue(current, config.getTextSpeedMs()); // Com erro
 
             if (current.getOptions().isEmpty()) {
                 view.printDebugWarning("JOGO ENCERRADO POR NÃO TER ACHADO NENHUMA OPÇÃO DE DIÁLOGO (" + currentId + ")");

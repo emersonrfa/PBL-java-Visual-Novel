@@ -1,5 +1,7 @@
 package Controller;
 
+import Model.GameConfig;
+import Repository.ConfigRepository;
 import Model.Player;
 import Model.Chapter;
 import Repository.StoryRepository;
@@ -14,18 +16,24 @@ public class GameManager {
     private MenuController menuController;
     private StoryRepository storyRepository;
     private EndingManager endingManager;
+    private GameConfig config;
 
     public GameManager(Player player, InputManager inputManager) {
         AffinityTracker tracker = new AffinityTracker();
-        this.dialogueController = new DialogueController(player, inputManager, tracker);
-        this.menuController = new MenuController(inputManager);
+
+        // Carrega as configurações
+        ConfigRepository configRepository = new ConfigRepository();
+        this.config = configRepository.getCurrentConfig();
+
+        this.dialogueController = new DialogueController(player, inputManager, tracker, this.config);
+
+        this.menuController = new MenuController(inputManager, configRepository);
         this.storyRepository = new StoryRepository();
         this.endingManager = new EndingManager();
     }
 
     public void startGame() {
         this.isRunning = true;
-
         gameLoop();
     }
 
@@ -36,8 +44,10 @@ public class GameManager {
             switch (choice) {
                 case 1:
                     Chapter prologue = storyRepository.buildPrologue();
+                    Chapter entrevista = storyRepository.buildEntrevista();
                     System.out.println("\nCarregando capítulo 1...");
                     dialogueController.playChapter(prologue);
+                    dialogueController.playChapter(entrevista);
                     break;
                 case 2:
                     Chapter cap2 = storyRepository.buildEntrevista();
