@@ -8,8 +8,8 @@ public class NPC extends Character {
 
     //constructor method
     public NPC(String role,String defaultLocation,String name,String description,String gender,int age){
+        super(name,gender,age,description);
         this.defaultLocation=defaultLocation;
         this.role=role;
-        super(name,gender,age,description);
     }
 }
