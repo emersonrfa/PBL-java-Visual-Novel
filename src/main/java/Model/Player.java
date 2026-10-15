@@ -87,4 +87,8 @@ public class Player extends Character {
     public Inventory getInventory() {
         return this.inventory;
     }
+
+    public void setMoney(double money) {
+        this.money = money;
+    }
 }

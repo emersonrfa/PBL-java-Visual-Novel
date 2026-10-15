@@ -33,13 +33,22 @@ public class DialogueController {
         inputManager.waitEnter();
     }
 
+
+    // Método padrão (início do capítulo do zero)
     public void playChapter(Chapter chapter) {
-        String currentId = "d1.1"; // primeiro dialogo de todos
+        playChapter(chapter, "d1.1");
+    }
+
+    // Sobrecarga: permite iniciar a partir de qualquer diálogo guardado
+    public void playChapter(Chapter chapter, String startingDialogueId) {
+        String currentId = (startingDialogueId != null && !startingDialogueId.isEmpty())
+                ? startingDialogueId
+                : "d1.1";
+
         Scene currentScene = null;
         EndingManager endingManager = new EndingManager();
 
         while (currentId != null && !currentId.isEmpty()) {
-            // localiza a cena que tem o dialogo atual
             Scene nextScene = StoryService.findSceneByDialogueId(chapter, currentId);
 
             if (nextScene == null) {
@@ -49,17 +58,17 @@ public class DialogueController {
 
             if (endingManager.isEndingCode(currentId)) {
                 endingManager.triggerEnding(currentId);
-                break; // Encerra o laço e o jogo
+                break;
             }
 
             if (currentScene != nextScene) {
                 currentScene = nextScene;
-                view.printSceneHeader(currentScene); // Delega para a View
+                view.printSceneHeader(currentScene);
             }
 
             Dialogue current = currentScene.getDialogueById(currentId);
 
-            // AUTO-SAVE: Registra a posição atual do diálogo antes de exibir
+            // Auto-save a cada avanço
             triggerAutoSave(chapter.getChapterNumber(), currentScene.getTitle(), current.getId());
 
             view.printDialogue(current, config.getTextSpeedMs());

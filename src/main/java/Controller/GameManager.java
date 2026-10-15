@@ -22,7 +22,6 @@ public class GameManager {
     public GameManager(Player player, InputManager inputManager) {
         AffinityTracker tracker = new AffinityTracker();
 
-
         // Carrega as configurações
         ConfigRepository configRepository = new ConfigRepository();
         this.config = configRepository.getCurrentConfig();
@@ -31,12 +30,11 @@ public class GameManager {
         this.stateRepository = new StateRepository();
         this.currentGameState = this.stateRepository.getCurrentStates();
 
-        this.dialogueController = new DialogueController(player, inputManager, tracker, this.config,this.stateRepository);
+        this.dialogueController = new DialogueController(player, inputManager, tracker, this.config, this.stateRepository);
 
         this.menuController = new MenuController(inputManager, configRepository);
         this.storyRepository = new StoryRepository();
         this.endingManager = new EndingManager();
-
     }
 
     public void startGame() {
@@ -44,8 +42,48 @@ public class GameManager {
         gameLoop();
     }
 
-    public void gameLoop(){
-        while(isRunning) {
+    // NOVO: Retoma o jogo diretamente a partir do capítulo e diálogo salvos
+    public void loadAndStartGame() {
+        this.isRunning = true;
+
+        if (this.currentGameState == null) {
+            System.out.println("\nNenhum save encontrado. Iniciando novo jogo...");
+            startGame();
+            return;
+        }
+
+        int savedChapter = this.currentGameState.getCurrentChapterId();
+        String savedDialogId = this.currentGameState.getCurrentDialogId();
+
+        System.out.println("\nRetomando a partida no Capítulo " + savedChapter + " [Diálogo: " + savedDialogId + "]...");
+
+        switch (savedChapter) {
+            case 1:
+                Chapter prologue = storyRepository.buildPrologue();
+                dialogueController.playChapter(prologue, savedDialogId);
+
+                // Ao terminar o prólogo, avança naturalmente para a continuação
+                Chapter entrevista = storyRepository.buildEntrevista();
+                dialogueController.playChapter(entrevista);
+                break;
+
+            case 2:
+                Chapter cap2 = storyRepository.buildEntrevista();
+                dialogueController.playChapter(cap2, savedDialogId);
+                break;
+
+            default:
+                System.out.println("\nCapítulo desconhecido no save (" + savedChapter + "). Abrindo seleção de capítulos...");
+                gameLoop();
+                break;
+        }
+
+        // Caso termine os capítulos do save, entra no loop geral para permitir novas escolhas ou seleção
+        gameLoop();
+    }
+
+    public void gameLoop() {
+        while (isRunning) {
             int choice = menuController.chapterSelection();
 
             switch (choice) {
@@ -62,7 +100,7 @@ public class GameManager {
                     dialogueController.playChapter(cap2);
                     break;
 
-                    //fazer os outros
+                // fazer os outros
 
                 case 11:
                     endingGalleryLoop();
@@ -98,7 +136,5 @@ public class GameManager {
                 dialogueController.getInputManager().waitEnter();
             }
         }
-
-
     }
 }

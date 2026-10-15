@@ -1,8 +1,10 @@
 package View;
 
 import Model.GameConfig;
+import Model.GameStates;
 
 import java.util.List;
+import java.util.Map;
 
 // Classe responsável por fazer os prints do menu
 public class MenuView {
@@ -21,13 +23,48 @@ public class MenuView {
         System.out.print("Esperando entrada:\n> ");
     }
 
-    public void displaySavesMenu() {
-        System.out.println("\n==================================================");
-        System.out.println("                     SAVES                        ");
-        System.out.println("==================================================");
-        System.out.println(" [Nenhum ficheiro para listar no momento]");
-        System.out.println("==================================================");
-        System.out.println("Pressione ENTER para voltar ao menu inicial...");
+    /**
+     * Exibe os 5 slots de save (0 = Auto-Save, 1 a 4 = Slots Manuais)
+     * @param slotsMap Mapa contendo o número do slot (0 a 4) e o respectivo GameStates (ou null se vazio)
+     */
+    public void displaySavesMenu(Map<Integer, GameStates> slotsMap) {
+        System.out.println("\n======================================================================");
+        System.out.println("                         ARQUIVOS DE SAVE                             ");
+        System.out.println("======================================================================");
+
+        // Slot 0: Auto-Save
+        printSlotDetails(0, "Auto-Save", slotsMap.get(0));
+
+        System.out.println("----------------------------------------------------------------------");
+
+        // Slots 1 a 4: Saves Manuais
+        for (int i = 1; i <= 4; i++) {
+            printSlotDetails(i, "Slot " + i, slotsMap.get(i));
+        }
+
+        System.out.println("======================================================================");
+        System.out.println(" Digite o número do slot (0 a 4) para selecionar");
+        System.out.println(" 9 - Voltar ao Menu Principal");
+        System.out.println("======================================================================");
+        System.out.print("Escolha uma opção:\n> ");
+    }
+
+    private void printSlotDetails(int slotIndex, String label, GameStates state) {
+        if (state != null) {
+            String blood = state.getPlayerBloodType() != null ? state.getPlayerBloodType() : "N/D";
+            int itemsCount = state.getPlayerInventoryItems() != null ? state.getPlayerInventoryItems().size() : 0;
+
+            System.out.printf(" [%d] %-10s | Cap: %-2d | Cena: %-15s | Sangue: %-3s | Itens: %d\n",
+                    slotIndex,
+                    label,
+                    state.getCurrentChapterId(),
+                    state.getCurrentSceneId() != null ? state.getCurrentSceneId() : "N/A",
+                    blood,
+                    itemsCount
+            );
+        } else {
+            System.out.printf(" [%d] %-10s | [Vazio]\n", slotIndex, label);
+        }
     }
 
     public void displayChapterSelection() {
