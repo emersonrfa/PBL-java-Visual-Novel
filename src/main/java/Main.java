@@ -7,7 +7,6 @@ import View.MenuView;
 public class Main {
 
     public static void main(String[] args) {
-        // Inicializa gerenciador de input e as views/controllers do menu
         InputManager inputManager = new InputManager();
         MenuView menuView = new MenuView();
         MenuController menuController = new MenuController(inputManager);
@@ -16,7 +15,6 @@ public class Main {
 
         boolean systemRunning = true;
 
-        // Loop principal do sistema
         while (systemRunning) {
             String menuResponse = menuController.start();
 
@@ -25,7 +23,7 @@ public class Main {
                 String tipoSanguineo = inputManager.readBloodType();
 
                 Player player = new Player(tipoSanguineo);
-                menuView.printMessage("\nTipo sanguíneo [" + player.getBloodType() + "] registrado com sucesso.\n"); // AFIM DE TESTES
+                menuView.printMessage("\nTipo sanguíneo [" + player.getBloodType() + "] registrado com sucesso.\n");
 
                 GameManager gameManager = new GameManager(player, inputManager);
                 gameManager.startGame();

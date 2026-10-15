@@ -1,12 +1,11 @@
 package Controller;
 
-import Model.GameConfig;
+import Model.*;
 import Repository.ConfigRepository;
-import Model.Player;
-import Model.Chapter;
+import Repository.StateRepository;
 import Repository.StoryRepository;
 import Service.AffinityTracker;
-import Model.Ending;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,19 +16,27 @@ public class GameManager {
     private StoryRepository storyRepository;
     private EndingManager endingManager;
     private GameConfig config;
+    private StateRepository stateRepository;
+    private GameStates currentGameState;
 
     public GameManager(Player player, InputManager inputManager) {
         AffinityTracker tracker = new AffinityTracker();
 
+
         // Carrega as configurações
         ConfigRepository configRepository = new ConfigRepository();
         this.config = configRepository.getCurrentConfig();
+
+        // Estado do Jogo (Progresso / Save)
+        this.stateRepository = new StateRepository();
+        this.currentGameState = this.stateRepository.getCurrentStates();
 
         this.dialogueController = new DialogueController(player, inputManager, tracker, this.config);
 
         this.menuController = new MenuController(inputManager, configRepository);
         this.storyRepository = new StoryRepository();
         this.endingManager = new EndingManager();
+
     }
 
     public void startGame() {
