@@ -168,13 +168,27 @@ public class DialogueController {
     }
 
     // Método centralizado para gerenciar o auto-save
-    private void triggerAutoSave(int chapterId, String sceneName, String dialogId) {
+    private void triggerAutoSave(int chapterId, String sceneTitle, String dialogId) {
         if (stateRepository != null) {
             GameStates state = stateRepository.getCurrentStates();
+
+            // 1. Dados de progresso da história
             state.setCurrentChapterId(chapterId);
-            state.setCurrentSceneId(sceneName);
+            state.setCurrentSceneId(sceneTitle);
             state.setCurrentDialogId(dialogId);
 
+            // 2. Dados do Player e inventário
+            if (this.player != null) {
+                state.setPlayerBloodType(this.player.getBloodType());
+                state.setPlayerMoney(this.player.getMoney());
+                state.setPlayerEnergy(this.player.getEnergy());
+
+                if (this.player.getInventory() != null) {
+                    state.setPlayerInventoryItems(this.player.getInventory().getItemNames());
+                }
+            }
+
+            // 3. Persistência em disco conforme configuração
             if (config != null && config.isTurnAutoSave()) {
                 stateRepository.saveState(state);
             }

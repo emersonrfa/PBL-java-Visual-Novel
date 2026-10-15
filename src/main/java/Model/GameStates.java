@@ -2,10 +2,11 @@ package Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-// classe responsavel por guardar os atributos do jogo, exclusivamente do jogo
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameStates {
 
@@ -14,20 +15,38 @@ public class GameStates {
     private String currentSceneId;
     private Map<String, Boolean> storyFlags;
 
-    // construtor vazio quer dizer novo jogo
+    // Atributos do Jogador
+    private String playerBloodType;
+    private double playerMoney;
+    private int playerEnergy;
+    private List<String> playerInventoryItems; // <- Adicionado para guardar os itens
+
+    // Construtor padrão (Novo jogo)
     public GameStates() {
         this.currentChapterId = 1;
         this.currentDialogId = "d1.1";
         this.currentSceneId = "Quarto";
         this.storyFlags = new HashMap<>();
+        this.playerBloodType = "A+";
+        this.playerMoney = 0.0;
+        this.playerEnergy = 100;
+        this.playerInventoryItems = new ArrayList<>(); // <- Inicializa lista vazia
     }
 
-    public GameStates(int currentChapterId, String currentDialogId, String currentSceneId, Map<String, Boolean> storyFlags) {
+    public GameStates(int currentChapterId, String currentDialogId, String currentSceneId,
+                      Map<String, Boolean> storyFlags, String playerBloodType,
+                      int playerMoney, int playerEnergy, List<String> playerInventoryItems) {
         this.currentChapterId = currentChapterId;
         this.currentDialogId = currentDialogId;
         this.currentSceneId = currentSceneId;
         this.storyFlags = (storyFlags != null) ? storyFlags : new HashMap<>();
+        this.playerBloodType = playerBloodType;
+        this.playerMoney = playerMoney;
+        this.playerEnergy = playerEnergy;
+        this.playerInventoryItems = (playerInventoryItems != null) ? playerInventoryItems : new ArrayList<>();
     }
+
+    // --- Progresso ---
 
     public int getCurrentChapterId() {
         return currentChapterId;
@@ -53,6 +72,8 @@ public class GameStates {
         this.currentSceneId = currentSceneId;
     }
 
+    // --- Flags ---
+
     public void setFlag(String flagName, boolean value) {
         if (this.storyFlags == null) {
             this.storyFlags = new HashMap<>();
@@ -73,5 +94,41 @@ public class GameStates {
 
     public void setStoryFlags(Map<String, Boolean> storyFlags) {
         this.storyFlags = storyFlags;
+    }
+
+    // --- Atributos do Player ---
+
+    public String getPlayerBloodType() {
+        return playerBloodType;
+    }
+
+    public void setPlayerBloodType(String playerBloodType) {
+        this.playerBloodType = playerBloodType;
+    }
+
+    public double getPlayerMoney() {
+        return playerMoney;
+    }
+
+    public void setPlayerMoney(double playerMoney) {
+        this.playerMoney = playerMoney;
+    }
+
+    public int getPlayerEnergy() {
+        return playerEnergy;
+    }
+
+    public void setPlayerEnergy(int playerEnergy) {
+        this.playerEnergy = playerEnergy;
+    }
+
+    // --- Itens do Inventário ---
+
+    public List<String> getPlayerInventoryItems() {
+        return playerInventoryItems;
+    }
+
+    public void setPlayerInventoryItems(List<String> playerInventoryItems) {
+        this.playerInventoryItems = playerInventoryItems;
     }
 }
