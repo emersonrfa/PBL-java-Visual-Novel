@@ -5,9 +5,8 @@ import Repository.ConfigRepository;
 import View.MenuView;
 import java.util.List;
 
-//agora em vem de usar o Scanner ele usa o inputMagager
 public class MenuController {
-    private String[] options = {"Jogar", "Configurações", "Creditos", "Sair"};
+    private String[] options = {"Jogar", "Saves", "Configurações", "Creditos", "Sair"};
     private int selectedOption = 0;
     private MenuView view;
     private InputManager inputManager;
@@ -29,42 +28,45 @@ public class MenuController {
         boolean running = true;
 
         while (running) {
-            // 1. O Controller pede pra View desenhar o estado atual
             view.printMenu(options, selectedOption);
-
-            // 2. O Controller pega a entrada do usuário
             String input = inputManager.readString().toUpperCase();
 
-            // 3. O Controller processa a lógica
             if (input.equals("W")) {
                 selectedOption--;
-                if(selectedOption < 0) {
-                    selectedOption = options.length - 1; // volta pro fim
+                if (selectedOption < 0) {
+                    selectedOption = options.length - 1;
                 }
             }
             else if (input.equals("S")) {
                 selectedOption++;
                 if (selectedOption >= options.length) {
-                    selectedOption = 0; // volta pro topo
+                    selectedOption = 0;
                 }
             }
             else if (input.equals("E")) {
-                if (selectedOption == 0) {
-                    view.printMessage("iniciando jogo....\n");
-                    return "jogar";
-                }
-                else if (selectedOption == 1){
-                    configLoop();
-                }
-                else if (selectedOption == 2) {
-                    view.printCredits();
-                    inputManager.waitEnter(); // Pausa até dar Enter
-                    // não encerra o loop, assim ele redesenha o menu
-                }
-                else if (selectedOption == 3) {
-                    view.printMessage("saindo...\n");
-                    running = false;
-                    return "sair";
+                switch (selectedOption) {
+                    case 0: // Jogar
+                        view.printMessage("iniciando jogo....\n");
+                        return "jogar";
+
+                    case 1: // Saves (apenas exibe e aguarda Enter para voltar)
+                        view.displaySavesMenu();
+                        inputManager.waitEnter();
+                        break;
+
+                    case 2: // Configurações
+                        configLoop();
+                        break;
+
+                    case 3: // Créditos
+                        view.printCredits();
+                        inputManager.waitEnter();
+                        break;
+
+                    case 4: // Sair
+                        view.printMessage("saindo...\n");
+                        running = false;
+                        return "sair";
                 }
             }
         }

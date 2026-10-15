@@ -31,7 +31,7 @@ public class GameManager {
         this.stateRepository = new StateRepository();
         this.currentGameState = this.stateRepository.getCurrentStates();
 
-        this.dialogueController = new DialogueController(player, inputManager, tracker, this.config);
+        this.dialogueController = new DialogueController(player, inputManager, tracker, this.config,this.stateRepository);
 
         this.menuController = new MenuController(inputManager, configRepository);
         this.storyRepository = new StoryRepository();

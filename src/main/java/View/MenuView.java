@@ -4,7 +4,7 @@ import Model.GameConfig;
 
 import java.util.List;
 
-//classe responsavel por fazer os prints do menu
+// Classe responsável por fazer os prints do menu
 public class MenuView {
 
     public void printMenu(String[] options, int selectedOption) {
@@ -13,12 +13,21 @@ public class MenuView {
 
         for (int i = 0; i < options.length; i++) {
             if (i == selectedOption) {
-                System.out.println("->" + options[i]);
+                System.out.println("-> " + options[i]);
             } else {
-                System.out.println("  " + options[i]);
+                System.out.println("   " + options[i]);
             }
         }
         System.out.print("Esperando entrada:\n> ");
+    }
+
+    public void displaySavesMenu() {
+        System.out.println("\n==================================================");
+        System.out.println("                     SAVES                        ");
+        System.out.println("==================================================");
+        System.out.println(" [Nenhum ficheiro para listar no momento]");
+        System.out.println("==================================================");
+        System.out.println("Pressione ENTER para voltar ao menu inicial...");
     }
 
     public void displayChapterSelection() {

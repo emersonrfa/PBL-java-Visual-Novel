@@ -1,7 +1,7 @@
 package Controller;
 
 import Model.*;
-import Repository.ConfigRepository;
+import Repository.StateRepository; // <- Adicionado
 import Service.PlayerService;
 import Service.StoryService;
 import Service.AffinityTracker;
@@ -14,15 +14,18 @@ public class DialogueController {
     private DialogueView view;
     private PlayerService playerService;
     private GameConfig config;
+    private StateRepository stateRepository; // <- Adicionado
 
-
-    public DialogueController(Player player, InputManager inputManager, AffinityTracker affinityTracker, GameConfig config) {
+    public DialogueController(Player player, InputManager inputManager,
+                              AffinityTracker affinityTracker, GameConfig config,
+                              StateRepository stateRepository) {
         this.player = player;
         this.inputManager = inputManager;
         this.affinityTracker = affinityTracker;
         this.view = new DialogueView();
         this.playerService = new PlayerService();
         this.config = config;
+        this.stateRepository = stateRepository; // <- Inicializado
     }
 
     public void advanceDialogue() {
@@ -55,7 +58,11 @@ public class DialogueController {
             }
 
             Dialogue current = currentScene.getDialogueById(currentId);
-            view.printDialogue(current, config.getTextSpeedMs()); // Com erro
+
+            // AUTO-SAVE: Registra a posição atual do diálogo antes de exibir
+            triggerAutoSave(chapter.getChapterNumber(), currentScene.getTitle(), current.getId());
+
+            view.printDialogue(current, config.getTextSpeedMs());
 
             if (current.getOptions().isEmpty()) {
                 view.printDebugWarning("JOGO ENCERRADO POR NÃO TER ACHADO NENHUMA OPÇÃO DE DIÁLOGO (" + currentId + ")");
@@ -137,7 +144,7 @@ public class DialogueController {
         int chosenIndex = choice - 1;
         Options chosenOption = options.get(chosenIndex);
 
-        // CONSEQUÊNCIAS DE ESCOLHA LOGICA:
+        // CONSEQUÊNCIAS DE ESCOLHA LÓGICA:
         playerService.applyOptionConsequences(player, chosenOption);
 
         if (chosenOption.getTargetNpc() != null) {
@@ -145,7 +152,33 @@ public class DialogueController {
             affinityTracker.modifySuspicion(chosenOption.getTargetNpc(), chosenOption.getSuspicionChange());
         }
 
+        // ATIVAÇÃO E PERSISTÊNCIA DA FLAG DE ESCOLHA
+        if (chosenOption.getFlagToSet() != null && !chosenOption.getFlagToSet().trim().isEmpty()) {
+            if (stateRepository != null) {
+                GameStates state = stateRepository.getCurrentStates();
+                state.setFlag(chosenOption.getFlagToSet(), true);
+
+                if (config != null && config.isTurnAutoSave()) {
+                    stateRepository.saveState(state);
+                }
+            }
+        }
+
         return chosenIndex;
+    }
+
+    // Método centralizado para gerenciar o auto-save
+    private void triggerAutoSave(int chapterId, String sceneName, String dialogId) {
+        if (stateRepository != null) {
+            GameStates state = stateRepository.getCurrentStates();
+            state.setCurrentChapterId(chapterId);
+            state.setCurrentSceneId(sceneName);
+            state.setCurrentDialogId(dialogId);
+
+            if (config != null && config.isTurnAutoSave()) {
+                stateRepository.saveState(state);
+            }
+        }
     }
 
     public InputManager getInputManager() {
