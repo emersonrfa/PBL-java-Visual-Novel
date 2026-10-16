@@ -124,7 +124,9 @@ public class StoryRepository {
                         " E então se formou num curso de Biologia e Criaturas Mágicas.", "dLORE.5");
         cenaLoreIntro.addSimpleDialogue("dLORE.5", "Essa foi sua vida desde então. Há alguns meses estava" +
                 " trabalhando em uma lojinha de acessórios, mas foi demitida… Você não se lembra exatamente o" +
-                " porquê. E logo pega no sono.", "dFIM.1");
+                " porquê.", "dLORE.6");
+        cenaLoreIntro.addSimpleDialogue("dLORE.6", "Após um minuto de vazio em sua mente, Emily se recorda " +
+                "vagamente de um nome familiar, aparentemente que veio de alguma mensagem que recebeu...", "dFIM.1");
 
         cap1.addScene(cenaLoreIntro);
 
@@ -158,8 +160,8 @@ public class StoryRepository {
         cenaQuartoManha.addSimpleDialogue("d1.1", "O dia amanheceu, você escuta o canto do pássaros vindos de lá de fora.",
                 "d1.2");
         cenaQuartoManha.addSimpleDialogue("d1.2", "Emily", "Cansada", "* Boceja e se espreguiça" +
-                "ainda na cama, após um sono tranqulo *", "d1.3");
-        cenaQuartoManha.addSimpleDialogue("d1.3", "Você se levanta de sua cama, acordando aos poucos." +
+                " ainda na cama, após um sono tranquilo *", "d1.3");
+        cenaQuartoManha.addSimpleDialogue("d1.3", "Você se levanta de sua cama, acordando aos poucos. " +
                 "Então, troca de roupa e segue para a cozinha, procurando o que comer.", "d1.4");
 
         Dialogue d1_1 = new Dialogue("d1.4", "Emily", "O que eu deveria comer?", "Normal");
@@ -188,8 +190,15 @@ public class StoryRepository {
                 " procurar outro emprego.", "d2.5");
 
         Dialogue d2_1 = new Dialogue("d2.5", "Emily", "...", "Pensando");
-        d2_1.addOption(new Options("Checar o celular para ver as notícias", "d2.7").setFlagToSet("NOTICIAS"));
-        d2_1.addOption(new Options("Descer o apartamento (sair de casa)", "d2.8"));
+        d2_1.addOption(new Options("Checar o celular para ver as notícias", "d2.7")
+                .setFlagToSet("NOTICIAS")
+                .setItemToGive(ItemRepository.getItem("Casaco Simples"))
+                .setItemToGive(ItemRepository.getItem("Chave de Casa"))
+        );
+        d2_1.addOption(new Options("Descer o apartamento (sair de casa)", "d2.8")
+                .setItemToGive(ItemRepository.getItem("Casaco Simples"))
+                .setItemToGive(ItemRepository.getItem("Chave de Casa"))
+        );
         cenaTomandoCafe.addDialogue(d2_1);
 
         cenaTomandoCafe.addSimpleDialogue("d2.7", "Você checa seu celular, descobrindo que hoje é 15 de dezembro, " +
@@ -229,7 +238,17 @@ public class StoryRepository {
                 "como você está?");
         d4_3.addOption(new Options("Oii! Estou bem e você?", "d4.4").setTargetNpc("Arthur").setAffinityChange(10));
         d4_3.addOption(new Options("Ah oi, Arthur...", "d4.5").setTargetNpc("Arthur").setAffinityChange(5));
-        d4_3.addOption(new Options("Agora não Arthur, estou com pressa.", "?").setTargetNpc("Arthur").setAffinityChange(-5));
+        d4_3.addOption(new Options("Agora não Arthur, estou com pressa.", "d4.6").setTargetNpc("Arthur").setAffinityChange(-5));
+        cenaMuralArthur.addDialogue(d4_3);
+
+        cenaMuralArthur.addSimpleDialogue("d4.4", "Arthur", "Envergonhado",
+                "Ah, estou bem também! Que bom ver você... Há um tempo que não conversamos...", "d4.7");
+        cenaMuralArthur.addSimpleDialogue("d4.5", "Arthur", "Envergonhado", "Eh, então... Como você vai?",
+                "d4.7");
+
+        cap2.addScene(cenaMuralArthur);
+
+
 
 
         return cap2;

@@ -1,6 +1,8 @@
 package Controller;
 
 import View.InputView;
+
+import java.io.IOException;
 import java.util.Scanner;
 
 public class InputManager {
@@ -12,13 +14,28 @@ public class InputManager {
         this.view = new InputView(); // Inicializa a View
     }
 
+    public static void clear() {
+        try {
+            String os = System.getProperty("os.name");
+            if (os.contains("Windows")) { // indetifica sistema operacional antes de limpar
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                Runtime.getRuntime().exec("clear");
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     // pra avançar dialogo
     public void waitEnter() {
+        clear(); //n funcionando, ajeitar
         scanner.nextLine();
     }
 
     // pra ler textos
     public String readString() {
+        clear(); //n funcionando, ajeitar
         return scanner.nextLine();
     }
 

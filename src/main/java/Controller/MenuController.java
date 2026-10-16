@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MenuController {
-    private String[] options = {"Jogar", "Saves", "Configurações", "Creditos", "Sair"};
+    private String[] options = {"Jogar", "Saves", "Configuracoes", "Creditos", "Sair"};
     private int selectedOption = 0;
     private MenuView view;
     private InputManager inputManager;
