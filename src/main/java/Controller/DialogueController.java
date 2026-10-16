@@ -8,6 +8,8 @@ import Service.AffinityTracker;
 import View.DialogueView;
 import View.MenuView;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,8 @@ public class DialogueController {
     private PlayerService playerService;
     private GameConfig config;
     private StateRepository stateRepository;
+    //esse metodo e final para garatir que o valor nn vai ser sobrescrito e static para economizar memoria
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public DialogueController(Player player, InputManager inputManager,
                               AffinityTracker affinityTracker, GameConfig config,
@@ -207,6 +211,7 @@ public class DialogueController {
             state.setCurrentChapterId(chapterId);
             state.setCurrentSceneId(sceneTitle);
             state.setCurrentDialogId(dialogId);
+            state.setSaveTimestamp(LocalDateTime.now().format(DATE_FORMATTER));
 
             // 2. Dados do Player e inventário
             if (this.player != null) {
@@ -254,6 +259,7 @@ public class DialogueController {
         manualState.setPlayerBloodType(this.player.getBloodType());
         manualState.setPlayerEnergy(this.player.getEnergy());
         manualState.setPlayerMoney(this.player.getMoney());
+        manualState.setSaveTimestamp(LocalDateTime.now().format(DATE_FORMATTER));
 
         // Clona as flags ativas do autosave corrente para manter coerência da história
         GameStates currentState = this.stateRepository.getCurrentStates();

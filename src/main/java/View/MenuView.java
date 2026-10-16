@@ -25,27 +25,28 @@ public class MenuView {
 
     /**
      * Exibe os 5 slots de save (0 = Auto-Save, 1 a 4 = Slots Manuais)
+     *
      * @param slotsMap Mapa contendo o número do slot (0 a 4) e o respectivo GameStates (ou null se vazio)
      */
     public void displaySavesMenu(Map<Integer, GameStates> slotsMap) {
-        System.out.println("\n======================================================================");
-        System.out.println("                         ARQUIVOS DE SAVE                             ");
-        System.out.println("======================================================================");
+        System.out.println("\n==========================================================================================================");
+        System.out.println("                                           ARQUIVOS DE SAVE                                               ");
+        System.out.println("==========================================================================================================");
 
         // Slot 0: Auto-Save
         printSlotDetails(0, "Auto-Save", slotsMap.get(0));
 
-        System.out.println("----------------------------------------------------------------------");
+        System.out.println("----------------------------------------------------------------------------------------------------------");
 
         // Slots 1 a 4: Saves Manuais
         for (int i = 1; i <= 4; i++) {
             printSlotDetails(i, "Slot " + i, slotsMap.get(i));
         }
 
-        System.out.println("======================================================================");
+        System.out.println("==========================================================================================================");
         System.out.println(" Digite o número do slot (0 a 4) para selecionar");
         System.out.println(" 9 - Voltar ao Menu Principal");
-        System.out.println("======================================================================");
+        System.out.println("==========================================================================================================");
         System.out.print("Escolha uma opção:\n> ");
     }
 
@@ -53,14 +54,18 @@ public class MenuView {
         if (state != null) {
             String blood = state.getPlayerBloodType() != null ? state.getPlayerBloodType() : "N/D";
             int itemsCount = state.getPlayerInventoryItems() != null ? state.getPlayerInventoryItems().size() : 0;
+            String timestamp = (state.getSaveTimestamp() != null && !state.getSaveTimestamp().trim().isEmpty())
+                    ? state.getSaveTimestamp()
+                    : "Sem registro";
 
-            System.out.printf(" [%d] %-10s | Cap: %-2d | Cena: %-15s | Sangue: %-3s | Itens: %d\n",
+            System.out.printf(" [%d] %-10s | Cap: %-2d | Cena: %-15s | Sangue: %-3s | Itens: %-2d | Salvo em: %s\n",
                     slotIndex,
                     label,
                     state.getCurrentChapterId(),
                     state.getCurrentSceneId() != null ? state.getCurrentSceneId() : "N/A",
                     blood,
-                    itemsCount
+                    itemsCount,
+                    timestamp
             );
         } else {
             System.out.printf(" [%d] %-10s | [Vazio]\n", slotIndex, label);
@@ -90,18 +95,18 @@ public class MenuView {
     }
 
     public void displayManualSaveMenu(Map<Integer, GameStates> slotsMap) {
-        System.out.println("\n======================================================================");
-        System.out.println("                        SALVAMENTO MANUAL                             ");
-        System.out.println("======================================================================");
+        System.out.println("\n==========================================================================================================");
+        System.out.println("                                          SALVAMENTO MANUAL                                               ");
+        System.out.println("==========================================================================================================");
 
         for (int i = 1; i <= 4; i++) {
             printSlotDetails(i, "Slot " + i, slotsMap.get(i));
         }
 
-        System.out.println("======================================================================");
+        System.out.println("==========================================================================================================");
         System.out.println(" Digite o número do slot (1 a 4) para salvar (sobrescrever)");
         System.out.println(" 0 - Cancelar e voltar ao jogo");
-        System.out.println("======================================================================");
+        System.out.println("==========================================================================================================");
         System.out.print("Escolha uma opção:\n> ");
     }
 

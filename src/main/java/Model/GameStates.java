@@ -1,6 +1,7 @@
 package Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +20,12 @@ public class GameStates {
     private String playerBloodType;
     private double playerMoney;
     private int playerEnergy;
-    private List<String> playerInventoryItems; // <- Adicionado para guardar os itens
+    private List<String> playerInventoryItems;
 
-    // Construtor padrão (Novo jogo)
+    @JsonProperty("saveTimestamp")
+    private String saveTimestamp; // Data e hora do save
+
+    // Construtor padrão (Novo jogo / Jackson)
     public GameStates() {
         this.currentChapterId = 1;
         this.currentDialogId = "d1.1";
@@ -30,12 +34,14 @@ public class GameStates {
         this.playerBloodType = "A+";
         this.playerMoney = 0.0;
         this.playerEnergy = 100;
-        this.playerInventoryItems = new ArrayList<>(); // <- Inicializa lista vazia
+        this.playerInventoryItems = new ArrayList<>();
+        this.saveTimestamp = "";
     }
 
     public GameStates(int currentChapterId, String currentDialogId, String currentSceneId,
                       Map<String, Boolean> storyFlags, String playerBloodType,
-                      int playerMoney, int playerEnergy, List<String> playerInventoryItems) {
+                      double playerMoney, int playerEnergy, List<String> playerInventoryItems,
+                      String saveTimestamp) {
         this.currentChapterId = currentChapterId;
         this.currentDialogId = currentDialogId;
         this.currentSceneId = currentSceneId;
@@ -44,6 +50,7 @@ public class GameStates {
         this.playerMoney = playerMoney;
         this.playerEnergy = playerEnergy;
         this.playerInventoryItems = (playerInventoryItems != null) ? playerInventoryItems : new ArrayList<>();
+        this.saveTimestamp = (saveTimestamp != null) ? saveTimestamp : "";
     }
 
     // --- Progresso ---
@@ -122,13 +129,21 @@ public class GameStates {
         this.playerEnergy = playerEnergy;
     }
 
-    // --- Itens do Inventário ---
-
     public List<String> getPlayerInventoryItems() {
         return playerInventoryItems;
     }
 
     public void setPlayerInventoryItems(List<String> playerInventoryItems) {
         this.playerInventoryItems = playerInventoryItems;
+    }
+
+    @JsonProperty("saveTimestamp")
+    public String getSaveTimestamp() {
+        return saveTimestamp;
+    }
+
+    @JsonProperty("saveTimestamp")
+    public void setSaveTimestamp(String saveTimestamp) {
+        this.saveTimestamp = saveTimestamp;
     }
 }
