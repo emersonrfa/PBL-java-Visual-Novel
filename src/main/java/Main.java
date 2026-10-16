@@ -15,6 +15,12 @@ public class Main {
         MenuView menuView = new MenuView();
         MenuController menuController = new MenuController(inputManager);
 
+        // Hook de segurança: garante o arquivamento mesmo se a aplicação for parada abruptamente
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            StateRepository repo = new StateRepository();
+            repo.archiveAutoSaveToEmptySlot();
+        }));
+
         menuView.printMessage("inicializando jogo...\n");
 
         boolean systemRunning = true;
@@ -52,7 +58,7 @@ public class Main {
                     player.setMoney(savedState.getPlayerMoney());
                     player.setEnergy(savedState.getPlayerEnergy());
 
-                    // 3. Restaura itens do inventário via ItemRepository (respeitando o padrão MVC)
+                    // 3. Restaura itens do inventário via ItemRepository (respeitando MVC)
                     if (savedState.getPlayerInventoryItems() != null) {
                         ItemRepository itemRepository = new ItemRepository();
 
@@ -83,6 +89,14 @@ public class Main {
                 }
             }
             else if (menuResponse.equals("sair")) {
+                // Arquiva o auto-save no primeiro slot manual livre antes de encerrar
+                StateRepository stateRepository = new StateRepository();
+                int archivedSlot = stateRepository.archiveAutoSaveToEmptySlot();
+
+                if (archivedSlot != -1) {
+                    menuView.printMessage("\n[Backup] Seu progresso recente foi arquivado no Slot " + archivedSlot + ".");
+                }
+
                 menuView.printMessage("finalizando sistema...");
                 systemRunning = false;
             }

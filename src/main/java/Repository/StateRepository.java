@@ -19,7 +19,6 @@ public class StateRepository {
         ensureDirectoryExists();
     }
 
-    // Garante que a pasta "saves/" exista na raiz do projeto
     private void ensureDirectoryExists() {
         File dir = new File(SAVES_DIR);
         if (!dir.exists()) {
@@ -27,8 +26,6 @@ public class StateRepository {
         }
     }
 
-    // Converte o índice de slot no nome de arquivo correto
-    // 0 = autosave | 1 a 4 = save_1.json até save_4.json
     private String getFilePathForSlot(int slot) {
         if (slot == 0) {
             return AUTOSAVE_FILE;
@@ -36,13 +33,11 @@ public class StateRepository {
         return SAVES_DIR + File.separator + "save_" + slot + ".json";
     }
 
-    // Verifica se um slot específico já possui arquivo salvo
     public boolean slotExists(int slot) {
         File file = new File(getFilePathForSlot(slot));
         return file.exists() && file.length() > 0;
     }
 
-    // Carrega o estado de um slot específico (retorna null se estiver vazio ou com erro)
     public GameStates loadStateFromSlot(int slot) {
         File file = new File(getFilePathForSlot(slot));
         if (!file.exists()) {
@@ -57,7 +52,6 @@ public class StateRepository {
         }
     }
 
-    // Salva o estado em um slot específico (0 para autosave, 1 a 4 para manuais)
     public boolean saveStateToSlot(GameStates state, int slot) {
         ensureDirectoryExists();
         File file = new File(getFilePathForSlot(slot));
@@ -70,7 +64,6 @@ public class StateRepository {
         }
     }
 
-    // Deleta o save de um slot específico
     public boolean deleteSlot(int slot) {
         File file = new File(getFilePathForSlot(slot));
         if (file.exists()) {
@@ -79,10 +72,40 @@ public class StateRepository {
         return false;
     }
 
-    // --- MÉTODOS DE COMPATIBILIDADE COM O CÓDIGO ANTERIOR ---
+    /**
+     * Procura o primeiro slot manual disponível (de 1 a 4).
+     * @return O número do slot vago (1 a 4) ou -1 se todos estiverem ocupados.
+     */
+    public int findFirstAvailableManualSlot() {
+        for (int slot = 1; slot <= 4; slot++) {
+            if (!slotExists(slot)) {
+                return slot;
+            }
+        }
+        return -1;
+    }
 
-    // O DialogueController e os auto-saves continuam usando esses métodos padrão,
-    // que agora direcionam automaticamente para o Slot 0 (autosave.json)
+    /**
+     * Copia o conteúdo do autosave (Slot 0) para o primeiro slot manual disponível (1 a 4).
+     * @return O número do slot de destino onde o backup foi gravado, ou -1 se não houver autosave ou vaga.
+     */
+    public int archiveAutoSaveToEmptySlot() {
+        if (!slotExists(0)) {
+            return -1;
+        }
+
+        int targetSlot = findFirstAvailableManualSlot();
+        if (targetSlot != -1) {
+            GameStates autoSaveState = loadStateFromSlot(0);
+            if (autoSaveState != null) {
+                saveStateToSlot(autoSaveState, targetSlot);
+                return targetSlot;
+            }
+        }
+        return -1;
+    }
+
+    // --- COMPATIBILIDADE ---
     public GameStates getCurrentStates() {
         GameStates state = loadStateFromSlot(0);
         if (state == null) {

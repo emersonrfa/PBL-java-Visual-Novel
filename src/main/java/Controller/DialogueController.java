@@ -1,11 +1,17 @@
 package Controller;
 
 import Model.*;
-import Repository.StateRepository; // <- Adicionado
+import Repository.StateRepository;
 import Service.PlayerService;
 import Service.StoryService;
 import Service.AffinityTracker;
 import View.DialogueView;
+import View.MenuView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DialogueController {
     private InputManager inputManager;
@@ -14,7 +20,7 @@ public class DialogueController {
     private DialogueView view;
     private PlayerService playerService;
     private GameConfig config;
-    private StateRepository stateRepository; // <- Adicionado
+    private StateRepository stateRepository;
 
     public DialogueController(Player player, InputManager inputManager,
                               AffinityTracker affinityTracker, GameConfig config,
@@ -25,16 +31,31 @@ public class DialogueController {
         this.view = new DialogueView();
         this.playerService = new PlayerService();
         this.config = config;
-        this.stateRepository = stateRepository; // <- Inicializado
+        this.stateRepository = stateRepository;
     }
 
-    public void advanceDialogue() {
-        view.printAdvancePrompt();
-        inputManager.waitEnter();
+    /**
+     * Aguarda o avanço do diálogo ou a ativação do menu de gravação manual ao digitar 'S'.
+     * Permanece no loop caso o jogador aceda ao menu de gravação e depois queira prosseguir.
+     */
+    public void advanceDialogue(Dialogue currentDialogue, Scene currentScene, int chapterNumber) {
+        boolean waitingAdvance = true;
+
+        while (waitingAdvance) {
+            String command = inputManager.waitEnterOrCommand();
+
+            if (command != null && command.equalsIgnoreCase("S")) {
+                String sceneTitle = (currentScene != null) ? currentScene.getTitle() : "Cena";
+                handleManualSave(currentDialogue.getId(), sceneTitle, chapterNumber);
+                // Após o save, exibe a fala resumida para manter o contexto visual
+                view.printDialogue(currentDialogue, 0);;
+            } else {
+                waitingAdvance = false;
+            }
+        }
     }
 
-
-    // Método padrão (início do capítulo do zero)
+    // Método padrão (início do capítulo a partir do início)
     public void playChapter(Chapter chapter) {
         playChapter(chapter, "d1.1");
     }
@@ -79,7 +100,8 @@ public class DialogueController {
             }
 
             if (current.getOptions().size() == 1 && current.getOptions().get(0).getText().equals("...")) {
-                advanceDialogue();
+                // Passa o contexto atual para permitir salvar ao premir 'S'
+                advanceDialogue(current, currentScene, chapter.getChapterNumber());
                 currentId = current.getOptions().get(0).getNextDialogueId();
             } else {
                 int choiceIndex = processinput(current);
@@ -176,7 +198,7 @@ public class DialogueController {
         return chosenIndex;
     }
 
-    // Método centralizado para gerenciar o auto-save
+    // Método centralizado para gerir o auto-save
     private void triggerAutoSave(int chapterId, String sceneTitle, String dialogId) {
         if (stateRepository != null) {
             GameStates state = stateRepository.getCurrentStates();
@@ -202,6 +224,62 @@ public class DialogueController {
                 stateRepository.saveState(state);
             }
         }
+    }
+
+    /**
+     * Abre a interface para o jogador salvar o estado atual num slot manual (1 a 4).
+     */
+    public void handleManualSave(String currentDialogId, String currentSceneId, int currentChapterId) {
+        MenuView menuView = new MenuView();
+
+        // 1. Carrega os 4 slots manuais para mostrar o estado atual na consola
+        Map<Integer, GameStates> slotsMap = new HashMap<>();
+        for (int i = 1; i <= 4; i++) {
+            slotsMap.put(i, this.stateRepository.loadStateFromSlot(i));
+        }
+
+        menuView.displayManualSaveMenu(slotsMap);
+        int choice = this.inputManager.readValidChoice(0, 4);
+
+        if (choice == 0) {
+            System.out.println("\nSalvamento cancelado. Retomando o diálogo...");
+            return;
+        }
+
+        // 2. Monta o snapshot atual do jogo
+        GameStates manualState = new GameStates();
+        manualState.setCurrentChapterId(currentChapterId);
+        manualState.setCurrentSceneId(currentSceneId);
+        manualState.setCurrentDialogId(currentDialogId);
+        manualState.setPlayerBloodType(this.player.getBloodType());
+        manualState.setPlayerEnergy(this.player.getEnergy());
+        manualState.setPlayerMoney(this.player.getMoney());
+
+        // Clona as flags ativas do autosave corrente para manter coerência da história
+        GameStates currentState = this.stateRepository.getCurrentStates();
+        if (currentState != null && currentState.getStoryFlags() != null) {
+            manualState.setStoryFlags(new HashMap<>(currentState.getStoryFlags()));
+        }
+
+        // Coleta itens do inventário
+        List<String> items = new ArrayList<>();
+        if (this.player.getInventory() != null && this.player.getInventory().getItems() != null) {
+            for (Item item : this.player.getInventory().getItems()) {
+                items.add(item.getName());
+            }
+        }
+        manualState.setPlayerInventoryItems(items);
+
+        // 3. Grava no slot escolhido (1 a 4)
+        boolean success = this.stateRepository.saveStateToSlot(manualState, choice);
+        if (success) {
+            System.out.println("\n[Sucesso] Jogo salvo no Slot " + choice + "!");
+        } else {
+            System.out.println("\n[Erro] Não foi possível salvar no Slot " + choice + ".");
+        }
+
+        System.out.println("\n[Pressione ENTER para continuar a história]");
+        this.inputManager.waitEnter();
     }
 
     public InputManager getInputManager() {

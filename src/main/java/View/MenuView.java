@@ -89,6 +89,22 @@ public class MenuView {
         System.out.println("==================================================");
     }
 
+    public void displayManualSaveMenu(Map<Integer, GameStates> slotsMap) {
+        System.out.println("\n======================================================================");
+        System.out.println("                        SALVAMENTO MANUAL                             ");
+        System.out.println("======================================================================");
+
+        for (int i = 1; i <= 4; i++) {
+            printSlotDetails(i, "Slot " + i, slotsMap.get(i));
+        }
+
+        System.out.println("======================================================================");
+        System.out.println(" Digite o número do slot (1 a 4) para salvar (sobrescrever)");
+        System.out.println(" 0 - Cancelar e voltar ao jogo");
+        System.out.println("======================================================================");
+        System.out.print("Escolha uma opção:\n> ");
+    }
+
     public void printConfigMenu(String[] options, int selectedOption, GameConfig config) {
         System.out.println("\n---- CONFIGURAÇÕES ----");
         System.out.println("W para subir, S para descer e E para alterar/confirmar\n");

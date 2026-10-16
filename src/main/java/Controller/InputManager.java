@@ -55,6 +55,13 @@ public class InputManager {
         }
     }
 
+    public String waitEnterOrCommand() {
+        System.out.println("\n[Pressione ENTER para continuar ou 'S' para salvar]");
+        System.out.print("> ");
+        String line = scanner.nextLine().trim();
+        return line.toUpperCase();
+    }
+
     public void close() {
         scanner.close();
     }
