@@ -23,7 +23,7 @@ public class ItemRepository {
     /**
      * Busca um item pelo identificador de chave do repositório.
      */
-    public static Item getItem(String key) {
+    public Item getItem(String key) {
         if (key == null) return null;
         return items.get(key);
     }

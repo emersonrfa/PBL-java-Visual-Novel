@@ -64,9 +64,15 @@ public class StateRepository {
         }
     }
 
+    /**
+     * Exclui fisicamente o arquivo de save correspondente ao slot informado.
+     *
+     * @param slot Número do slot (0 para autosave, 1 a 4 para manuais).
+     * @return true se o arquivo existia e foi deletado com sucesso, false caso contrário.
+     */
     public boolean deleteSlot(int slot) {
         File file = new File(getFilePathForSlot(slot));
-        if (file.exists()) {
+        if (file.exists() && file.isFile()) {
             return file.delete();
         }
         return false;
@@ -74,6 +80,7 @@ public class StateRepository {
 
     /**
      * Procura o primeiro slot manual disponível (de 1 a 4).
+     *
      * @return O número do slot vago (1 a 4) ou -1 se todos estiverem ocupados.
      */
     public int findFirstAvailableManualSlot() {
@@ -87,6 +94,7 @@ public class StateRepository {
 
     /**
      * Copia o conteúdo do autosave (Slot 0) para o primeiro slot manual disponível (1 a 4).
+     *
      * @return O número do slot de destino onde o backup foi gravado, ou -1 se não houver autosave ou vaga.
      */
     public int archiveAutoSaveToEmptySlot() {

@@ -86,6 +86,7 @@ public class MenuController {
 
     /**
      * Gerencia a tela e escolha dos slots de save.
+     *
      * @return true se o jogador escolheu um save válido para carregar; false se voltou ao menu.
      */
     public boolean savesLoop() {
@@ -100,12 +101,14 @@ public class MenuController {
 
             view.displaySavesMenu(slotsMap);
 
-            // Permite escolher 0, 1, 2, 3, 4 ou 9 (voltar)
+            // Permite escolher 0 a 4 (carregar), 8 (excluir) ou 9 (voltar)
             int choice = inputManager.readValidChoice(0, 9);
 
             if (choice == 9) {
                 inSaves = false;
                 return false;
+            } else if (choice == 8) {
+                handleDeleteSave(); // Abre o submenu de exclusão com confirmação
             } else if (choice >= 0 && choice <= 4) {
                 if (stateRepo.slotExists(choice)) {
                     this.selectedSaveSlot = choice;
@@ -115,11 +118,57 @@ public class MenuController {
                     view.printMessage("\n[Aviso] O Slot selecionado está vazio. Escolha outro slot ou pressione 9 para voltar.");
                 }
             } else {
-                view.printMessage("\nOpção inválida! Escolha um slot entre 0 e 4, ou 9 para voltar.");
+                view.printMessage("\nOpção inválida! Escolha um slot entre 0 e 4, 8 para excluir ou 9 para voltar.");
             }
         }
 
         return false;
+    }
+
+    /**
+     * Controla o fluxo de exclusão de saves com confirmação prévia do jogador.
+     */
+    public void handleDeleteSave() {
+        Map<Integer, GameStates> slotsMap = new HashMap<>();
+        for (int i = 0; i <= 4; i++) {
+            slotsMap.put(i, stateRepo.loadStateFromSlot(i));
+        }
+
+        view.displayDeleteMenu(slotsMap);
+        int choice = inputManager.readValidChoice(0, 9);
+
+        if (choice == 9) {
+            view.printMessage("\nOperação de exclusão cancelada.");
+            return;
+        }
+
+        if (choice < 0 || choice > 4) {
+            view.printMessage("\n[Aviso] Slot inválido!");
+            return;
+        }
+
+        if (!stateRepo.slotExists(choice)) {
+            view.printMessage("\n[Aviso] O Slot " + choice + " já está vazio. Nada para deletar.");
+            return;
+        }
+
+        // Pede confirmação explícita
+        view.printDeleteConfirmation(choice);
+        String confirmation = inputManager.readString().trim();
+
+        if (confirmation.equalsIgnoreCase("S")) {
+            boolean deleted = stateRepo.deleteSlot(choice);
+            if (deleted) {
+                view.printMessage("\n[Sucesso] O save do Slot " + (choice == 0 ? "Auto-Save" : choice) + " foi deletado com sucesso!");
+            } else {
+                view.printMessage("\n[Erro] Falha ao tentar deletar o arquivo do Slot " + choice + ".");
+            }
+        } else {
+            view.printMessage("\n[Cancelado] A exclusão do Slot " + choice + " foi cancelada.");
+        }
+
+        view.printMessage("\n[Pressione ENTER para continuar]");
+        inputManager.waitEnter();
     }
 
     public int chapterSelection() {

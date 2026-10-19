@@ -4,8 +4,6 @@ import Model.Chapter;
 import Model.Scene;
 import Model.Dialogue;
 import Model.Options;
-import Repository.ItemRepository;
-import Repository.NpcRepository;
 
 public class StoryRepository {
     private ItemRepository itemRepo = new ItemRepository();
@@ -23,10 +21,10 @@ public class StoryRepository {
         // sintaxe padrao: addSimpleDialogue(id, text, nextId)
         cenaQuartoIntro.addSimpleDialogue("d1.1", "Você sente o vento frio balançando as cortinas do seu quarto.", "d1.2");
         cenaQuartoIntro.addSimpleDialogue("d1.2", "Sua janela aberta permite a entrada tanto da brisa constante da" +
-                        " noite quanto da suave luz da lua.", "d1.3");
+                " noite quanto da suave luz da lua.", "d1.3");
         cenaQuartoIntro.addSimpleDialogue("d1.3", "Seu confortável travesseiro nunca lhe abandona quando deseja-se" +
                         " paz e descanso. O quarto, apesar de bagunçado, aconchega-lhe o suficiente para te fazer sentir segura."
-                        , "d1.4");
+                , "d1.4");
 
         // diálogo com múltiplas escolhas (usa-se o construtor de opções simples)
         Dialogue d1_4 = new Dialogue("d1.4", "Mas algo lhe incomoda, você não consegue dormir.");
@@ -64,14 +62,14 @@ public class StoryRepository {
                 "supérfluas e alguns spams. Porém, você visualiza uma mensagem favoritada há algumas semanas atrás." +
                 " É uma proposta de emprego para uma organização aparentemente não muito confiável.", "d3.2");
         cenaIntroEmails.addSimpleDialogue("d3.2", "Então você se lembra, esta semana você deixou de receber seu " +
-                        "auxílio desemprego, e agora é necessário conseguir uma renda.", "d3.3");
+                "auxílio desemprego, e agora é necessário conseguir uma renda.", "d3.3");
         cenaIntroEmails.addSimpleDialogue("d3.3", "Player", "Cansada", "“Ahh, mas eu já tentei" +
-                        " tantas entrevistas e ainda não consegui nada… Eu deveria tentar esta do email. Qual era o" +
-                        " nome mesmo?”", "d3.4");
+                " tantas entrevistas e ainda não consegui nada… Eu deveria tentar esta do email. Qual era o" +
+                " nome mesmo?”", "d3.4");
 
         cenaIntroEmails.addSimpleDialogue("d3.4", "Enquanto você procura o nome da empresa, você" +
-                        " se distrai ao explorar a mensagem lida, e começa a se lembrar de acontecimentos de" +
-                        " seu passado.", "dLORE.1");
+                " se distrai ao explorar a mensagem lida, e começa a se lembrar de acontecimentos de" +
+                " seu passado.", "dLORE.1");
 
         cap1.addScene(cenaIntroEmails);
 
@@ -84,12 +82,12 @@ public class StoryRepository {
                 " Nova Iorque se destaca na paisagem. Sua cidade, à esta hora, é silenciosa e calma. Você visualiza a " +
                 "lua e se encanta com sua beleza.", "d4.2");
         cenaOlhandoJanelaIntro.addSimpleDialogue("d4.2", "Em um pequeno prédio próximo à janela, você vê que há alguns" +
-                                " apartamentos de luz acesa. Aparentemente você não é a única acordada a esta hora.",
-                        "d4.3");
+                        " apartamentos de luz acesa. Aparentemente você não é a única acordada a esta hora.",
+                "d4.3");
         cenaOlhandoJanelaIntro.addSimpleDialogue("d4.3", "Player", "Cansada", "“Quem me dera não " +
-                        "precisar dormir, me sinto tão cansada.”", "d4.4");
+                "precisar dormir, me sinto tão cansada.”", "d4.4");
         cenaOlhandoJanelaIntro.addSimpleDialogue("d4.4", "Você suspira e pensa um pouco sobre seu estado…",
-                        "dLORE.1");
+                "dLORE.1");
 
         cap1.addScene(cenaOlhandoJanelaIntro);
 
@@ -114,14 +112,14 @@ public class StoryRepository {
                 " escolas ou com o talento para fazer qualquer coisa que imaginar. Todavia, são poucas as que conseguem" +
                 " sequer despertar uma faísca desta força.", "dLORE.2");
         cenaLoreIntro.addSimpleDialogue("dLORE.2", "Existem criaturas diversas que aterrorizam ou encantam seus" +
-                        " arredores. Lobisomens, vampiros, gárgulas, unicórnios… Todos estes são encontrados por aí com um " +
-                        "pouco de sorte.", "dLORE.3");
+                " arredores. Lobisomens, vampiros, gárgulas, unicórnios… Todos estes são encontrados por aí com um " +
+                "pouco de sorte.", "dLORE.3");
         cenaLoreIntro.addSimpleDialogue("dLORE.3", "E dentre tantas criaturas e pessoas mágicas, você nasceu no" +
-                        " interior de Nova Iorque, nos EUA. Seus pais não tiveram muito tempo de vida após seu nascimento" +
-                        " e envolveram-se num acidente em um ritual.", "dLORE.4");
+                " interior de Nova Iorque, nos EUA. Seus pais não tiveram muito tempo de vida após seu nascimento" +
+                " e envolveram-se num acidente em um ritual.", "dLORE.4");
         cenaLoreIntro.addSimpleDialogue("dLORE.4", "Você passou grande parte da sua vida em um orfanato." +
-                        " Quando cresceu, conseguiu uma bolsa em uma universidade não muito longe de sua cidade natal." +
-                        " E então se formou num curso de Biologia e Criaturas Mágicas.", "dLORE.5");
+                " Quando cresceu, conseguiu uma bolsa em uma universidade não muito longe de sua cidade natal." +
+                " E então se formou num curso de Biologia e Criaturas Mágicas.", "dLORE.5");
         cenaLoreIntro.addSimpleDialogue("dLORE.5", "Essa foi sua vida desde então. Há alguns meses estava" +
                 " trabalhando em uma lojinha de acessórios, mas foi demitida… Você não se lembra exatamente o" +
                 " porquê.", "dLORE.6");
@@ -141,7 +139,7 @@ public class StoryRepository {
 
         // passa null (ou string vazia) como nextId para sinalizar fim
         cenaFimIntro.addSimpleDialogue("dFIM.2", "A noite passa em um instante enquanto seus sonhos" +
-                        " recheiam-se de cenários utópicos.\n\n[ FIM DO PRÓLOGO ]", null);
+                " recheiam-se de cenários utópicos.\n\n[ FIM DO PRÓLOGO ]", null);
 
         cap1.addScene(cenaFimIntro);
 
@@ -181,7 +179,7 @@ public class StoryRepository {
                 " Então você o esquenta novamente e o toma com leite e açúcar.", "d2.2");
         cenaTomandoCafe.addSimpleDialogue("d2.1.2", "Você procura por um pedaço de pão que deixou no outro dia" +
                 " por não estar com fome. Ele lhe é útil agora.", "d2.2");
-        cenaTomandoCafe.addSimpleDialogue("2.1.3", "Você vai até sua cozinha, observa se não tem nada fora do" +
+        cenaTomandoCafe.addSimpleDialogue("d2.1.3", "Você vai até sua cozinha, observa se não tem nada fora do" +
                 " lugar e não decide comer nada.", "d2.2");
         cenaTomandoCafe.addSimpleDialogue("d2.2", "Após isso, você para um pouco e observa seu quadro de anotações, " +
                 "perto da porta de seu apartamento.", "d2.3");
@@ -192,12 +190,12 @@ public class StoryRepository {
         Dialogue d2_1 = new Dialogue("d2.5", "Emily", "...", "Pensando");
         d2_1.addOption(new Options("Checar o celular para ver as notícias", "d2.7")
                 .setFlagToSet("NOTICIAS")
-                .setItemToGive(ItemRepository.getItem("Casaco Simples"))
-                .setItemToGive(ItemRepository.getItem("Chave de Casa"))
+                .setItemToGive(itemRepo.getItem("Casaco Simples"))
+                .setItemToGive(itemRepo.getItem("Chave de Casa"))
         );
         d2_1.addOption(new Options("Descer o apartamento (sair de casa)", "d2.8")
-                .setItemToGive(ItemRepository.getItem("Casaco Simples"))
-                .setItemToGive(ItemRepository.getItem("Chave de Casa"))
+                .setItemToGive(itemRepo.getItem("Casaco Simples"))
+                .setItemToGive(itemRepo.getItem("Chave de Casa"))
         );
         cenaTomandoCafe.addDialogue(d2_1);
 
@@ -247,9 +245,6 @@ public class StoryRepository {
                 "d4.7");
 
         cap2.addScene(cenaMuralArthur);
-
-
-
 
         return cap2;
     }

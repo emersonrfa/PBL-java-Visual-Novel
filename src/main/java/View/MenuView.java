@@ -45,9 +45,46 @@ public class MenuView {
 
         System.out.println("==========================================================================================================");
         System.out.println(" Digite o número do slot (0 a 4) para selecionar");
+        System.out.println(" 8 - Excluir um save");
         System.out.println(" 9 - Voltar ao Menu Principal");
         System.out.println("==========================================================================================================");
         System.out.print("Escolha uma opção:\n> ");
+    }
+
+    /**
+     * Exibe os slots para que o jogador escolha qual arquivo deseja excluir.
+     *
+     * @param slotsMap Mapa contendo o número do slot (0 a 4) e o respectivo GameStates (ou null se vazio)
+     */
+    public void displayDeleteMenu(Map<Integer, GameStates> slotsMap) {
+        System.out.println("\n==========================================================================================================");
+        System.out.println("                                          EXCLUIR ARQUIVO DE SAVE                                         ");
+        System.out.println("==========================================================================================================");
+
+        // Slot 0: Auto-Save
+        printSlotDetails(0, "Auto-Save", slotsMap.get(0));
+
+        System.out.println("----------------------------------------------------------------------------------------------------------");
+
+        // Slots 1 a 4: Saves Manuais
+        for (int i = 1; i <= 4; i++) {
+            printSlotDetails(i, "Slot " + i, slotsMap.get(i));
+        }
+
+        System.out.println("==========================================================================================================");
+        System.out.println(" Digite o número do slot (0 a 4) que deseja EXCLUIR");
+        System.out.println(" 9 - Cancelar e voltar");
+        System.out.println("==========================================================================================================");
+        System.out.print("Escolha uma opção:\n> ");
+    }
+
+    /**
+     * Exibe o diálogo de confirmação prévia antes de apagar permanentemente um save.
+     */
+    public void printDeleteConfirmation(int slot) {
+        String slotLabel = (slot == 0) ? "Auto-Save (Slot 0)" : "Slot " + slot;
+        System.out.println("\n[ATENÇÃO] Tem certeza de que deseja deletar permanentemente o " + slotLabel + "?");
+        System.out.print("Digite 'S' para confirmar ou 'N' para cancelar:\n> ");
     }
 
     private void printSlotDetails(int slotIndex, String label, GameStates state) {

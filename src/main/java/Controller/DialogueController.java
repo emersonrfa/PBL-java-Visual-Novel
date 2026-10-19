@@ -291,4 +291,46 @@ public class DialogueController {
     public InputManager getInputManager() {
         return inputManager;
     }
+
+    public void handleDeleteSave() {
+        MenuView menuView = new MenuView();
+
+        // 1. Carrega os estados de todos os slots para mostrar na tela
+        Map<Integer, GameStates> slotsMap = new HashMap<>();
+        for (int i = 0; i <= 4; i++) {
+            slotsMap.put(i, this.stateRepository.loadStateFromSlot(i));
+        }
+
+        menuView.displayDeleteMenu(slotsMap);
+        int choice = this.inputManager.readValidChoice(0, 9);
+
+        if (choice == 9) {
+            System.out.println("\nOperação de exclusão cancelada.");
+            return;
+        }
+
+        // 2. Valida se o slot escolhido realmente tem um arquivo existente
+        if (!stateRepository.slotExists(choice)) {
+            System.out.println("\n[Aviso] O Slot " + choice + " já está vazio. Nada para deletar.");
+            return;
+        }
+
+        // 3. Pede a confirmação do jogador usando a instância menuView
+        menuView.printDeleteConfirmation(choice);
+        String confirmation = this.inputManager.waitEnterOrCommand();
+
+        if (confirmation != null && confirmation.equalsIgnoreCase("S")) {
+            boolean deleted = stateRepository.deleteSlot(choice);
+            if (deleted) {
+                System.out.println("\n[Sucesso] O save do Slot " + choice + " foi deletado com sucesso!");
+            } else {
+                System.out.println("\n[Erro] Falha ao tentar deletar o arquivo do Slot " + choice + ".");
+            }
+        } else {
+            System.out.println("\n[Cancelado] A exclusão do Slot " + choice + " foi cancelada.");
+        }
+
+        System.out.println("\n[Pressione ENTER para continuar]");
+        this.inputManager.waitEnter();
+    }
 }
