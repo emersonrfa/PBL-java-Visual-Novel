@@ -195,4 +195,11 @@ public class MenuView {
                 " PBL da matéria de MI - Algoritmos de Programação II.");
         System.out.println("pressione ENTER para voltar ao menu");
     }
+
+    public void printOverwriteConfirmation(int slot) {
+        System.out.println("\n[ATENÇÃO] O Slot " + slot + " já possui um save gravado!");
+        System.out.print("Deseja realmente sobrescrevê-lo? Digite 'S' para confirmar ou qualquer outra tecla para cancelar:\n> ");
+    }
+
+
 }

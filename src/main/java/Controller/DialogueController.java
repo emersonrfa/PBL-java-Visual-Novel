@@ -237,54 +237,60 @@ public class DialogueController {
     public void handleManualSave(String currentDialogId, String currentSceneId, int currentChapterId) {
         MenuView menuView = new MenuView();
 
-        // 1. Carrega os 4 slots manuais para mostrar o estado atual na consola
+        // 1. Carrega os metadados dos 4 slots manuais (1 a 4)
         Map<Integer, GameStates> slotsMap = new HashMap<>();
         for (int i = 1; i <= 4; i++) {
             slotsMap.put(i, this.stateRepository.loadStateFromSlot(i));
         }
 
+        // 2. Apresenta o menu de seleção de slot manual
         menuView.displayManualSaveMenu(slotsMap);
         int choice = this.inputManager.readValidChoice(0, 4);
 
         if (choice == 0) {
-            System.out.println("\nSalvamento cancelado. Retomando o diálogo...");
+            System.out.println("\nSalvamento cancelado.");
             return;
         }
 
-        // 2. Monta o snapshot atual do jogo
+        // 3. Validação de sobrescrita: se o slot já existir, pede confirmação
+        if (stateRepository.slotExists(choice)) {
+            menuView.printOverwriteConfirmation(choice);
+            String confirmation = this.inputManager.readString().trim();
+
+            if (!confirmation.equalsIgnoreCase("S")) {
+                System.out.println("\n[Cancelado] O save do Slot " + choice + " não foi modificado.");
+                System.out.println("[Pressione ENTER para continuar]");
+                this.inputManager.waitEnter();
+                return;
+            }
+        }
+
+        // 4. Monta o snapshot completo do estado atual
         GameStates manualState = new GameStates();
         manualState.setCurrentChapterId(currentChapterId);
         manualState.setCurrentSceneId(currentSceneId);
         manualState.setCurrentDialogId(currentDialogId);
-        manualState.setPlayerBloodType(this.player.getBloodType());
-        manualState.setPlayerEnergy(this.player.getEnergy());
-        manualState.setPlayerMoney(this.player.getMoney());
         manualState.setSaveTimestamp(LocalDateTime.now().format(DATE_FORMATTER));
 
-        // Clona as flags ativas do autosave corrente para manter coerência da história
-        GameStates currentState = this.stateRepository.getCurrentStates();
-        if (currentState != null && currentState.getStoryFlags() != null) {
-            manualState.setStoryFlags(new HashMap<>(currentState.getStoryFlags()));
-        }
+        if (this.player != null) {
+            manualState.setPlayerBloodType(this.player.getBloodType());
+            manualState.setPlayerMoney(this.player.getMoney());
+            manualState.setPlayerEnergy(this.player.getEnergy());
 
-        // Coleta itens do inventário
-        List<String> items = new ArrayList<>();
-        if (this.player.getInventory() != null && this.player.getInventory().getItems() != null) {
-            for (Item item : this.player.getInventory().getItems()) {
-                items.add(item.getName());
+            if (this.player.getInventory() != null) {
+                manualState.setPlayerInventoryItems(this.player.getInventory().getItemNames());
             }
         }
-        manualState.setPlayerInventoryItems(items);
 
-        // 3. Grava no slot escolhido (1 a 4)
-        boolean success = this.stateRepository.saveStateToSlot(manualState, choice);
-        if (success) {
+        // 5. Grava fisicamente no disco
+        boolean saved = stateRepository.saveStateToSlot(manualState, choice);
+        if (saved) {
             System.out.println("\n[Sucesso] Jogo salvo no Slot " + choice + "!");
         } else {
-            System.out.println("\n[Erro] Não foi possível salvar no Slot " + choice + ".");
+            System.out.println("\n[Erro] Falha ao tentar salvar no Slot " + choice + ".");
         }
 
-        System.out.println("\n[Pressione ENTER para continuar a história]");
+        System.out.println("[Pressione ENTER para continuar]");
         this.inputManager.waitEnter();
     }
 
