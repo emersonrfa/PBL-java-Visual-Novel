@@ -1,9 +1,12 @@
 package Controller;
 
+import Model.Ending;
 import Model.GameConfig;
 import Model.GameStates;
 import Repository.ConfigRepository;
+import Repository.EndingRepository;
 import Repository.StateRepository;
+import Repository.UnlockedEndingsRepository;
 import View.MenuView;
 
 import java.util.HashMap;
@@ -11,19 +14,23 @@ import java.util.List;
 import java.util.Map;
 
 public class MenuController {
-    private String[] options = {"Jogar", "Saves", "Configuracoes", "Creditos", "Sair"};
+    private String[] options = {"Jogar", "Saves", "Galeria de Finais", "Configuracoes", "Creditos", "Sair"};
     private int selectedOption = 0;
     private MenuView view;
     private InputManager inputManager;
     private ConfigRepository configRepo;
     private StateRepository stateRepo;
-    private int selectedSaveSlot = -1; // Guarda qual slot o jogador escolheu para carregar
+    private EndingRepository endingRepo;
+    private UnlockedEndingsRepository unlockedEndingsRepo;
+    private int selectedSaveSlot = -1;
 
     public MenuController(InputManager inputManager) {
         this.inputManager = inputManager;
         this.view = new MenuView();
         this.configRepo = new ConfigRepository();
         this.stateRepo = new StateRepository();
+        this.endingRepo = new EndingRepository();
+        this.unlockedEndingsRepo = new UnlockedEndingsRepository();
     }
 
     public MenuController(InputManager inputManager, ConfigRepository configRepo) {
@@ -31,6 +38,8 @@ public class MenuController {
         this.view = new MenuView();
         this.configRepo = configRepo;
         this.stateRepo = new StateRepository();
+        this.endingRepo = new EndingRepository();
+        this.unlockedEndingsRepo = new UnlockedEndingsRepository();
     }
 
     public String start() {
@@ -45,14 +54,12 @@ public class MenuController {
                 if (selectedOption < 0) {
                     selectedOption = options.length - 1;
                 }
-            }
-            else if (input.equals("S")) {
+            } else if (input.equals("S")) {
                 selectedOption++;
                 if (selectedOption >= options.length) {
                     selectedOption = 0;
                 }
-            }
-            else if (input.equals("E")) {
+            } else if (input.equals("E")) {
                 switch (selectedOption) {
                     case 0: // Jogar (Novo Jogo)
                         view.printMessage("iniciando novo jogo....\n");
@@ -61,20 +68,24 @@ public class MenuController {
                     case 1: // Menu de Saves
                         boolean loaded = savesLoop();
                         if (loaded) {
-                            return "carregar"; // Sinaliza para o Main carregar o slot escolhido
+                            return "carregar";
                         }
-                        break; // Se escolheu voltar (9), redesenha o menu principal
+                        break;
 
-                    case 2: // Configurações
+                    case 2: // Galeria de Finais
+                        endingsGalleryLoop();
+                        break;
+
+                    case 3: // Configurações
                         configLoop();
                         break;
 
-                    case 3: // Créditos
+                    case 4: // Créditos
                         view.printCredits();
                         inputManager.waitEnter();
                         break;
 
-                    case 4: // Sair
+                    case 5: // Sair
                         view.printMessage("saindo...\n");
                         running = false;
                         return "sair";
@@ -85,30 +96,48 @@ public class MenuController {
     }
 
     /**
-     * Gerencia a tela e escolha dos slots de save.
-     *
-     * @return true se o jogador escolheu um save válido para carregar; false se voltou ao menu.
+     * Loop de visualização e leitura da Galeria de Finais.
      */
+    public void endingsGalleryLoop() {
+        boolean inGallery = true;
+        List<Ending> allEndings = endingRepo.getAllEndings();
+
+        while (inGallery) {
+            view.displayEndingsGallery(allEndings, unlockedEndingsRepo);
+            int choice = inputManager.readValidChoice(0, allEndings.size());
+
+            if (choice == 0) {
+                inGallery = false;
+            } else {
+                Ending chosen = allEndings.get(choice - 1);
+                if (unlockedEndingsRepo.isUnlocked(chosen.getId())) {
+                    view.printEndingDetails(chosen);
+                } else {
+                    view.printMessage("\n[Bloqueado] Você ainda não descobriu este final na história!");
+                }
+                view.printMessage("\n[Pressione ENTER para voltar à galeria]");
+                inputManager.waitEnter();
+            }
+        }
+    }
+
     public boolean savesLoop() {
         boolean inSaves = true;
 
         while (inSaves) {
-            // Monta o mapa dos slots (0 = autosave, 1 a 4 = manuais)
             Map<Integer, GameStates> slotsMap = new HashMap<>();
             for (int i = 0; i <= 4; i++) {
                 slotsMap.put(i, stateRepo.loadStateFromSlot(i));
             }
 
             view.displaySavesMenu(slotsMap);
-
-            // Permite escolher 0 a 4 (carregar), 8 (excluir) ou 9 (voltar)
             int choice = inputManager.readValidChoice(0, 9);
 
             if (choice == 9) {
                 inSaves = false;
                 return false;
             } else if (choice == 8) {
-                handleDeleteSave(); // Abre o submenu de exclusão com confirmação
+                handleDeleteSave();
             } else if (choice >= 0 && choice <= 4) {
                 if (stateRepo.slotExists(choice)) {
                     this.selectedSaveSlot = choice;
@@ -125,9 +154,6 @@ public class MenuController {
         return false;
     }
 
-    /**
-     * Controla o fluxo de exclusão de saves com confirmação prévia do jogador.
-     */
     public void handleDeleteSave() {
         Map<Integer, GameStates> slotsMap = new HashMap<>();
         for (int i = 0; i <= 4; i++) {
@@ -152,7 +178,6 @@ public class MenuController {
             return;
         }
 
-        // Pede confirmação explícita
         view.printDeleteConfirmation(choice);
         String confirmation = inputManager.readString().trim();
 

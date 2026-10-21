@@ -201,5 +201,41 @@ public class MenuView {
         System.out.print("Deseja realmente sobrescrevê-lo? Digite 'S' para confirmar ou qualquer outra tecla para cancelar:\n> ");
     }
 
+    public void displayEndingsGallery(List<Model.Ending> allEndings, Repository.UnlockedEndingsRepository unlockedRepo) {
+        System.out.println("\n==========================================================================================================");
+        System.out.println("                                           GALERIA DE FINAIS                                              ");
+        System.out.println("==========================================================================================================");
+
+        for (int i = 0; i < allEndings.size(); i++) {
+            Model.Ending e = allEndings.get(i);
+            boolean unlocked = unlockedRepo.isUnlocked(e.getId());
+
+            if (unlocked) {
+                System.out.printf(" [%d] %-40s | [DESBLOQUEADO]\n", (i + 1), e.getTitle());
+            } else {
+                System.out.printf(" [%d] %-40s | [BLOQUEADO]\n", (i + 1), "???");
+            }
+        }
+
+        System.out.println("==========================================================================================================");
+        System.out.println(" Digite o número do final (1 a " + allEndings.size() + ") para ler a descrição");
+        System.out.println(" 0 - Voltar ao Menu Principal");
+        System.out.println("==========================================================================================================");
+        System.out.print("Escolha uma opção:\n> ");
+    }
+
+    /**
+     * Exibe os detalhes e a narrativa do final desbloqueado selecionado.
+     */
+    public void printEndingDetails(Model.Ending ending) {
+        System.out.println("\n----------------------------------------------------------------------------------------------------------");
+        System.out.println("TÍTULO: " + ending.getTitle());
+        System.out.println("----------------------------------------------------------------------------------------------------------");
+        System.out.println(ending.getDescription());
+        System.out.println("----------------------------------------------------------------------------------------------------------");
+    }
+
+
+
 
 }

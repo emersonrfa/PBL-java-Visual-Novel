@@ -2,34 +2,61 @@ package Controller;
 
 import Model.Ending;
 import Repository.EndingRepository;
+import Repository.UnlockedEndingsRepository;
 import View.EndingView;
+
 import java.util.List;
 
 public class EndingManager {
     private EndingRepository endingRepo;
-    private EndingView view; // Adicionamos a View
+    private UnlockedEndingsRepository unlockedEndingsRepo;
+    private EndingView view;
 
     public EndingManager() {
         this.endingRepo = new EndingRepository();
-        this.view = new EndingView(); // Inicializa a View
+        this.unlockedEndingsRepo = new UnlockedEndingsRepository();
+        this.view = new EndingView();
     }
 
-    // se o jogo for identificar se é o momento de ir para um final pela opção, ele usa esse metodo
+    public EndingManager(EndingRepository endingRepo, UnlockedEndingsRepository unlockedEndingsRepo, EndingView view) {
+        this.endingRepo = endingRepo;
+        this.unlockedEndingsRepo = unlockedEndingsRepo;
+        this.view = view;
+    }
+
+    /**
+     * Verifica se o identificador recebido representa o gatilho de um final.
+     */
     public boolean isEndingCode(String dialogueId) {
         return dialogueId != null && dialogueId.startsWith("FINAL_");
     }
 
+    /**
+     * Aciona o final correspondente, persiste o desbloqueio no arquivo JSON global e exibe a tela de desfecho.
+     */
     public void triggerEnding(String endingId) {
         Ending ending = endingRepo.getEnding(endingId);
 
         if (ending != null) {
-            view.printEnding(ending); // Delega para a View
+            // 1. Grava no JSON global saves/unlocked_endings.json
+            unlockedEndingsRepo.unlockEnding(endingId);
+
+            // 2. Renderiza a cena de encerramento através da View
+            view.printEnding(ending);
         } else {
-            view.printEndingNotFoundWarning(endingId); // Delega para a View
+            view.printEndingNotFoundWarning(endingId);
         }
     }
 
     public List<Ending> getAllEndings() {
         return endingRepo.getAllEndings();
+    }
+
+    public EndingRepository getEndingRepo() {
+        return endingRepo;
+    }
+
+    public UnlockedEndingsRepository getUnlockedEndingsRepo() {
+        return unlockedEndingsRepo;
     }
 }
