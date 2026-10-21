@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MenuController {
-    private String[] options = {"Jogar", "Saves", "Galeria de Finais", "Configuracoes", "Creditos", "Sair"};
+    // Opções atualizadas conforme solicitado
+    private String[] options = {"Novo Jogo", "Carregar Jogo", "Galeria de Finais", "Configuracoes", "Creditos", "Sair"};
     private int selectedOption = 0;
     private MenuView view;
     private InputManager inputManager;
@@ -61,11 +62,11 @@ public class MenuController {
                 }
             } else if (input.equals("E")) {
                 switch (selectedOption) {
-                    case 0: // Jogar (Novo Jogo)
-                        view.printMessage("iniciando novo jogo....\n");
+                    case 0: // Novo Jogo
+                        view.printMessage("Iniciando novo jogo....\n");
                         return "jogar";
 
-                    case 1: // Menu de Saves
+                    case 1: // Carregar Jogo (Menu de Saves)
                         boolean loaded = savesLoop();
                         if (loaded) {
                             return "carregar";
@@ -86,7 +87,7 @@ public class MenuController {
                         break;
 
                     case 5: // Sair
-                        view.printMessage("saindo...\n");
+                        view.printMessage("Saindo...\n");
                         running = false;
                         return "sair";
                 }
