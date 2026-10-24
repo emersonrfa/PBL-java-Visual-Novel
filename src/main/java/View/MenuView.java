@@ -235,7 +235,33 @@ public class MenuView {
         System.out.println("----------------------------------------------------------------------------------------------------------");
     }
 
+    public void printPlaySubMenu(String[] playOptions, int selectedOption) {
+        System.out.println("\n---- MODO DE JOGO ----");
+        System.out.println("W para subir, S para descer e E para confirmar");
 
+        for (int i = 0; i < playOptions.length; i++) {
+            if (i == selectedOption) {
+                System.out.println("-> " + playOptions[i]);
+            } else {
+                System.out.println("   " + playOptions[i]);
+            }
+        }
+        System.out.print("Esperando entrada:\n> ");
+    }
 
+    public void displayNewGameSlotMenu(Map<Integer, GameStates> slotsMap) {
+        System.out.println("\n==========================================================================================================");
+        System.out.println("                                   SELECIONE UM SLOT PARA O NOVO JOGO                                     ");
+        System.out.println("==========================================================================================================");
 
+        for (int i = 1; i <= 4; i++) {
+            printSlotDetails(i, "Slot " + i, slotsMap.get(i));
+        }
+
+        System.out.println("==========================================================================================================");
+        System.out.println(" Digite o número do slot (1 a 4) onde deseja iniciar o Novo Jogo");
+        System.out.println(" 0 - Cancelar e voltar");
+        System.out.println("==========================================================================================================");
+        System.out.print("Escolha uma opção:\n> ");
+    }
 }

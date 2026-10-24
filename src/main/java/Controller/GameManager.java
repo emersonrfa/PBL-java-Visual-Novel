@@ -5,6 +5,7 @@ import Repository.ConfigRepository;
 import Repository.StateRepository;
 import Repository.StoryRepository;
 import Service.AffinityTracker;
+import View.MenuView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,20 +19,23 @@ public class GameManager {
     private GameConfig config;
     private StateRepository stateRepository;
     private GameStates currentGameState;
+    private MenuView menuView;
 
     public GameManager(Player player, InputManager inputManager) {
-        AffinityTracker tracker = new AffinityTracker();
+        this(player, inputManager, null);
+    }
 
-        // Carrega as configurações
+    public GameManager(Player player, InputManager inputManager, GameStates activeState) {
+        AffinityTracker tracker = new AffinityTracker();
+        this.menuView = new MenuView();
+
         ConfigRepository configRepository = new ConfigRepository();
         this.config = configRepository.getCurrentConfig();
 
-        // Estado do Jogo (Progresso / Save)
         this.stateRepository = new StateRepository();
-        this.currentGameState = this.stateRepository.getCurrentStates();
+        this.currentGameState = (activeState != null) ? activeState : this.stateRepository.getCurrentStates();
 
         this.dialogueController = new DialogueController(player, inputManager, tracker, this.config, this.stateRepository);
-
         this.menuController = new MenuController(inputManager, configRepository);
         this.storyRepository = new StoryRepository();
         this.endingManager = new EndingManager();
@@ -39,6 +43,13 @@ public class GameManager {
 
     public void startGame() {
         this.isRunning = true;
+        // Inicia imediatamente no Capítulo 1 quando começa um Novo Jogo
+        Chapter prologue = storyRepository.buildPrologue();
+        Chapter entrevista = storyRepository.buildEntrevista();
+        menuView.printMessage("\nCarregando Capítulo 1...");
+        dialogueController.playChapter(prologue);
+        dialogueController.playChapter(entrevista);
+
         gameLoop();
     }
 
@@ -46,7 +57,7 @@ public class GameManager {
         this.isRunning = true;
 
         if (this.currentGameState == null) {
-            System.out.println("\nNenhum save encontrado. Iniciando novo jogo...");
+            menuView.printMessage("\nNenhum save encontrado. Iniciando novo jogo...");
             startGame();
             return;
         }
@@ -54,14 +65,13 @@ public class GameManager {
         int savedChapter = this.currentGameState.getCurrentChapterId();
         String savedDialogId = this.currentGameState.getCurrentDialogId();
 
-        System.out.println("\nRetomando a partida no Capítulo " + savedChapter + " [Diálogo: " + savedDialogId + "]...");
+        menuView.printMessage("\nRetomando a partida no Capítulo " + savedChapter + " [Diálogo: " + savedDialogId + "]...");
 
         switch (savedChapter) {
             case 1:
                 Chapter prologue = storyRepository.buildPrologue();
                 dialogueController.playChapter(prologue, savedDialogId);
 
-                // Ao terminar o prólogo, avança naturalmente para a continuação
                 Chapter entrevista = storyRepository.buildEntrevista();
                 dialogueController.playChapter(entrevista);
                 break;
@@ -72,12 +82,10 @@ public class GameManager {
                 break;
 
             default:
-                System.out.println("\nCapítulo desconhecido no save (" + savedChapter + "). Abrindo seleção de capítulos...");
-                gameLoop();
+                menuView.printMessage("\nCapítulo desconhecido no save (" + savedChapter + "). Abrindo seleção de capítulos...");
                 break;
         }
 
-        // Caso termine os capítulos do save, entra no loop geral para permitir novas escolhas ou seleção
         gameLoop();
     }
 
@@ -89,23 +97,20 @@ public class GameManager {
                 case 1:
                     Chapter prologue = storyRepository.buildPrologue();
                     Chapter entrevista = storyRepository.buildEntrevista();
-                    System.out.println("\nCarregando capítulo 1...");
+                    menuView.printMessage("\nCarregando capítulo 1...");
                     dialogueController.playChapter(prologue);
                     dialogueController.playChapter(entrevista);
                     break;
                 case 2:
                     Chapter cap2 = storyRepository.buildEntrevista();
-                    System.out.println("\nCarregando capítulo 2...");
+                    menuView.printMessage("\nCarregando capítulo 2...");
                     dialogueController.playChapter(cap2);
                     break;
-
-                // fazer os outros
-
                 case 11:
                     endingGalleryLoop();
                     break;
                 case 0:
-                    System.out.println("\nVoltando para o Menu Principal...");
+                    menuView.printMessage("\nVoltando para o Menu Principal...");
                     isRunning = false;
                     break;
             }
@@ -126,12 +131,11 @@ public class GameManager {
 
             if (choice == 0) {
                 inGallery = false;
-            }
-            else {
+            } else {
                 Ending selected = allEndings.get(choice - 1);
                 endingManager.triggerEnding(selected.getId());
 
-                System.out.println("\n[Pressione ENTER para voltar à galeria]");
+                menuView.printMessage("\n[Pressione ENTER para voltar à galeria]");
                 dialogueController.getInputManager().waitEnter();
             }
         }

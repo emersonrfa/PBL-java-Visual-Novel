@@ -1,12 +1,15 @@
-   import Controller.GameManager;
+import Controller.GameManager;
 import Controller.InputManager;
 import Controller.MenuController;
 import Model.GameStates;
-import Model.Item;
 import Model.Player;
 import Repository.ItemRepository;
 import Repository.StateRepository;
+import Service.PlayerService;
 import View.MenuView;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Main {
 
@@ -14,8 +17,9 @@ public class Main {
         InputManager inputManager = new InputManager();
         MenuView menuView = new MenuView();
         MenuController menuController = new MenuController(inputManager);
+        PlayerService playerService = new PlayerService();
+        ItemRepository itemRepository = new ItemRepository();
 
-        // Hook de segurança: garante o arquivamento mesmo se a aplicação for parada abruptamente
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             StateRepository repo = new StateRepository();
             repo.archiveAutoSaveToEmptySlot();
@@ -28,19 +32,32 @@ public class Main {
         while (systemRunning) {
             String menuResponse = menuController.start();
 
-            if (menuResponse.equals("jogar")) {
-                // FLUXO DE NOVO JOGO
+            if (menuResponse.equals("novo_jogo")) {
+                int targetSlot = menuController.getSelectedSaveSlot();
+                StateRepository stateRepository = menuController.getStateRepo();
+
                 menuView.printBloodTypePrompt();
                 String tipoSanguineo = inputManager.readBloodType();
 
                 Player player = new Player(tipoSanguineo);
-                menuView.printMessage("\nTipo sanguíneo [" + player.getBloodType() + "] registrado com sucesso.\n");
+                menuView.printMessage("\nTipo sanguíneo [" + player.getBloodType() + "] registrado com sucesso.");
 
-                GameManager gameManager = new GameManager(player, inputManager);
+                // Cria o estado inicial limpo e sobrescreve o slot escolhido + auto-save
+                GameStates initialState = new GameStates();
+                initialState.setCurrentChapterId(1);
+                initialState.setCurrentSceneId("Quarto");
+                initialState.setCurrentDialogId("d1.1");
+                initialState.setSaveTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+                playerService.populateStateFromPlayer(initialState, player);
+
+                stateRepository.saveStateToSlot(initialState, targetSlot);
+                stateRepository.saveState(initialState); // Atualiza também o Slot 0 (Auto-Save)
+                menuView.printMessage("[Sucesso] Novo jogo gravado no Slot " + targetSlot + "!\n");
+
+                GameManager gameManager = new GameManager(player, inputManager, initialState);
                 gameManager.startGame();
             }
             else if (menuResponse.equals("carregar")) {
-                // FLUXO DE CARREGAR JOGO SALVO
                 int slot = menuController.getSelectedSaveSlot();
                 StateRepository stateRepository = menuController.getStateRepo();
                 GameStates savedState = stateRepository.loadStateFromSlot(slot);
@@ -48,48 +65,18 @@ public class Main {
                 if (savedState != null) {
                     menuView.printMessage("\nRecuperando dados do save (Slot " + (slot == 0 ? "Auto-Save" : slot) + ")...");
 
-                    // 1. Reconstrói o Player com o tipo sanguíneo salvo
-                    String bloodType = (savedState.getPlayerBloodType() != null)
-                            ? savedState.getPlayerBloodType()
-                            : "A+";
-                    Player player = new Player(bloodType);
-
-                    // 2. Restaura dinheiro e energia
-                    player.setMoney(savedState.getPlayerMoney());
-                    player.setEnergy(savedState.getPlayerEnergy());
-
-                    // 3. Restaura itens do inventário via ItemRepository (respeitando MVC)
-                    if (savedState.getPlayerInventoryItems() != null) {
-                        ItemRepository itemRepository = new ItemRepository();
-
-                        for (String itemName : savedState.getPlayerInventoryItems()) {
-                            Item item = itemRepository.findByName(itemName);
-                            if (item != null) {
-                                player.getInventory().addItem(item);
-                            } else {
-                                System.err.println("[Aviso] Item não catalogado no ItemRepository: " + itemName);
-                            }
-                        }
-                    }
-
-                    // 4. Sincroniza as flags narrativas salvas
-                    if (savedState.getStoryFlags() != null) {
-                        for (var entry : savedState.getStoryFlags().entrySet()) {
-                            player.setFlag(entry.getKey(), entry.getValue());
-                        }
-                    }
+                    Player player = playerService.createPlayerFromState(savedState, itemRepository);
+                    stateRepository.saveState(savedState); // Sincroniza o auto-save com o save carregado
 
                     menuView.printMessage("Save carregado com sucesso!\n");
 
-                    // 5. Inicia o GameManager a partir do ponto salvo
-                    GameManager gameManager = new GameManager(player, inputManager);
+                    GameManager gameManager = new GameManager(player, inputManager, savedState);
                     gameManager.loadAndStartGame();
                 } else {
                     menuView.printMessage("\n[Erro] Falha ao ler os dados do slot selecionado.\n");
                 }
             }
             else if (menuResponse.equals("sair")) {
-                // Arquiva o auto-save no primeiro slot manual livre antes de encerrar
                 StateRepository stateRepository = new StateRepository();
                 int archivedSlot = stateRepository.archiveAutoSaveToEmptySlot();
 

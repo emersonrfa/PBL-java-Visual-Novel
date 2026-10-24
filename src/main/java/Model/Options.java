@@ -22,6 +22,7 @@ public class Options {
 
     // atributos para manipulação de inventario
     private Item itemToGive = null;
+    private java.util.List<Item> itemsToGive = new java.util.ArrayList<>();
     private String requiredItemName = null;
     private boolean consumeRequiredItem = false;
 
@@ -73,6 +74,17 @@ public class Options {
         this.flagToSet = flag;
         return this;
     } // SET FLAG ALTERADA
+
+    public java.util.List<Item> getItemsToGive() {
+        return itemsToGive;
+    }
+
+    public Options setItemToGive(Item item) {
+        if (item != null) {
+            this.itemsToGive.add(item);
+        }
+        return this;
+    }
 
     public String getTargetNpc() { return targetNpc; } // GET NPC AFETADO
 

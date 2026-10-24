@@ -7,6 +7,8 @@ import Repository.ConfigRepository;
 import Repository.EndingRepository;
 import Repository.StateRepository;
 import Repository.UnlockedEndingsRepository;
+import Service.AchievementService;
+import View.AchievementView;
 import View.MenuView;
 
 import java.util.HashMap;
@@ -14,10 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MenuController {
-    // Opções atualizadas conforme solicitado
     private String[] options = {
-            "Novo Jogo",
-            "Carregar Jogo",
+            "Jogar",
             "Galeria de Finais",
             "Galeria de Conquistas",
             "Configuracoes",
@@ -26,32 +26,28 @@ public class MenuController {
     };
     private int selectedOption = 0;
     private MenuView view;
+    private AchievementView achievementView;
     private InputManager inputManager;
     private ConfigRepository configRepo;
     private StateRepository stateRepo;
     private EndingRepository endingRepo;
     private UnlockedEndingsRepository unlockedEndingsRepo;
+    private AchievementService achievementService;
     private int selectedSaveSlot = -1;
-    private Service.AchievementService achievementService;
 
     public MenuController(InputManager inputManager) {
-        this.inputManager = inputManager;
-        this.view = new MenuView();
-        this.configRepo = new ConfigRepository();
-        this.stateRepo = new StateRepository();
-        this.endingRepo = new EndingRepository();
-        this.unlockedEndingsRepo = new UnlockedEndingsRepository();
-        this.achievementService = new Service.AchievementService();
+        this(inputManager, new ConfigRepository());
     }
 
     public MenuController(InputManager inputManager, ConfigRepository configRepo) {
         this.inputManager = inputManager;
         this.view = new MenuView();
+        this.achievementView = new AchievementView();
         this.configRepo = configRepo;
         this.stateRepo = new StateRepository();
         this.endingRepo = new EndingRepository();
         this.unlockedEndingsRepo = new UnlockedEndingsRepository();
-        this.achievementService = new Service.AchievementService();
+        this.achievementService = new AchievementService();
     }
 
     public String start() {
@@ -73,35 +69,31 @@ public class MenuController {
                 }
             } else if (input.equals("E")) {
                 switch (selectedOption) {
-                    case 0: // Novo Jogo
-                        view.printMessage("Iniciando novo jogo....\n");
-                        return "jogar";
-
-                    case 1: // Carregar Jogo (Menu de Saves)
-                        boolean loaded = savesLoop();
-                        if (loaded) {
-                            return "carregar";
+                    case 0: // Jogar -> Submenu (Novo Jogo / Carregar Save)
+                        String playResult = playSubMenuLoop();
+                        if (!playResult.equals("voltar")) {
+                            return playResult; // Retorna "novo_jogo" ou "carregar"
                         }
                         break;
 
-                    case 2: // Galeria de Finais
+                    case 1: // Galeria de Finais
                         endingsGalleryLoop();
                         break;
 
-                    case 3: // Galeria de Conquistas
+                    case 2: // Galeria de Conquistas
                         achievementsGalleryLoop();
                         break;
 
-                    case 4: // Configurações
+                    case 3: // Configurações
                         configLoop();
                         break;
 
-                    case 5: // Créditos
+                    case 4: // Créditos
                         view.printCredits();
                         inputManager.waitEnter();
                         break;
 
-                    case 6: // Sair
+                    case 5: // Sair
                         view.printMessage("Saindo...\n");
                         running = false;
                         return "sair";
@@ -111,17 +103,82 @@ public class MenuController {
         return "sair";
     }
 
+    /**
+     * Submenu exibido ao selecionar "Jogar" no Menu Inicial.
+     */
+    private String playSubMenuLoop() {
+        String[] playOptions = {"Novo Jogo", "Carregar Save", "Voltar"};
+        int selected = 0;
+
+        while (true) {
+            view.printPlaySubMenu(playOptions, selected);
+            String input = inputManager.readString().toUpperCase();
+
+            if (input.equals("W")) {
+                selected--;
+                if (selected < 0) selected = playOptions.length - 1;
+            } else if (input.equals("S")) {
+                selected++;
+                if (selected >= playOptions.length) selected = 0;
+            } else if (input.equals("E")) {
+                switch (selected) {
+                    case 0: // Novo Jogo (escolher slot para criar/sobrescrever)
+                        if (newGameSlotSelectionLoop()) {
+                            return "novo_jogo";
+                        }
+                        break;
+                    case 1: // Carregar Save
+                        if (savesLoop()) {
+                            return "carregar";
+                        }
+                        break;
+                    case 2: // Voltar
+                        return "voltar";
+                }
+            }
+        }
+    }
+
+    /**
+     * Solicita qual slot (1 a 4) será usado/sobrescrito para começar um Novo Jogo do zero.
+     */
+    public boolean newGameSlotSelectionLoop() {
+        while (true) {
+            Map<Integer, GameStates> slotsMap = new HashMap<>();
+            for (int i = 1; i <= 4; i++) {
+                slotsMap.put(i, stateRepo.loadStateFromSlot(i));
+            }
+
+            view.displayNewGameSlotMenu(slotsMap);
+            int choice = inputManager.readValidChoice(0, 4);
+
+            if (choice == 0) {
+                return false;
+            }
+
+            if (stateRepo.slotExists(choice)) {
+                view.printOverwriteConfirmation(choice);
+                String confirmation = inputManager.readString().trim();
+                if (!confirmation.equalsIgnoreCase("S")) {
+                    view.printMessage("\n[Cancelado] Escolha outro slot ou digite 0 para voltar.");
+                    continue;
+                }
+            }
+
+            this.selectedSaveSlot = choice;
+            view.printMessage("\nSlot " + choice + " preparado para iniciar um Novo Jogo!");
+            return true;
+        }
+    }
+
     public void achievementsGalleryLoop() {
-        achievementService.getView().displayAchievementsGallery(
+        achievementView.displayAchievementsGallery(
                 achievementService.getAllAchievements(),
                 achievementService.getUnlockedRepo()
         );
         inputManager.waitEnter();
     }
 
-    /**
-     * Loop de visualização e leitura da Galeria de Finais.
-     */
     public void endingsGalleryLoop() {
         boolean inGallery = true;
         List<Ending> allEndings = endingRepo.getAllEndings();
