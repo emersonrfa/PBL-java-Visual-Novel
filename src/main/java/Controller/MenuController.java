@@ -15,7 +15,15 @@ import java.util.Map;
 
 public class MenuController {
     // Opções atualizadas conforme solicitado
-    private String[] options = {"Novo Jogo", "Carregar Jogo", "Galeria de Finais", "Configuracoes", "Creditos", "Sair"};
+    private String[] options = {
+            "Novo Jogo",
+            "Carregar Jogo",
+            "Galeria de Finais",
+            "Galeria de Conquistas",
+            "Configuracoes",
+            "Creditos",
+            "Sair"
+    };
     private int selectedOption = 0;
     private MenuView view;
     private InputManager inputManager;
@@ -24,6 +32,7 @@ public class MenuController {
     private EndingRepository endingRepo;
     private UnlockedEndingsRepository unlockedEndingsRepo;
     private int selectedSaveSlot = -1;
+    private Service.AchievementService achievementService;
 
     public MenuController(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -32,6 +41,7 @@ public class MenuController {
         this.stateRepo = new StateRepository();
         this.endingRepo = new EndingRepository();
         this.unlockedEndingsRepo = new UnlockedEndingsRepository();
+        this.achievementService = new Service.AchievementService();
     }
 
     public MenuController(InputManager inputManager, ConfigRepository configRepo) {
@@ -41,6 +51,7 @@ public class MenuController {
         this.stateRepo = new StateRepository();
         this.endingRepo = new EndingRepository();
         this.unlockedEndingsRepo = new UnlockedEndingsRepository();
+        this.achievementService = new Service.AchievementService();
     }
 
     public String start() {
@@ -77,16 +88,20 @@ public class MenuController {
                         endingsGalleryLoop();
                         break;
 
-                    case 3: // Configurações
+                    case 3: // Galeria de Conquistas
+                        achievementsGalleryLoop();
+                        break;
+
+                    case 4: // Configurações
                         configLoop();
                         break;
 
-                    case 4: // Créditos
+                    case 5: // Créditos
                         view.printCredits();
                         inputManager.waitEnter();
                         break;
 
-                    case 5: // Sair
+                    case 6: // Sair
                         view.printMessage("Saindo...\n");
                         running = false;
                         return "sair";
@@ -94,6 +109,14 @@ public class MenuController {
             }
         }
         return "sair";
+    }
+
+    public void achievementsGalleryLoop() {
+        achievementService.getView().displayAchievementsGallery(
+                achievementService.getAllAchievements(),
+                achievementService.getUnlockedRepo()
+        );
+        inputManager.waitEnter();
     }
 
     /**

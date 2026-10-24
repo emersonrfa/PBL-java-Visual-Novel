@@ -10,6 +10,7 @@ import java.util.List;
 public class EndingManager {
     private EndingRepository endingRepo;
     private UnlockedEndingsRepository unlockedEndingsRepo;
+    private Service.AchievementService achievementService = new Service.AchievementService();
     private EndingView view;
 
     public EndingManager() {
@@ -38,11 +39,14 @@ public class EndingManager {
         Ending ending = endingRepo.getEnding(endingId);
 
         if (ending != null) {
-            // 1. Grava no JSON global saves/unlocked_endings.json
             unlockedEndingsRepo.unlockEnding(endingId);
-
-            // 2. Renderiza a cena de encerramento através da View
             view.printEnding(ending);
+
+            // Disparo das conquistas de término
+            achievementService.checkAndUnlock("ACH_PRIMEIRO_FIM");
+            if (unlockedEndingsRepo.getUnlockedKeys().size() >= endingRepo.getAllEndings().size()) {
+                achievementService.checkAndUnlock("ACH_MESTRE_FALA");
+            }
         } else {
             view.printEndingNotFoundWarning(endingId);
         }

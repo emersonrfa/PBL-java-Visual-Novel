@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DialogueController {
+    private Service.AchievementService achievementService = new Service.AchievementService();
     private InputManager inputManager;
     private Player player;
     private AffinityTracker affinityTracker;
@@ -92,6 +93,8 @@ public class DialogueController {
             }
 
             Dialogue current = currentScene.getDialogueById(currentId);
+
+            achievementService.evaluateDialogueTrigger(current.getId());
 
             // Auto-save a cada avanço
             triggerAutoSave(chapter.getChapterNumber(), currentScene.getTitle(), current.getId());
@@ -185,10 +188,15 @@ public class DialogueController {
         if (chosenOption.getTargetNpc() != null) {
             affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
             affinityTracker.modifySuspicion(chosenOption.getTargetNpc(), chosenOption.getSuspicionChange());
+
+            // Gatilho de afinidade
+            int currentAff = affinityTracker.getAffinity(chosenOption.getTargetNpc());
+            achievementService.evaluateAffinityTrigger(chosenOption.getTargetNpc(), currentAff);
         }
 
         // ATIVAÇÃO E PERSISTÊNCIA DA FLAG DE ESCOLHA
         if (chosenOption.getFlagToSet() != null && !chosenOption.getFlagToSet().trim().isEmpty()) {
+            achievementService.evaluateFlagTrigger(chosenOption.getFlagToSet());
             if (stateRepository != null) {
                 GameStates state = stateRepository.getCurrentStates();
                 state.setFlag(chosenOption.getFlagToSet(), true);

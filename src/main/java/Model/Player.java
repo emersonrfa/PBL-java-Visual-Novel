@@ -64,7 +64,7 @@ public class Player extends Character {
         }
         else {
             this.energy -= amount;
-            return this.energy - amount;
+            return this.energy;
         }
     }
 

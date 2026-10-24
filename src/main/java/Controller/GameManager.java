@@ -42,7 +42,6 @@ public class GameManager {
         gameLoop();
     }
 
-    // NOVO: Retoma o jogo diretamente a partir do capítulo e diálogo salvos
     public void loadAndStartGame() {
         this.isRunning = true;
 
