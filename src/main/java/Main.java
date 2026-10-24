@@ -42,7 +42,6 @@ public class Main {
                 Player player = new Player(tipoSanguineo);
                 menuView.printMessage("\nTipo sanguíneo [" + player.getBloodType() + "] registrado com sucesso.");
 
-                // Cria o estado inicial limpo e sobrescreve o slot escolhido + auto-save
                 GameStates initialState = new GameStates();
                 initialState.setCurrentChapterId(1);
                 initialState.setCurrentSceneId("Quarto");
@@ -51,7 +50,7 @@ public class Main {
                 playerService.populateStateFromPlayer(initialState, player);
 
                 stateRepository.saveStateToSlot(initialState, targetSlot);
-                stateRepository.saveState(initialState); // Atualiza também o Slot 0 (Auto-Save)
+                stateRepository.saveState(initialState);
                 menuView.printMessage("[Sucesso] Novo jogo gravado no Slot " + targetSlot + "!\n");
 
                 GameManager gameManager = new GameManager(player, inputManager, initialState);
@@ -66,7 +65,7 @@ public class Main {
                     menuView.printMessage("\nRecuperando dados do save (Slot " + (slot == 0 ? "Auto-Save" : slot) + ")...");
 
                     Player player = playerService.createPlayerFromState(savedState, itemRepository);
-                    stateRepository.saveState(savedState); // Sincroniza o auto-save com o save carregado
+                    stateRepository.saveState(savedState);
 
                     menuView.printMessage("Save carregado com sucesso!\n");
 

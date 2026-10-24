@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/aaa/aaa.iml" filepath="$PROJECT_DIR$/aaa/aaa.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PBL-java-Visual-Novel.iml" filepath="$PROJECT_DIR$/PBL-java-Visual-Novel.iml" />
     </modules>
   </component>
 </project>
