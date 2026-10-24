@@ -50,4 +50,20 @@ public class AffinityTracker {
 
         npcSuspicions.put(npcName, newSuspicion);
     }
+
+    public Map<String, Integer> getNpcAffinities() {
+        return new HashMap<>(this.npcAffinities);
+    }
+
+    public void setNpcAffinities(Map<String, Integer> affinities) {
+        this.npcAffinities = (affinities != null) ? new HashMap<>(affinities) : new HashMap<>();
+    }
+
+    public Map<String, Integer> getNpcSuspicions() {
+        return new HashMap<>(this.npcSuspicions);
+    }
+
+    public void setNpcSuspicions(Map<String, Integer> suspicions) {
+        this.npcSuspicions = (suspicions != null) ? new HashMap<>(suspicions) : new HashMap<>();
+    }
 }

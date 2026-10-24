@@ -68,10 +68,20 @@ public class PlayerService {
     }
 
     /**
-     * Popula um objeto GameStates com os dados atuais do Player.
+     * Sobrecarga para quando ainda não há AffinityTracker (ex: Novo Jogo na Main).
      */
     public void populateStateFromPlayer(GameStates state, Player player) {
+        populateStateFromPlayer(state, player, null);
+    }
+
+    /**
+     * Popula um objeto GameStates com os dados atuais do Player e do AffinityTracker.
+     */
+    public void populateStateFromPlayer(GameStates state, Player player, AffinityTracker tracker) {
         if (state == null || player == null) return;
+        if (state.getSaveName() == null || state.getSaveName().trim().isEmpty()) {
+            state.setSaveName("Emily");
+        }
         state.setPlayerBloodType(player.getBloodType());
         state.setPlayerMoney(player.getMoney());
         state.setPlayerEnergy(player.getEnergy());
@@ -79,6 +89,16 @@ public class PlayerService {
         if (player.getInventory() != null) {
             state.setPlayerInventoryItems(player.getInventory().getItemNames());
         }
+        if (tracker != null) {
+            state.setNpcAffinities(tracker.getNpcAffinities());
+            state.setNpcSuspicions(tracker.getNpcSuspicions());
+        }
+    }
+
+    public void restoreAffinityFromState(GameStates savedState, AffinityTracker tracker) {
+        if (savedState == null || tracker == null) return;
+        tracker.setNpcAffinities(savedState.getNpcAffinities());
+        tracker.setNpcSuspicions(savedState.getNpcSuspicions());
     }
 
     /**

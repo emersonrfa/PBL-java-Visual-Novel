@@ -140,11 +140,6 @@ public class Options {
     public String getRequiredItemName() { return requiredItemName; }
     public boolean isConsumeRequiredItem() { return consumeRequiredItem; }
 
-    public Options setItemToGive(Item item) { // seta um item para conceder na escolha da opção
-        this.itemToGive = item;
-        return this;
-    }
-
     public Options setRequiredItem(String itemName, boolean consume) { //  seta um item necessario pra opcao
         this.requiredItemName = itemName;
         this.consumeRequiredItem = consume;

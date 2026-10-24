@@ -11,7 +11,6 @@ public class Player extends Character {
 
     private Map<String, Boolean> flags;
 
-
     public Player(String bloodType) {
         super("Emily", "Feminino", 22, "Protagonista");
         this.energy = 100;
@@ -53,16 +52,14 @@ public class Player extends Character {
         this.energy += amount;
 
         if (this.energy > 100)
-            this.energy = 100; //encapsulamento
+            this.energy = 100; // encapsulamento
     }
 
-    public int consumeEnergy(int amount){
-
+    public int consumeEnergy(int amount) {
         if (this.energy - amount < 0) {
             this.energy = 0;
             return 0;
-        }
-        else {
+        } else {
             this.energy -= amount;
             return this.energy;
         }
@@ -80,6 +77,10 @@ public class Player extends Character {
 
     public boolean getFlag(String flagName) {
         return this.flags.getOrDefault(flagName, false);
+    }
+
+    public Map<String, Boolean> getFlags() {
+        return this.flags;
     }
 
     // Para inventário e itens:

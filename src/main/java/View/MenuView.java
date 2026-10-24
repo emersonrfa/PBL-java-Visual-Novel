@@ -89,23 +89,27 @@ public class MenuView {
 
     private void printSlotDetails(int slotIndex, String label, GameStates state) {
         if (state != null) {
+            String saveName = (state.getSaveName() != null && !state.getSaveName().isEmpty()) ? state.getSaveName() : "Emily";
             String blood = state.getPlayerBloodType() != null ? state.getPlayerBloodType() : "N/D";
             int itemsCount = state.getPlayerInventoryItems() != null ? state.getPlayerInventoryItems().size() : 0;
             String timestamp = (state.getSaveTimestamp() != null && !state.getSaveTimestamp().trim().isEmpty())
                     ? state.getSaveTimestamp()
                     : "Sem registro";
 
-            System.out.printf(" [%d] %-10s | Cap: %-2d | Cena: %-15s | Sangue: %-3s | Itens: %-2d | Salvo em: %s\n",
+            System.out.printf(" [%d] %-10s | Nome: %-8s | Cap: %-2d (%-15s) | Resumo: [Energia: %3d%%, R$: %5.2f, Sangue: %-3s, Itens: %-2d] | Data: %s\n",
                     slotIndex,
                     label,
+                    saveName,
                     state.getCurrentChapterId(),
                     state.getCurrentSceneId() != null ? state.getCurrentSceneId() : "N/A",
+                    state.getPlayerEnergy(),
+                    state.getPlayerMoney(),
                     blood,
                     itemsCount,
                     timestamp
             );
         } else {
-            System.out.printf(" [%d] %-10s | [Vazio]\n", slotIndex, label);
+            System.out.printf(" [%d] %-10s | [Vazio ou Indisponível]\n", slotIndex, label);
         }
     }
 

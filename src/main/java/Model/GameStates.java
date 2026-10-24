@@ -11,10 +11,15 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameStates {
 
+    private String saveName;
     private int currentChapterId;
     private String currentDialogId;
     private String currentSceneId;
     private Map<String, Boolean> storyFlags;
+
+    // Relacionamentos (Afinidades e Suspeitas)
+    private Map<String, Integer> npcAffinities;
+    private Map<String, Integer> npcSuspicions;
 
     // Atributos do Jogador
     private String playerBloodType;
@@ -23,37 +28,30 @@ public class GameStates {
     private List<String> playerInventoryItems;
 
     @JsonProperty("saveTimestamp")
-    private String saveTimestamp; // Data e hora do save
+    private String saveTimestamp;
 
-    // Construtor padrão (Novo jogo / Jackson)
     public GameStates() {
+        this.saveName = "Emily";
         this.currentChapterId = 1;
         this.currentDialogId = "d1.1";
         this.currentSceneId = "Quarto";
         this.storyFlags = new HashMap<>();
+        this.npcAffinities = new HashMap<>();
+        this.npcSuspicions = new HashMap<>();
         this.playerBloodType = "A+";
-        this.playerMoney = 0.0;
+        this.playerMoney = 20.0;
         this.playerEnergy = 100;
         this.playerInventoryItems = new ArrayList<>();
         this.saveTimestamp = "";
     }
 
-    public GameStates(int currentChapterId, String currentDialogId, String currentSceneId,
-                      Map<String, Boolean> storyFlags, String playerBloodType,
-                      double playerMoney, int playerEnergy, List<String> playerInventoryItems,
-                      String saveTimestamp) {
-        this.currentChapterId = currentChapterId;
-        this.currentDialogId = currentDialogId;
-        this.currentSceneId = currentSceneId;
-        this.storyFlags = (storyFlags != null) ? storyFlags : new HashMap<>();
-        this.playerBloodType = playerBloodType;
-        this.playerMoney = playerMoney;
-        this.playerEnergy = playerEnergy;
-        this.playerInventoryItems = (playerInventoryItems != null) ? playerInventoryItems : new ArrayList<>();
-        this.saveTimestamp = (saveTimestamp != null) ? saveTimestamp : "";
+    public String getSaveName() {
+        return saveName;
     }
 
-    // --- Progresso ---
+    public void setSaveName(String saveName) {
+        this.saveName = saveName;
+    }
 
     public int getCurrentChapterId() {
         return currentChapterId;
@@ -79,8 +77,6 @@ public class GameStates {
         this.currentSceneId = currentSceneId;
     }
 
-    // --- Flags ---
-
     public void setFlag(String flagName, boolean value) {
         if (this.storyFlags == null) {
             this.storyFlags = new HashMap<>();
@@ -103,7 +99,21 @@ public class GameStates {
         this.storyFlags = storyFlags;
     }
 
-    // --- Atributos do Player ---
+    public Map<String, Integer> getNpcAffinities() {
+        return npcAffinities;
+    }
+
+    public void setNpcAffinities(Map<String, Integer> npcAffinities) {
+        this.npcAffinities = npcAffinities;
+    }
+
+    public Map<String, Integer> getNpcSuspicions() {
+        return npcSuspicions;
+    }
+
+    public void setNpcSuspicions(Map<String, Integer> npcSuspicions) {
+        this.npcSuspicions = npcSuspicions;
+    }
 
     public String getPlayerBloodType() {
         return playerBloodType;

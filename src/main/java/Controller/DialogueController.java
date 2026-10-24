@@ -1,5 +1,6 @@
 package Controller;
 
+import Exception.GamePersistenceException;
 import Model.*;
 import Repository.StateRepository;
 import Service.AchievementService;
@@ -96,7 +97,6 @@ public class DialogueController {
 
             view.printDialogue(current, config.getTextSpeedMs());
 
-            // Verifica conquistas atreladas ao diálogo atual
             Achievement unlockedByDialogue = achievementService.evaluateDialogueTrigger(current.getId());
             if (unlockedByDialogue != null) {
                 achievementView.printAchievementBanner(unlockedByDialogue);
@@ -173,6 +173,14 @@ public class DialogueController {
             if (!playerService.validatePlayerRequirements(player, chosenOption) || !isAffinityValid(chosenOption)) {
                 view.printRequirementWarning();
             } else {
+                if (config != null && config.isConfirmChoices()) {
+                    menuView.printMessage("Confirmar escolha \"" + chosenOption.getText() + "\"? (Digite 'S' para confirmar ou outra tecla para cancelar):");
+                    String confirm = inputManager.readString().trim();
+                    if (!confirm.equalsIgnoreCase("S")) {
+                        menuView.printMessage("Escolha cancelada. Selecione novamente.");
+                        continue;
+                    }
+                }
                 validChoice = true;
             }
         }
@@ -180,7 +188,6 @@ public class DialogueController {
         int chosenIndex = choice - 1;
         Options chosenOption = options.get(chosenIndex);
 
-        // Aplica consequências e imprime avisos pela View
         List<String> messages = playerService.applyOptionConsequences(player, chosenOption);
         for (String msg : messages) {
             view.printConsequence(msg);
@@ -216,7 +223,7 @@ public class DialogueController {
             state.setCurrentDialogId(dialogId);
             state.setSaveTimestamp(LocalDateTime.now().format(DATE_FORMATTER));
 
-            playerService.populateStateFromPlayer(state, this.player);
+            playerService.populateStateFromPlayer(state, this.player, this.affinityTracker);
 
             if (config != null && config.isTurnAutoSave()) {
                 stateRepository.saveState(state);
@@ -256,13 +263,13 @@ public class DialogueController {
         manualState.setCurrentDialogId(currentDialogId);
         manualState.setSaveTimestamp(LocalDateTime.now().format(DATE_FORMATTER));
 
-        playerService.populateStateFromPlayer(manualState, this.player);
+        playerService.populateStateFromPlayer(manualState, this.player, this.affinityTracker);
 
-        boolean saved = stateRepository.saveStateToSlot(manualState, choice);
-        if (saved) {
+        try {
+            stateRepository.saveStateToSlotChecked(manualState, choice);
             menuView.printMessage("\n[Sucesso] Jogo salvo no Slot " + choice + "!");
-        } else {
-            menuView.printMessage("\n[Erro] Falha ao tentar salvar no Slot " + choice + ".");
+        } catch (GamePersistenceException e) {
+            menuView.printMessage("\n[Erro de Gravação] " + e.getMessage());
         }
 
         menuView.printMessage("[Pressione ENTER para continuar]");

@@ -27,6 +27,9 @@ public class GameManager {
 
     public GameManager(Player player, InputManager inputManager, GameStates activeState) {
         AffinityTracker tracker = new AffinityTracker();
+        if (activeState != null) {
+            new Service.PlayerService().restoreAffinityFromState(activeState, tracker);
+        }
         this.menuView = new MenuView();
 
         ConfigRepository configRepository = new ConfigRepository();

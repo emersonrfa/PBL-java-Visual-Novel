@@ -1,5 +1,8 @@
 package Controller;
 
+import Exception.CorruptedSaveException;
+import Exception.GamePersistenceException;
+import Exception.SaveSlotNotFoundException;
 import Model.Ending;
 import Model.GameConfig;
 import Model.GameStates;
@@ -69,10 +72,10 @@ public class MenuController {
                 }
             } else if (input.equals("E")) {
                 switch (selectedOption) {
-                    case 0: // Jogar -> Submenu (Novo Jogo / Carregar Save)
+                    case 0: // Jogar -> Submenu
                         String playResult = playSubMenuLoop();
                         if (!playResult.equals("voltar")) {
-                            return playResult; // Retorna "novo_jogo" ou "carregar"
+                            return playResult;
                         }
                         break;
 
@@ -103,11 +106,8 @@ public class MenuController {
         return "sair";
     }
 
-    /**
-     * Submenu exibido ao selecionar "Jogar" no Menu Inicial.
-     */
     private String playSubMenuLoop() {
-        String[] playOptions = {"Novo Jogo", "Carregar Save", "Voltar"};
+        String[] playOptions = {"Continuar (Auto-Save)", "Novo Jogo", "Carregar Save", "Voltar"};
         int selected = 0;
 
         while (true) {
@@ -122,26 +122,32 @@ public class MenuController {
                 if (selected >= playOptions.length) selected = 0;
             } else if (input.equals("E")) {
                 switch (selected) {
-                    case 0: // Novo Jogo (escolher slot para criar/sobrescrever)
+                    case 0: // Continuar direto do Auto-Save (Slot 0)
+                        try {
+                            stateRepo.loadStateFromSlotChecked(0);
+                            this.selectedSaveSlot = 0;
+                            return "carregar";
+                        } catch (GamePersistenceException e) {
+                            view.printMessage("\n[Aviso] Não foi possível continuar: " + e.getMessage());
+                        }
+                        break;
+                    case 1: // Novo Jogo
                         if (newGameSlotSelectionLoop()) {
                             return "novo_jogo";
                         }
                         break;
-                    case 1: // Carregar Save
+                    case 2: // Carregar Save
                         if (savesLoop()) {
                             return "carregar";
                         }
                         break;
-                    case 2: // Voltar
+                    case 3: // Voltar
                         return "voltar";
                 }
             }
         }
     }
 
-    /**
-     * Solicita qual slot (1 a 4) será usado/sobrescrito para começar um Novo Jogo do zero.
-     */
     public boolean newGameSlotSelectionLoop() {
         while (true) {
             Map<Integer, GameStates> slotsMap = new HashMap<>();
@@ -220,12 +226,17 @@ public class MenuController {
             } else if (choice == 8) {
                 handleDeleteSave();
             } else if (choice >= 0 && choice <= 4) {
-                if (stateRepo.slotExists(choice)) {
+                try {
+                    stateRepo.loadStateFromSlotChecked(choice);
                     this.selectedSaveSlot = choice;
-                    view.printMessage("\nSave do Slot " + (choice == 0 ? "Auto-Save" : choice) + " selecionado com sucesso!");
+                    view.printMessage("\nSave do Slot " + (choice == 0 ? "Auto-Save" : choice) + " validado e selecionado com sucesso!");
                     return true;
-                } else {
-                    view.printMessage("\n[Aviso] O Slot selecionado está vazio. Escolha outro slot ou pressione 9 para voltar.");
+                } catch (SaveSlotNotFoundException e) {
+                    view.printMessage("\n[Aviso] " + e.getMessage() + " Escolha outro slot ou pressione 9 para voltar.");
+                } catch (CorruptedSaveException e) {
+                    view.printMessage("\n[Erro - Save Corrompido] " + e.getMessage());
+                } catch (GamePersistenceException e) {
+                    view.printMessage("\n[Erro de Leitura] " + e.getMessage());
                 }
             } else {
                 view.printMessage("\nOpção inválida! Escolha um slot entre 0 e 4, 8 para excluir ou 9 para voltar.");
@@ -263,11 +274,11 @@ public class MenuController {
         String confirmation = inputManager.readString().trim();
 
         if (confirmation.equalsIgnoreCase("S")) {
-            boolean deleted = stateRepo.deleteSlot(choice);
-            if (deleted) {
+            try {
+                stateRepo.deleteSlotChecked(choice);
                 view.printMessage("\n[Sucesso] O save do Slot " + (choice == 0 ? "Auto-Save" : choice) + " foi deletado com sucesso!");
-            } else {
-                view.printMessage("\n[Erro] Falha ao tentar deletar o arquivo do Slot " + choice + ".");
+            } catch (GamePersistenceException e) {
+                view.printMessage("\n[Erro] " + e.getMessage());
             }
         } else {
             view.printMessage("\n[Cancelado] A exclusão do Slot " + choice + " foi cancelada.");
