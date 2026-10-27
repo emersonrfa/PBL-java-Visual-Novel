@@ -1,0 +1,14 @@
+{
+  "saveName" : "Emily",
+  "currentChapterId" : 1,
+  "currentDialogId" : "d1.1",
+  "currentSceneId" : "Quarto",
+  "storyFlags" : { },
+  "npcAffinities" : { },
+  "npcSuspicions" : { },
+  "playerBloodType" : "A+",
+  "playerMoney" : 20.0,
+  "playerEnergy" : 100,
+  "playerInventoryItems" : [ ],
+  "saveTimestamp" : "24/10/2026 15:03:42"
+}

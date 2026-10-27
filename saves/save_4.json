@@ -1,0 +1,13 @@
+{
+  "currentChapterId" : 2,
+  "currentDialogId" : "d2.2",
+  "currentSceneId" : "Cozinha",
+  "storyFlags" : {
+    "JANELAARTHUR" : true,
+    "NOTICIAS" : false
+  },
+  "playerBloodType" : "O-",
+  "playerMoney" : 20.0,
+  "playerEnergy" : 100,
+  "playerInventoryItems" : [ ]
+}

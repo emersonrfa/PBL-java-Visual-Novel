@@ -1,0 +1,13 @@
+{
+  "currentChapterId" : 1,
+  "currentDialogId" : "dFIM.2",
+  "currentSceneId" : "Enfim, o sono",
+  "storyFlags" : {
+    "JANELAARTHUR" : true,
+    "NOTICIAS" : false
+  },
+  "playerBloodType" : "A+",
+  "playerMoney" : 0.0,
+  "playerEnergy" : 100,
+  "playerInventoryItems" : [ ]
+}
