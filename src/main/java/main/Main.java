@@ -1,14 +1,14 @@
 package main;
 
-import Controller.GameManager;
-import Controller.InputManager;
-import Controller.MenuController;
-import Model.GameStates;
-import Model.Player;
-import Repository.ItemRepository;
-import Repository.StateRepository;
-import Service.PlayerService;
-import View.MenuView;
+import controller.GameManager;
+import controller.InputManager;
+import controller.MenuController;
+import model.GameStates;
+import model.Player;
+import repository.ItemRepository;
+import repository.StateRepository;
+import service.PlayerService;
+import view.MenuView;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
