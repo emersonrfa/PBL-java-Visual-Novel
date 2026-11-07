@@ -113,13 +113,14 @@ public class MenuView {
         }
     }
 
-    public void displayChapterSelection() {
+    public void displayChapterSelection(Map<Integer, String> chapterTitles, int endingsGalleryOption) {
         System.out.println("\n==================================================");
         System.out.println("               SELEÇÃO DE CAPÍTULO                ");
         System.out.println("==================================================");
-        System.out.println(" 1 - Capítulo 1: O Prólogo");
-        System.out.println(" 2 - Capítulo 2: A entrevista de emprego");
-        System.out.println(" 11 - Galeria de Finais");
+        for (Map.Entry<Integer, String> chapter : chapterTitles.entrySet()) {
+            System.out.println(" " + chapter.getKey() + " - Capítulo " + chapter.getKey() + ": " + chapter.getValue());
+        }
+        System.out.println(" " + endingsGalleryOption + " - Galeria de Finais");
         System.out.println(" 0 - Voltar / Sair");
         System.out.println("==================================================");
     }

@@ -11,22 +11,23 @@ import view.EndingView;
 import java.util.List;
 
 public class EndingManager {
-    private EndingRepository endingRepo;
-    private UnlockedEndingsRepository unlockedEndingsRepo;
-    private EndingView view;
-    private AchievementService achievementService;
-    private AchievementView achievementView;
+    private final EndingRepository endingRepo;
+    private final UnlockedEndingsRepository unlockedEndingsRepo;
+    private final AchievementService achievementService;
+    private final EndingView view = new EndingView();
+    private final AchievementView achievementView = new AchievementView();
 
-    public EndingManager() {
-        this.endingRepo = new EndingRepository();
-        this.unlockedEndingsRepo = new UnlockedEndingsRepository();
-        this.view = new EndingView();
-        this.achievementService = new AchievementService();
-        this.achievementView = new AchievementView();
+    /** Recebe as instâncias compartilhadas da aplicação (ver main.AppContext). */
+    public EndingManager(EndingRepository endingRepo,
+                         UnlockedEndingsRepository unlockedEndingsRepo,
+                         AchievementService achievementService) {
+        this.endingRepo = endingRepo;
+        this.unlockedEndingsRepo = unlockedEndingsRepo;
+        this.achievementService = achievementService;
     }
 
     public boolean isEndingCode(String dialogueId) {
-        return dialogueId != null && dialogueId.startsWith("FINAL_");
+        return dialogueId != null && dialogueId.startsWith(Ending.CODE_PREFIX);
     }
 
     public void triggerEnding(String endingId) {

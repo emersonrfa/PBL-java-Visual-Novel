@@ -10,11 +10,6 @@ public class AchievementService {
     private final AchievementRepository achievementRepo;
     private final UnlockedAchievementsRepository unlockedRepo;
 
-    public AchievementService() {
-        this.achievementRepo = new AchievementRepository();
-        this.unlockedRepo = new UnlockedAchievementsRepository();
-    }
-
     public AchievementService(AchievementRepository achievementRepo,
                               UnlockedAchievementsRepository unlockedRepo) {
         this.achievementRepo = achievementRepo;

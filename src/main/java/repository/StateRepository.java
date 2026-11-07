@@ -5,6 +5,7 @@ import exception.GamePersistenceException;
 import exception.SaveSlotNotFoundException;
 import model.GameStates;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -171,19 +172,38 @@ public class StateRepository {
         return -1;
     }
 
+    /**
+     * Copia o autosave para o primeiro slot manual livre. É idempotente: se um slot manual já
+     * contém exatamente este progresso, nada é copiado e o retorno é -1. Assim, chamar o método
+     * mais de uma vez (opção "Sair" + shutdown hook) ou reabrir o jogo sem jogar não gera cópias.
+     *
+     * Limitação conhecida: se o jogador apagar o slot que recebeu a cópia e sair sem jogar mais,
+     * o mesmo autosave será arquivado de novo.
+     *
+     * @return número do slot usado, ou -1 se não havia o que arquivar (sem autosave, já arquivado ou sem slot livre)
+     */
     public int archiveAutoSaveToEmptySlot() {
-        if (!slotExists(0) || isSlotCorrupted(0)) {
+        GameStates autoSaveState = loadStateFromSlot(0); // null se ausente ou corrompido
+        if (autoSaveState == null || isAlreadyArchived(autoSaveState)) {
             return -1;
         }
 
         int targetSlot = findFirstAvailableManualSlot();
-        if (targetSlot != -1) {
-            GameStates autoSaveState = loadStateFromSlot(0);
-            if (autoSaveState != null && saveStateToSlot(autoSaveState, targetSlot)) {
-                return targetSlot;
-            }
+        if (targetSlot != -1 && saveStateToSlot(autoSaveState, targetSlot)) {
+            return targetSlot;
         }
         return -1;
+    }
+
+    private boolean isAlreadyArchived(GameStates autoSave) {
+        JsonNode autoSaveTree = mapper.valueToTree(autoSave);
+        for (int slot = 1; slot <= 4; slot++) {
+            GameStates manual = loadStateFromSlot(slot);
+            if (manual != null && autoSaveTree.equals(mapper.valueToTree(manual))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public GameStates getCurrentStates() {

@@ -1,47 +1,36 @@
 package controller;
 
-import model.*;
-import repository.ConfigRepository;
-import repository.StateRepository;
-import repository.StoryRepository;
-import service.AffinityTracker;
+import model.Chapter;
+import model.Ending;
+import model.GameStates;
+import repository.ChapterCatalog;
 import view.MenuView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager {
+    private static final int FIRST_CHAPTER = 1;
+
     private boolean isRunning;
-    private DialogueController dialogueController;
-    private MenuController menuController;
-    private StoryRepository storyRepository;
-    private EndingManager endingManager;
-    private GameConfig config;
-    private StateRepository stateRepository;
-    private GameStates currentGameState;
-    private MenuView menuView;
+    private final DialogueController dialogueController;
+    private final MenuController menuController;
+    private final ChapterCatalog chapterCatalog;
+    private final EndingManager endingManager;
+    private final GameStates currentGameState;
+    private final MenuView menuView = new MenuView();
 
-    public GameManager(Player player, InputManager inputManager) {
-        this(player, inputManager, null);
-    }
-
-    public GameManager(Player player, InputManager inputManager, GameStates activeState) {
-        AffinityTracker tracker = new AffinityTracker();
-        if (activeState != null) {
-            new service.PlayerService().restoreAffinityFromState(activeState, tracker);
-        }
-        this.menuView = new MenuView();
-
-        ConfigRepository configRepository = new ConfigRepository();
-        this.config = configRepository.getCurrentConfig();
-
-        this.stateRepository = new StateRepository();
-        this.currentGameState = (activeState != null) ? activeState : this.stateRepository.getCurrentStates();
-
-        this.dialogueController = new DialogueController(player, inputManager, tracker, this.config, this.stateRepository);
-        this.menuController = new MenuController(inputManager, configRepository);
-        this.storyRepository = new StoryRepository();
-        this.endingManager = new EndingManager();
+    /** Criado por main.AppContext, que injeta as instâncias compartilhadas. */
+    public GameManager(DialogueController dialogueController,
+                       MenuController menuController,
+                       ChapterCatalog chapterCatalog,
+                       EndingManager endingManager,
+                       GameStates currentGameState) {
+        this.dialogueController = dialogueController;
+        this.menuController = menuController;
+        this.chapterCatalog = chapterCatalog;
+        this.endingManager = endingManager;
+        this.currentGameState = currentGameState;
     }
 
     /**
@@ -49,9 +38,8 @@ public class GameManager {
      */
     public void startGame() {
         this.isRunning = true;
-        Chapter prologue = storyRepository.buildPrologue();
-        menuView.printMessage("\nCarregando Capítulo 1...");
-        dialogueController.playChapter(prologue);
+        menuView.printMessage("\nCarregando Capítulo " + FIRST_CHAPTER + "...");
+        dialogueController.playChapter(chapterCatalog.get(FIRST_CHAPTER));
         this.isRunning = false;
     }
 
@@ -72,20 +60,11 @@ public class GameManager {
 
         menuView.printMessage("\nRetomando a partida no Capítulo " + savedChapter + " [Diálogo: " + savedDialogId + "]...");
 
-        switch (savedChapter) {
-            case 1:
-                Chapter prologue = storyRepository.buildPrologue();
-                dialogueController.playChapter(prologue, savedDialogId);
-                break;
-
-            case 2:
-                Chapter cap2 = storyRepository.buildEntrevista();
-                dialogueController.playChapter(cap2, savedDialogId);
-                break;
-
-            default:
-                menuView.printMessage("\nCapítulo desconhecido no save (" + savedChapter + ").");
-                break;
+        Chapter chapter = chapterCatalog.get(savedChapter);
+        if (chapter != null) {
+            dialogueController.playChapter(chapter, savedDialogId);
+        } else {
+            menuView.printMessage("\nCapítulo desconhecido no save (" + savedChapter + ").");
         }
 
         this.isRunning = false;
@@ -97,26 +76,19 @@ public class GameManager {
     public void gameLoop() {
         this.isRunning = true;
         while (isRunning) {
-            int choice = menuController.chapterSelection();
+            int choice = menuController.chapterSelection(chapterCatalog.titles());
 
-            switch (choice) {
-                case 1:
-                    Chapter prologue = storyRepository.buildPrologue();
-                    menuView.printMessage("\nCarregando capítulo 1...");
-                    dialogueController.playChapter(prologue);
-                    break;
-                case 2:
-                    Chapter cap2 = storyRepository.buildEntrevista();
-                    menuView.printMessage("\nCarregando capítulo 2...");
-                    dialogueController.playChapter(cap2);
-                    break;
-                case 11:
-                    endingGalleryLoop();
-                    break;
-                case 0:
-                    menuView.printMessage("\nVoltando para o Menu Principal...");
-                    isRunning = false;
-                    break;
+            if (choice == 0) {
+                menuView.printMessage("\nVoltando para o Menu Principal...");
+                isRunning = false;
+            } else if (choice == MenuController.ENDINGS_GALLERY_OPTION) {
+                endingGalleryLoop();
+            } else {
+                Chapter chapter = chapterCatalog.get(choice);
+                if (chapter != null) {
+                    menuView.printMessage("\nCarregando capítulo " + choice + "...");
+                    dialogueController.playChapter(chapter);
+                }
             }
         }
     }

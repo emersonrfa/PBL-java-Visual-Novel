@@ -5,6 +5,7 @@ import model.*;
 import repository.StateRepository;
 import service.AchievementService;
 import service.AffinityTracker;
+import service.ConsequenceReport;
 import service.PlayerService;
 import service.StoryService;
 import view.AchievementView;
@@ -14,7 +15,6 @@ import view.MenuView;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class DialogueController {
@@ -26,6 +26,7 @@ public class DialogueController {
     private AchievementView achievementView;
     private PlayerService playerService;
     private AchievementService achievementService;
+    private EndingManager endingManager;
     private GameConfig config;
     private StateRepository stateRepository;
     private boolean returnToMenuRequested = false;
@@ -33,7 +34,9 @@ public class DialogueController {
 
     public DialogueController(Player player, InputManager inputManager,
                               AffinityTracker affinityTracker, GameConfig config,
-                              StateRepository stateRepository) {
+                              StateRepository stateRepository,
+                              AchievementService achievementService,
+                              EndingManager endingManager) {
         this.player = player;
         this.inputManager = inputManager;
         this.affinityTracker = affinityTracker;
@@ -41,7 +44,8 @@ public class DialogueController {
         this.menuView = new MenuView();
         this.achievementView = new AchievementView();
         this.playerService = new PlayerService();
-        this.achievementService = new AchievementService();
+        this.achievementService = achievementService;
+        this.endingManager = endingManager;
         this.config = config;
         this.stateRepository = stateRepository;
     }
@@ -87,7 +91,6 @@ public class DialogueController {
                 : "d1.1";
 
         StoryScene currentScene = null;
-        EndingManager endingManager = new EndingManager();
 
         while (currentId != null && !currentId.isEmpty() && !this.returnToMenuRequested) {
             if (endingManager.isEndingCode(currentId)) {
@@ -221,15 +224,12 @@ public class DialogueController {
         int chosenIndex = choice - 1;
         Choice chosenOption = options.get(chosenIndex);
 
-        List<String> messages = playerService.applyOptionConsequences(player, chosenOption);
-        for (String msg : messages) {
+        ConsequenceReport report = playerService.applyChoiceConsequences(player, chosenOption, affinityTracker);
+        for (String msg : report.messages()) {
             view.printConsequence(msg);
         }
 
         if (chosenOption.getTargetNpc() != null) {
-            affinityTracker.modifyAffinity(chosenOption.getTargetNpc(), chosenOption.getAffinityChange());
-            affinityTracker.modifySuspicion(chosenOption.getTargetNpc(), chosenOption.getSuspicionChange());
-
             int currentAff = affinityTracker.getAffinity(chosenOption.getTargetNpc());
             Achievement unlockedAff = achievementService.evaluateAffinityTrigger(chosenOption.getTargetNpc(), currentAff);
             if (unlockedAff != null) {

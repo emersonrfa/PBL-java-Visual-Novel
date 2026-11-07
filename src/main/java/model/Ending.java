@@ -1,6 +1,9 @@
 package model;
 
 public class Ending {
+    /** Prefixo que identifica, num próximo-diálogo, um código de final (ex.: FINAL_VAMPIRA). */
+    public static final String CODE_PREFIX = "FINAL_";
+
     private String id;
     private String title;
     private String description;

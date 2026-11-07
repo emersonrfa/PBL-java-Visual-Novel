@@ -16,16 +16,17 @@ import java.time.format.DateTimeFormatter;
 public class Main {
 
     public static void main(String[] args) {
+        AppContext context = new AppContext();
         InputManager inputManager = new InputManager();
         MenuView menuView = new MenuView();
-        MenuController menuController = new MenuController(inputManager);
-        PlayerService playerService = new PlayerService();
-        ItemRepository itemRepository = new ItemRepository();
+        MenuController menuController = context.createMenuController(inputManager);
+        PlayerService playerService = context.getPlayerService();
+        ItemRepository itemRepository = context.getItemRepository();
+        StateRepository stateRepository = context.getStateRepository();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            StateRepository repo = new StateRepository();
-            repo.archiveAutoSaveToEmptySlot();
-        }));
+        // Rede de segurança para encerramentos abruptos (Ctrl+C, terminal fechado).
+        // archiveAutoSaveToEmptySlot() é idempotente: se a opção "Sair" já arquivou, não duplica.
+        Runtime.getRuntime().addShutdownHook(new Thread(stateRepository::archiveAutoSaveToEmptySlot));
 
         menuView.printMessage("inicializando jogo...\n");
 
@@ -36,7 +37,6 @@ public class Main {
 
             if (menuResponse.equals("novo_jogo")) {
                 int targetSlot = menuController.getSelectedSaveSlot();
-                StateRepository stateRepository = menuController.getStateRepo();
 
                 menuView.printBloodTypePrompt();
                 String tipoSanguineo = inputManager.readBloodType();
@@ -55,12 +55,11 @@ public class Main {
                 stateRepository.saveState(initialState);
                 menuView.printMessage("[Sucesso] Novo jogo gravado no Slot " + targetSlot + "!\n");
 
-                GameManager gameManager = new GameManager(player, inputManager, initialState);
+                GameManager gameManager = context.createGameManager(player, inputManager, initialState);
                 gameManager.startGame();
             }
             else if (menuResponse.equals("carregar")) {
                 int slot = menuController.getSelectedSaveSlot();
-                StateRepository stateRepository = menuController.getStateRepo();
                 GameStates savedState = stateRepository.loadStateFromSlot(slot);
 
                 if (savedState != null) {
@@ -71,7 +70,7 @@ public class Main {
 
                     menuView.printMessage("Save carregado com sucesso!\n");
 
-                    GameManager gameManager = new GameManager(player, inputManager, savedState);
+                    GameManager gameManager = context.createGameManager(player, inputManager, savedState);
                     gameManager.loadAndStartGame();
                 } else {
                     menuView.printMessage("\n[Erro] Falha ao ler os dados do slot selecionado.\n");
@@ -79,11 +78,10 @@ public class Main {
             }
             else if (menuResponse.equals("admin")) {
                 Player adminPlayer = new Player("O-");
-                GameManager gameManager = new GameManager(adminPlayer, inputManager);
+                GameManager gameManager = context.createGameManager(adminPlayer, inputManager, null);
                 gameManager.gameLoop();
             }
             else if (menuResponse.equals("sair")) {
-                StateRepository stateRepository = new StateRepository();
                 int archivedSlot = stateRepository.archiveAutoSaveToEmptySlot();
 
                 if (archivedSlot != -1) {

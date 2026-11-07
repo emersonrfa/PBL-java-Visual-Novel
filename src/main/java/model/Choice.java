@@ -1,7 +1,6 @@
 package model;
 
 public class Choice {
-    private String id;
     private String text;
     private String nextDialogueId;
 
@@ -19,7 +18,6 @@ public class Choice {
 
 
     // atributos para manipulação de inventario
-    private Item itemToGive = null;
     private java.util.List<Item> itemsToGive = new java.util.ArrayList<>();
     private String requiredItemName = null;
     private boolean consumeRequiredItem = false;
@@ -29,21 +27,15 @@ public class Choice {
     private int maxSuspicionAllowed = 100;
     private int suspicionChange = 0;
 
-    // construtor completo
-    public Choice(String id, String text, String nextDialogueId) {
-        this.id = id;
+    // Construtor completo: texto exibido + próximo diálogo
+    public Choice(String text, String nextDialogueId) {
         this.text = text;
         this.nextDialogueId = nextDialogueId;
     }
 
-    // Construtor para opção sem pré requisitos de item ou suspeita
-    public Choice(String text, String nextDialogueId) {
-        this("", text, nextDialogueId);
-    }
-
     // Construtor para apenas avançar texto
     public Choice(String nextDialogueId) {
-        this("", "...", nextDialogueId);
+        this("...", nextDialogueId);
     }
 
     // setters e getters
@@ -134,7 +126,6 @@ public class Choice {
 
     // para iventario e itens:
 
-    public Item getItemToGive() { return itemToGive; }
     public String getRequiredItemName() { return requiredItemName; }
     public boolean isConsumeRequiredItem() { return consumeRequiredItem; }
 

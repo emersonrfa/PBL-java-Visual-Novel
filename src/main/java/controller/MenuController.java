@@ -38,19 +38,24 @@ public class MenuController {
     private AchievementService achievementService;
     private int selectedSaveSlot = -1;
 
-    public MenuController(InputManager inputManager) {
-        this(inputManager, new ConfigRepository());
-    }
+    /** Número do menu de capítulos reservado para a galeria de finais (portanto, no máximo 10 capítulos). */
+    public static final int ENDINGS_GALLERY_OPTION = 11;
 
-    public MenuController(InputManager inputManager, ConfigRepository configRepo) {
+    /** Recebe as instâncias compartilhadas da aplicação (ver main.AppContext). */
+    public MenuController(InputManager inputManager,
+                          ConfigRepository configRepo,
+                          StateRepository stateRepo,
+                          EndingRepository endingRepo,
+                          UnlockedEndingsRepository unlockedEndingsRepo,
+                          AchievementService achievementService) {
         this.inputManager = inputManager;
         this.view = new MenuView();
         this.achievementView = new AchievementView();
         this.configRepo = configRepo;
-        this.stateRepo = new StateRepository();
-        this.endingRepo = new EndingRepository();
-        this.unlockedEndingsRepo = new UnlockedEndingsRepository();
-        this.achievementService = new AchievementService();
+        this.stateRepo = stateRepo;
+        this.endingRepo = endingRepo;
+        this.unlockedEndingsRepo = unlockedEndingsRepo;
+        this.achievementService = achievementService;
     }
 
     public String start() {
@@ -285,9 +290,9 @@ public class MenuController {
         inputManager.waitEnter();
     }
 
-    public int chapterSelection() {
-        view.displayChapterSelection();
-        return inputManager.readValidChoice(0, 11);
+    public int chapterSelection(Map<Integer, String> chapterTitles) {
+        view.displayChapterSelection(chapterTitles, ENDINGS_GALLERY_OPTION);
+        return inputManager.readValidChoice(0, ENDINGS_GALLERY_OPTION);
     }
 
     public int endingSelection(List<String> endingTitles) {

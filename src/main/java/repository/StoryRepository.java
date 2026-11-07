@@ -7,7 +7,13 @@ import model.Choice;
 
 public class StoryRepository {
     private ItemRepository itemRepo = new ItemRepository();
-    private NpcRepository npcRepo = new NpcRepository();
+
+    /** Registra todos os capítulos do jogo. Para criar um capítulo novo: escreva buildX() e registre aqui. */
+    public ChapterCatalog buildCatalog() {
+        return new ChapterCatalog()
+                .register(1, this::buildPrologue)
+                .register(2, this::buildEntrevista);
+    }
 
     public Chapter buildPrologue() { // CAPÍTULO 1 CAP1
 

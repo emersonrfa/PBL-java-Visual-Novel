@@ -6,9 +6,7 @@ import model.Choice;
 import model.Player;
 import repository.ItemRepository;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class PlayerService {
 
@@ -33,38 +31,60 @@ public class PlayerService {
     }
 
     /**
-     * Aplica as consequências no Player e retorna as mensagens geradas para a View exibir.
+     * Aplica todas as consequências de uma escolha (energia, dinheiro, flag, itens e relacionamento)
+     * e devolve um relatório estruturado do que de fato mudou. Não imprime nada: a View decide
+     * como exibir o relatório.
+     *
+     * @param tracker rastreador de afinidade/suspeita; pode ser {@code null} se não houver (ignora a parte de NPC)
      */
-    public List<String> applyOptionConsequences(Player player, Choice option) {
-        List<String> feedbackMessages = new ArrayList<>();
+    public ConsequenceReport applyChoiceConsequences(Player player, Choice choice, AffinityTracker tracker) {
+        ConsequenceReport report = new ConsequenceReport();
 
-        if (option.getEnergyChange() < 0) {
-            player.consumeEnergy(Math.abs(option.getEnergyChange()));
-        } else if (option.getEnergyChange() > 0) {
-            player.addEnergy(option.getEnergyChange());
+        int energyBefore = player.getEnergy();
+        if (choice.getEnergyChange() < 0) {
+            player.consumeEnergy(Math.abs(choice.getEnergyChange()));
+        } else if (choice.getEnergyChange() > 0) {
+            player.addEnergy(choice.getEnergyChange());
+        }
+        report.addEnergy(energyBefore, player.getEnergy());
+
+        double moneyBefore = player.getMoney();
+        if (choice.getMoneyChange() < 0) {
+            player.spendMoney(Math.abs(choice.getMoneyChange()));
+        } else if (choice.getMoneyChange() > 0) {
+            player.addMoney(choice.getMoneyChange());
+        }
+        report.addMoney(moneyBefore, player.getMoney());
+
+        if (choice.getFlagToSet() != null && !choice.getFlagToSet().trim().isEmpty()) {
+            player.setFlag(choice.getFlagToSet(), true);
+            report.addFlag(choice.getFlagToSet());
         }
 
-        if (option.getMoneyChange() < 0) {
-            player.spendMoney(Math.abs(option.getMoneyChange()));
-        } else if (option.getMoneyChange() > 0) {
-            player.addMoney(option.getMoneyChange());
+        if (choice.getRequiredItemName() != null && choice.isConsumeRequiredItem()) {
+            if (player.getInventory().removeItem(choice.getRequiredItemName())) {
+                report.addItemUsed(choice.getRequiredItemName());
+            }
         }
 
-        if (option.getFlagToSet() != null && !option.getFlagToSet().trim().isEmpty()) {
-            player.setFlag(option.getFlagToSet(), true);
-        }
-
-        if (option.getRequiredItemName() != null && option.isConsumeRequiredItem()) {
-            player.getInventory().removeItem(option.getRequiredItemName());
-            feedbackMessages.add("[-1 " + option.getRequiredItemName() + " (Utilizado)]");
-        }
-
-        for (Item item : option.getItemsToGive()) {
+        for (Item item : choice.getItemsToGive()) {
             player.getInventory().addItem(item);
-            feedbackMessages.add("[+ " + item.getName() + "]");
+            report.addItemGained(item.getName());
         }
 
-        return feedbackMessages;
+        if (tracker != null && choice.getTargetNpc() != null) {
+            String npc = choice.getTargetNpc();
+
+            int affinityBefore = tracker.getAffinity(npc);
+            tracker.modifyAffinity(npc, choice.getAffinityChange());
+            report.addAffinity(npc, affinityBefore, tracker.getAffinity(npc));
+
+            int suspicionBefore = tracker.getSuspicion(npc);
+            tracker.modifySuspicion(npc, choice.getSuspicionChange());
+            report.addSuspicion(npc, suspicionBefore, tracker.getSuspicion(npc));
+        }
+
+        return report;
     }
 
     /**

@@ -10,13 +10,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class UnlockedAchievementsRepository {
-    private static final String SAVES_DIR = "saves";
-    private static final String FILE_PATH = SAVES_DIR + File.separator + "unlocked_achievements.json";
+    private static final String DEFAULT_SAVES_DIR = "saves";
+
+    private final String savesDir;
+    private final String filePath;
 
     private final ObjectMapper mapper;
     private Set<String> unlockedKeys;
 
     public UnlockedAchievementsRepository() {
+        this(DEFAULT_SAVES_DIR);
+    }
+
+    public UnlockedAchievementsRepository(String savesDir) {
+        this.savesDir = savesDir;
+        this.filePath = savesDir + File.separator + "unlocked_achievements.json";
         this.mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         this.unlockedKeys = new HashSet<>();
         ensureDirectoryExists();
@@ -24,14 +32,14 @@ public class UnlockedAchievementsRepository {
     }
 
     private void ensureDirectoryExists() {
-        File dir = new File(SAVES_DIR);
+        File dir = new File(savesDir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
     }
 
     public synchronized void load() {
-        File file = new File(FILE_PATH);
+        File file = new File(filePath);
         if (file.exists() && file.length() > 0) {
             try {
                 Set<String> loaded = mapper.readValue(file, new TypeReference<Set<String>>() {});
@@ -57,7 +65,7 @@ public class UnlockedAchievementsRepository {
 
     private synchronized void save() {
         ensureDirectoryExists();
-        File file = new File(FILE_PATH);
+        File file = new File(filePath);
         try {
             mapper.writeValue(file, unlockedKeys);
         } catch (IOException e) {

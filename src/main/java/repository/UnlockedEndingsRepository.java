@@ -10,13 +10,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class UnlockedEndingsRepository {
-    private static final String SAVES_DIR = "saves";
-    private static final String FILE_PATH = SAVES_DIR + File.separator + "unlocked_endings.json";
+    private static final String DEFAULT_SAVES_DIR = "saves";
+
+    private final String savesDir;
+    private final String filePath;
 
     private ObjectMapper mapper;
     private Set<String> unlockedKeys;
 
     public UnlockedEndingsRepository() {
+        this(DEFAULT_SAVES_DIR);
+    }
+
+    public UnlockedEndingsRepository(String savesDir) {
+        this.savesDir = savesDir;
+        this.filePath = savesDir + File.separator + "unlocked_endings.json";
         this.mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         this.unlockedKeys = new HashSet<>();
         ensureDirectoryExists();
@@ -24,14 +32,14 @@ public class UnlockedEndingsRepository {
     }
 
     private void ensureDirectoryExists() {
-        File dir = new File(SAVES_DIR);
+        File dir = new File(savesDir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
     }
 
     public synchronized void load() {
-        File file = new File(FILE_PATH);
+        File file = new File(filePath);
         if (file.exists() && file.length() > 0) {
             try {
                 Set<String> loaded = mapper.readValue(file, new TypeReference<Set<String>>() {});
@@ -59,7 +67,7 @@ public class UnlockedEndingsRepository {
 
     private synchronized void save() {
         ensureDirectoryExists();
-        File file = new File(FILE_PATH);
+        File file = new File(filePath);
         try {
             mapper.writeValue(file, unlockedKeys);
         } catch (IOException e) {
