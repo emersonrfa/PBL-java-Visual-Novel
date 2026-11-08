@@ -1,0 +1,43 @@
+/* Estilo de todas as telas. Cada regra .nome vale para os elementos com styleClass="nome" nos FXML.
+   Cores principais no topo (.root) para trocar o tema inteiro de uma vez. */
+
+.root {
+    -cor-fundo: #141420;
+    -cor-painel: #1d1d33;
+    -cor-texto: #ffffff;
+    -cor-destaque: #ffd479;
+    -cor-apagado: #9a9ab0;
+    -fx-font-size: 16px;
+}
+
+/* ---------- telas de menu ---------- */
+.screen { -fx-background-color: -cor-fundo; -fx-padding: 24; }
+.title { -fx-text-fill: -cor-texto; -fx-font-size: 40px; -fx-font-weight: bold; }
+.title-small { -fx-text-fill: -cor-texto; -fx-font-size: 24px; -fx-font-weight: bold; }
+.text { -fx-text-fill: -cor-texto; -fx-font-size: 16px; }
+.text-muted { -fx-text-fill: -cor-apagado; -fx-font-size: 16px; }
+.status { -fx-text-fill: -cor-destaque; }
+.panel { -fx-background-color: -cor-painel; -fx-padding: 24; }
+.menu-button { -fx-font-size: 18px; -fx-padding: 10 24 10 24; }
+.check-box { -fx-text-fill: -cor-texto; }
+.scroll { -fx-background: transparent; -fx-background-color: transparent; }
+.scroll > .viewport { -fx-background-color: transparent; }
+.row { -fx-background-color: rgba(255,255,255,0.06); -fx-padding: 10; }
+.row-title { -fx-text-fill: -cor-destaque; -fx-font-size: 18px; -fx-font-weight: bold; }
+.row-title-locked { -fx-text-fill: -cor-apagado; -fx-font-size: 18px; -fx-font-weight: bold; }
+
+/* ---------- tela do jogo ---------- */
+.game-root { -fx-background-color: -cor-fundo; }
+.hud { -fx-background-color: rgba(0,0,0,0.45); -fx-padding: 12 20 12 20; }
+.hud-text { -fx-text-fill: -cor-texto; -fx-font-size: 16px; }
+.hud-button { -fx-font-size: 14px; }
+.dialogue-box { -fx-background-color: rgba(10,10,20,0.85); -fx-padding: 20 40 24 40; }
+.speaker { -fx-text-fill: -cor-destaque; -fx-font-size: 20px; -fx-font-weight: bold; }
+.dialogue-text { -fx-text-fill: -cor-texto; -fx-font-size: 20px; }
+.hint { -fx-text-fill: #cccccc; -fx-font-size: 14px; }
+.choice-button { -fx-font-size: 16px; }
+.chapter-banner { -fx-text-fill: white; -fx-font-size: 36px; -fx-font-weight: bold;
+                  -fx-background-color: rgba(0,0,0,0.6); -fx-padding: 18 36 18 36; -fx-text-alignment: center; }
+.toast { -fx-text-fill: white; -fx-background-color: rgba(30,30,60,0.92); -fx-padding: 8 14 8 14; }
+.modal-layer { -fx-background-color: rgba(0,0,0,0.7); }
+.item-placeholder { -fx-background-color: rgba(255,255,255,0.12); }

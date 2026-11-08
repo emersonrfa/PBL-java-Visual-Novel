@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- NOVO JOGO: slot onde salvar + tipo sanguíneo. Comportamento: ui/screens/NewGameController.java.
+     As opções dos dois ChoiceBox são preenchidas pelo controller (método initialize). -->
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="ui.screens.NewGameController"
+           styleClass="screen">
+    <VBox alignment="CENTER_LEFT" spacing="14" maxWidth="720" maxHeight="-Infinity" styleClass="panel">
+        <Label text="Novo Jogo" styleClass="title"/>
+        <Label text="Slot onde o jogo será salvo:" styleClass="text"/>
+        <ChoiceBox fx:id="slotChoice" maxWidth="Infinity"/>
+        <Label text="Tipo sanguíneo:" styleClass="text"/>
+        <ChoiceBox fx:id="bloodChoice"/>
+        <Label fx:id="statusLabel" styleClass="status" wrapText="true"/>
+        <HBox spacing="12">
+            <Button text="Iniciar" onAction="#onStart" styleClass="menu-button"/>
+            <Button text="Voltar" onAction="#onBack" styleClass="menu-button"/>
+        </HBox>
+    </VBox>
+</StackPane>

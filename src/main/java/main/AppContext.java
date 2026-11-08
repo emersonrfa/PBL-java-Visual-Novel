@@ -21,7 +21,9 @@ import repository.UnlockedEndingsRepository;
 import service.AchievementService;
 import service.AffinityTracker;
 import service.AssetResolver;
+import service.EndingService;
 import service.GameSession;
+import service.SaveService;
 import service.PlayerService;
 
 /**
@@ -54,6 +56,26 @@ public final class AppContext {
 
     public ItemRepository getItemRepository() {
         return itemRepository;
+    }
+
+    public boolean hasChapter(int number) {
+        return chapterCatalog.contains(number);
+    }
+
+    public SaveService getSaveService() {
+        return new SaveService(stateRepository, playerService, itemRepository);
+    }
+
+    public AchievementService getAchievementService() {
+        return achievementService;
+    }
+
+    public EndingService getEndingService() {
+        return endingManager.getService();
+    }
+
+    public ConfigRepository getConfigRepository() {
+        return configRepository;
     }
 
     public GameConfig getConfig() {

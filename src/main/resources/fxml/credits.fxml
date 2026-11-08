@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- CRÉDITOS. Comportamento: ui/screens/CreditsController.java -->
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="ui.screens.CreditsController"
+           styleClass="screen">
+    <VBox alignment="CENTER" spacing="14" maxWidth="640" maxHeight="-Infinity">
+        <Label text="Créditos" styleClass="title"/>
+        <Label styleClass="text" wrapText="true" textAlignment="CENTER"
+               text="Feito por:&#10;Emerson Rodrigues Farias de Araújo&#10;Daniel Fontes Aguiar&#10;&#10;Projeto PBL da matéria de MI - Algoritmos de Programação II."/>
+        <Button text="Voltar" onAction="#onBack" styleClass="menu-button"/>
+    </VBox>
+</StackPane>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- CONFIGURAÇÕES. Comportamento: ui/screens/SettingsController.java -->
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="ui.screens.SettingsController"
+           styleClass="screen">
+    <VBox alignment="CENTER_LEFT" spacing="14" maxWidth="560" maxHeight="-Infinity" styleClass="panel">
+        <Label text="Configurações" styleClass="title"/>
+        <Label text="Velocidade do texto:" styleClass="text"/>
+        <ChoiceBox fx:id="speedChoice"/>
+        <CheckBox fx:id="confirmChoicesBox" text="Confirmar escolhas" styleClass="text"/>
+        <CheckBox fx:id="autoSaveBox" text="Salvar automaticamente a cada diálogo" styleClass="text"/>
+        <CheckBox fx:id="musicBox" text="Música" styleClass="text"/>
+        <Label fx:id="statusLabel" styleClass="status"/>
+        <HBox spacing="12">
+            <Button text="Salvar" onAction="#onSave" styleClass="menu-button"/>
+            <Button text="Voltar" onAction="#onBack" styleClass="menu-button"/>
+        </HBox>
+    </VBox>
+</StackPane>

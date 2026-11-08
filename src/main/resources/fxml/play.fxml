@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- JOGAR: escolhe entre Novo Jogo e Carregar. Comportamento: ui/screens/PlayController.java -->
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="ui.screens.PlayController"
+           styleClass="screen">
+    <VBox alignment="CENTER" spacing="14" maxWidth="360" maxHeight="-Infinity">
+        <Label text="Jogar" styleClass="title"/>
+        <Button text="Novo Jogo" onAction="#onNewGame" styleClass="menu-button" maxWidth="Infinity"/>
+        <Button text="Carregar Jogo" onAction="#onLoadGame" styleClass="menu-button" maxWidth="Infinity"/>
+        <Button text="Voltar" onAction="#onBack" styleClass="menu-button" maxWidth="Infinity"/>
+    </VBox>
+</StackPane>

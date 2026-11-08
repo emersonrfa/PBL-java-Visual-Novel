@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+  TELA ÚNICA DO JOGO. Tudo (diálogos, escolhas, sprites, fundos) acontece aqui; o controller
+  (ui/game/GameController.java) só preenche os elementos abaixo com fx:id.
+  Os elementos ficam EMPILHADOS (StackPane): o último do arquivo aparece por cima.
+  Pode mudar posições, tamanhos e estilos à vontade; só não remova nem renomeie os fx:id,
+  nem os onAction="#..." / onMouseClicked="#...", ou o jogo não encontra o elemento.
+-->
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:id="root" fx:controller="ui.game.GameController"
+           styleClass="game-root">
+
+    <!-- 1. Fundo da cena (preenche a janela inteira) -->
+    <ImageView fx:id="background" preserveRatio="false" mouseTransparent="true"/>
+
+    <!-- 2. Sprite de quem está falando (altura = altura da janela, centralizado embaixo) -->
+    <ImageView fx:id="sprite" preserveRatio="true" mouseTransparent="true" StackPane.alignment="BOTTOM_CENTER"/>
+
+    <!-- 3. HUD no topo: energia, dinheiro e botões -->
+    <HBox alignment="CENTER_LEFT" spacing="16" styleClass="hud"
+          StackPane.alignment="TOP_CENTER" maxHeight="-Infinity">
+        <Label fx:id="energyLabel" styleClass="hud-text"/>
+        <Label fx:id="moneyLabel" styleClass="hud-text"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Inventário" onAction="#onInventory" styleClass="hud-button"/>
+        <Button text="Salvar" onAction="#onSave" styleClass="hud-button"/>
+        <Button text="Menu" onAction="#onMenu" styleClass="hud-button"/>
+    </HBox>
+
+    <!-- 4. Caixa de diálogo (embaixo). Clicar nela avança o texto. -->
+    <VBox spacing="8" styleClass="dialogue-box" onMouseClicked="#onDialogueClicked"
+          StackPane.alignment="BOTTOM_CENTER" maxHeight="-Infinity">
+        <Label fx:id="speakerLabel" styleClass="speaker"/>
+        <Label fx:id="textLabel" styleClass="dialogue-text" wrapText="true" minHeight="90"/>
+        <VBox fx:id="choicesBox" spacing="8"/>
+        <Label fx:id="continueHint" text="▼ continuar" styleClass="hint"/>
+    </VBox>
+
+    <!-- 5. Avisos rápidos (conquistas, consequências...), canto superior direito -->
+    <VBox fx:id="toastBox" spacing="6" alignment="TOP_RIGHT" mouseTransparent="true"
+          StackPane.alignment="TOP_RIGHT" maxWidth="-Infinity" maxHeight="-Infinity">
+        <StackPane.margin>
+            <Insets top="70" right="20"/>
+        </StackPane.margin>
+    </VBox>
+
+    <!-- 6. Título do capítulo (aparece e some sozinho) -->
+    <Label fx:id="chapterBanner" styleClass="chapter-banner" visible="false" mouseTransparent="true"
+           maxWidth="-Infinity" maxHeight="-Infinity"/>
+
+    <!-- 7. Janelas por cima de tudo (começam invisíveis) -->
+    <StackPane fx:id="inventoryOverlay" styleClass="modal-layer" visible="false">
+        <VBox spacing="16" styleClass="panel" maxWidth="640" maxHeight="-Infinity">
+            <Label text="Inventário" styleClass="title-small"/>
+            <ScrollPane fitToWidth="true" prefHeight="360" styleClass="scroll">
+                <VBox fx:id="inventoryList" spacing="12"/>
+            </ScrollPane>
+            <Button text="Fechar" onAction="#onCloseInventory" styleClass="menu-button"/>
+        </VBox>
+    </StackPane>
+
+    <StackPane fx:id="saveOverlay" styleClass="modal-layer" visible="false">
+        <VBox spacing="16" styleClass="panel" maxWidth="640" maxHeight="-Infinity">
+            <Label text="Salvar jogo" styleClass="title-small"/>
+            <VBox fx:id="saveSlotsBox" spacing="8"/>
+            <Button text="Cancelar" onAction="#onCloseSave" styleClass="menu-button"/>
+        </VBox>
+    </StackPane>
+
+    <StackPane fx:id="endOverlay" styleClass="modal-layer" visible="false">
+        <VBox spacing="16" styleClass="panel" maxWidth="640" maxHeight="-Infinity">
+            <Label fx:id="endTitle" styleClass="title-small"/>
+            <Label fx:id="endText" styleClass="text" wrapText="true"/>
+            <Button text="Voltar ao menu" onAction="#onLeave" styleClass="menu-button"/>
+        </VBox>
+    </StackPane>
+
+    <StackPane fx:id="confirmOverlay" styleClass="modal-layer" visible="false">
+        <VBox spacing="16" styleClass="panel" maxWidth="640" maxHeight="-Infinity">
+            <Label text="Voltar ao menu?" styleClass="title-small"/>
+            <Label text="O progresso não salvo será perdido." styleClass="text"/>
+            <HBox spacing="10">
+                <Button text="Continuar jogando" onAction="#onStay" styleClass="menu-button"/>
+                <Button text="Sair para o menu" onAction="#onLeave" styleClass="menu-button"/>
+            </HBox>
+        </VBox>
+    </StackPane>
+</StackPane>
