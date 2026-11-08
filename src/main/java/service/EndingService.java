@@ -53,6 +53,10 @@ public class EndingService {
         return new EndingOutcome(endingId, ending, unlocked);
     }
 
+    public boolean isUnlocked(Ending ending) {
+        return unlockedEndingsRepo.isUnlocked(ending.getId());
+    }
+
     public List<Ending> getAllEndings() {
         return endingRepo.getAllEndings();
     }

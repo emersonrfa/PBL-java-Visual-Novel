@@ -6,6 +6,7 @@ import ui.navigation.NavigationModel.NavigationEvent;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -15,7 +16,7 @@ import java.util.function.Supplier;
  * <pre>
  * ScreenNavigator navigator = new ScreenNavigator(new NavigationModel());
  * navigator.register(ScreenId.MAIN_MENU, () -> new MainMenuScreen(navigator, context));
- * navigator.register(ScreenId.GAME,      () -> new GameScreen(...));
+ * navigator.registerWithArgument(ScreenId.GAME, arg -> GameController.create(navigator, context, (GameRequest) arg));
  * stage.setScene(new Scene(navigator.root(), 1280, 720));
  * navigator.goTo(ScreenId.MAIN_MENU);
  * </pre>
@@ -26,16 +27,24 @@ import java.util.function.Supplier;
 public class ScreenNavigator {
     private final StackPane root = new StackPane();
     private final NavigationModel model;
-    private final Map<ScreenId, Supplier<Screen>> factories = new EnumMap<>(ScreenId.class);
+    private final Map<ScreenId, Function<Object, Screen>> factories = new EnumMap<>(ScreenId.class);
     private final Observer<NavigationEvent> onNavigation = this::show;
     private Screen shown;
+    private Object pendingArgument;
 
     public ScreenNavigator(NavigationModel model) {
         this.model = model;
         model.addObserver(onNavigation);
     }
 
+    /** Registra uma tela que não recebe nada ao abrir. */
     public ScreenNavigator register(ScreenId id, Supplier<Screen> factory) {
+        factories.put(id, argument -> factory.get());
+        return this;
+    }
+
+    /** Registra uma tela que recebe o argumento passado em {@code goTo(id, argumento)} (nulo se não houve). */
+    public ScreenNavigator registerWithArgument(ScreenId id, Function<Object, Screen> factory) {
         factories.put(id, factory);
         return this;
     }
@@ -49,17 +58,28 @@ public class ScreenNavigator {
     }
 
     public void goTo(ScreenId id) {
+        goTo(id, null);
+    }
+
+    public void goTo(ScreenId id, Object argument) {
         requireRegistered(id);
+        pendingArgument = argument;
         model.goTo(id);
     }
 
     public void replaceWith(ScreenId id) {
+        replaceWith(id, null);
+    }
+
+    public void replaceWith(ScreenId id, Object argument) {
         requireRegistered(id);
+        pendingArgument = argument;
         model.replaceWith(id);
     }
 
     public void resetTo(ScreenId id) {
         requireRegistered(id);
+        pendingArgument = null;
         model.resetTo(id);
     }
 
@@ -77,7 +97,9 @@ public class ScreenNavigator {
         if (shown != null) {
             shown.onHide();
         }
-        shown = factories.get(event.to()).get();
+        Object argument = pendingArgument;
+        pendingArgument = null;
+        shown = factories.get(event.to()).apply(argument);
         root.getChildren().setAll(shown.view());
         shown.onShow();
     }
