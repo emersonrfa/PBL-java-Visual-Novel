@@ -2,6 +2,7 @@ package controller;
 
 import exception.GamePersistenceException;
 import model.*;
+import repository.ChapterCatalog;
 import repository.StateRepository;
 import service.AchievementService;
 import service.AffinityTracker;
@@ -57,18 +58,24 @@ public class DialogueController {
         this.stateRepository = stateRepository;
     }
 
-    public void playChapter(Chapter chapter) {
-        playChapter(chapter, null);
-    }
-
-    /** Joga o capítulo a partir de {@code startingDialogueId} (nulo = primeiro diálogo). */
-    public void playChapter(Chapter chapter, String startingDialogueId) {
+    /**
+     * Joga a partir de {@code startingDialogueId} (nulo = primeiro diálogo do capítulo).
+     * Em modo campanha segue para os capítulos seguintes do catálogo até um final, o último
+     * capítulo, um erro de roteiro ou o jogador voltar ao menu.
+     */
+    public void playChapter(ChapterCatalog catalog, int chapterNumber, String startingDialogueId,
+                            boolean continueToNextChapter) {
         returnToMenuRequested = false;
-        session = new GameSession(chapter, player, affinityTracker, config, stateRepository,
-                achievementService, endingManager.getService(), playerService, assets);
+        session = new GameSession(catalog, chapterNumber, continueToNextChapter, player, affinityTracker,
+                config, stateRepository, achievementService, endingManager.getService(), playerService, assets);
 
+        boolean firstScreen = true;
         StepResult step = session.start(startingDialogueId);
         while (step != null) {
+            if (step.snapshot() != null && step.snapshot().chapterChanged() && !firstScreen) {
+                menuView.printMessage("\nCarregando Capítulo " + step.snapshot().chapterNumber() + "...");
+            }
+            firstScreen = false;
             printStep(step);
             if (!step.isShowing() || returnToMenuRequested) {
                 break;

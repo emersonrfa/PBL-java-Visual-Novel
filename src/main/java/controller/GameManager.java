@@ -39,7 +39,7 @@ public class GameManager {
     public void startGame() {
         this.isRunning = true;
         menuView.printMessage("\nCarregando Capítulo " + FIRST_CHAPTER + "...");
-        dialogueController.playChapter(chapterCatalog.get(FIRST_CHAPTER));
+        dialogueController.playChapter(chapterCatalog, FIRST_CHAPTER, null, true);
         this.isRunning = false;
     }
 
@@ -60,9 +60,8 @@ public class GameManager {
 
         menuView.printMessage("\nRetomando a partida no Capítulo " + savedChapter + " [Diálogo: " + savedDialogId + "]...");
 
-        Chapter chapter = chapterCatalog.get(savedChapter);
-        if (chapter != null) {
-            dialogueController.playChapter(chapter, savedDialogId);
+        if (chapterCatalog.contains(savedChapter)) {
+            dialogueController.playChapter(chapterCatalog, savedChapter, savedDialogId, true);
         } else {
             menuView.printMessage("\nCapítulo desconhecido no save (" + savedChapter + ").");
         }
@@ -84,10 +83,9 @@ public class GameManager {
             } else if (choice == MenuController.ENDINGS_GALLERY_OPTION) {
                 endingGalleryLoop();
             } else {
-                Chapter chapter = chapterCatalog.get(choice);
-                if (chapter != null) {
+                if (chapterCatalog.contains(choice)) {
                     menuView.printMessage("\nCarregando capítulo " + choice + "...");
-                    dialogueController.playChapter(chapter);
+                    dialogueController.playChapter(chapterCatalog, choice, null, false);
                 }
             }
         }

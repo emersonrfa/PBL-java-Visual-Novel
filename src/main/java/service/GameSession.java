@@ -1,5 +1,7 @@
 package service;
 
+import event.Observer;
+import event.Subject;
 import exception.GamePersistenceException;
 import model.Achievement;
 import model.Chapter;
@@ -9,10 +11,12 @@ import model.GameConfig;
 import model.GameStates;
 import model.Player;
 import model.StoryScene;
+import repository.ChapterCatalog;
 import repository.StateRepository;
 import service.ChoiceEvaluator.ChoiceAvailability;
 import service.DialogueSnapshot.ChoiceView;
 import service.EndingService.EndingOutcome;
+import service.GameEvent.*;
 import service.StepResult.Status;
 
 import java.time.LocalDateTime;
@@ -21,12 +25,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Uma partida em andamento de UM capítulo, conduzida por eventos em vez de por um laço bloqueante.
+ * Uma partida em andamento, conduzida por eventos em vez de por um laço bloqueante. No modo
+ * "campanha" ela segue sozinha para o capítulo seguinte do catálogo quando um termina.
  *
  * A tela (console ou JavaFX) chama {@link #start}, depois {@link #advance()} para diálogos lineares
  * ou {@link #choose(int)} para escolhas; cada chamada devolve um {@link StepResult} com o que
  * desenhar. A sessão cuida de regras, consequências, conquistas, finais e autosave; não imprime
  * nem lê nada, então roda igual em testes, no console e numa única tela JavaFX.
+ *
+ * Também é o "Subject" do padrão Observer: publica {@link GameEvent}s (diálogo mostrado, status
+ * alterado, conquista, final, ...) para HUD, avisos e o que mais precisar reagir.
  *
  * Não é thread-safe: use sempre da mesma thread (na JavaFX, a Application Thread).
  */
@@ -34,7 +42,11 @@ public class GameSession {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private static final List<Achievement> NONE = List.of();
 
-    private final Chapter chapter;
+    private final ChapterCatalog catalog;
+    private final boolean continueToNextChapter;
+    private final Subject<GameEvent> events = new Subject<>();
+    private Chapter chapter;
+    private boolean chapterChanged;
     private final Player player;
     private final AffinityTracker affinityTracker;
     private final GameConfig config;
@@ -49,10 +61,19 @@ public class GameSession {
     private Dialogue currentDialogue;
     private boolean over;
 
-    public GameSession(Chapter chapter, Player player, AffinityTracker affinityTracker, GameConfig config,
+    /**
+     * @param continueToNextChapter true = campanha (ao fim do capítulo abre o próximo registrado);
+     *                              false = joga só este capítulo (ex.: seleção de capítulo do admin)
+     */
+    public GameSession(ChapterCatalog catalog, int chapterNumber, boolean continueToNextChapter, Player player, AffinityTracker affinityTracker, GameConfig config,
                        StateRepository stateRepository, AchievementService achievementService,
                        EndingService endingService, PlayerService playerService, AssetResolver assets) {
-        this.chapter = chapter;
+        this.catalog = catalog;
+        this.chapter = catalog.get(chapterNumber);
+        if (this.chapter == null) {
+            throw new IllegalArgumentException("Capítulo não registrado: " + chapterNumber);
+        }
+        this.continueToNextChapter = continueToNextChapter;
         this.player = player;
         this.affinityTracker = affinityTracker;
         this.config = config;
@@ -69,6 +90,8 @@ public class GameSession {
     /** Começa (ou retoma um save) no diálogo informado; nulo/vazio = primeiro diálogo do capítulo. */
     public StepResult start(String dialogueId) {
         over = false;
+        chapterChanged = true;
+        events.publish(new ChapterStarted(chapter.getChapterNumber(), chapter.getTitle()));
         currentScene = null;
         currentDialogue = null;
         String id = (dialogueId == null || dialogueId.isBlank()) ? firstDialogueId() : dialogueId;
@@ -99,6 +122,7 @@ public class GameSession {
         }
 
         ConsequenceReport report = playerService.applyChoiceConsequences(player, chosen, affinityTracker);
+        publishConsequences(report);
         return moveTo(chosen.getNextDialogueId(), report, achievementsFor(chosen));
     }
 
@@ -116,6 +140,17 @@ public class GameSession {
         GameStates state = new GameStates();
         fillState(state);
         stateRepository.saveStateToSlotChecked(state, slot);
+        events.publish(new GameSaved(slot));
+    }
+
+    // ------------------------------------------------------------ observers
+
+    public void addObserver(Observer<GameEvent> observer) {
+        events.addObserver(observer);
+    }
+
+    public void removeObserver(Observer<GameEvent> observer) {
+        events.removeObserver(observer);
     }
 
     // ------------------------------------------------------------ consulta
@@ -144,10 +179,22 @@ public class GameSession {
 
     private StepResult moveTo(String id, ConsequenceReport report, List<Achievement> choiceAchievements) {
         if (id == null || id.isBlank()) {
-            return finish(Status.CHAPTER_END, report, choiceAchievements, null, null);
+            events.publish(new ChapterFinished(chapter.getChapterNumber()));
+            Chapter next = continueToNextChapter ? nextChapter() : null;
+            if (next == null || next.getScenes().isEmpty()) {
+                return finish(Status.CHAPTER_END, report, choiceAchievements, null, null);
+            }
+            chapter = next;
+            chapterChanged = true;
+            currentScene = null;
+            events.publish(new ChapterStarted(chapter.getChapterNumber(), chapter.getTitle()));
+            return moveTo(firstDialogueId(), report, choiceAchievements);
         }
         if (endingService.isEndingCode(id)) {
-            return finish(Status.ENDING, report, choiceAchievements, endingService.reach(id), null);
+            EndingOutcome outcome = endingService.reach(id);
+            outcome.newAchievements().forEach(a -> events.publish(new AchievementUnlocked(a)));
+            events.publish(new EndingReached(outcome));
+            return finish(Status.ENDING, report, choiceAchievements, outcome, null);
         }
 
         StoryScene scene = StoryService.findSceneByDialogueId(chapter, id);
@@ -157,6 +204,8 @@ public class GameSession {
         }
 
         boolean sceneChanged = scene != currentScene;
+        boolean newChapter = chapterChanged;
+        chapterChanged = false;
         currentScene = scene;
         currentDialogue = scene.getDialogueById(id);
 
@@ -166,15 +215,43 @@ public class GameSession {
         Achievement byDialogue = achievementService.evaluateDialogueTrigger(currentDialogue.getId());
         if (byDialogue != null) dialogueAchievements = List.of(byDialogue);
 
+        choiceAchievements.forEach(a -> events.publish(new AchievementUnlocked(a)));
+        dialogueAchievements.forEach(a -> events.publish(new AchievementUnlocked(a)));
+
         if (!currentDialogue.hasChoices()) {
             // o diálogo é mostrado antes de acusar o erro, como no console original
             over = true;
-            return new StepResult(Status.ERROR, snapshot(sceneChanged), report, choiceAchievements,
+            return new StepResult(Status.ERROR, publishShown(snapshot(sceneChanged, newChapter)), report, choiceAchievements,
                     dialogueAchievements, null,
                     "JOGO ENCERRADO POR NÃO TER ACHADO NENHUMA OPÇÃO DE DIÁLOGO (" + id + ")");
         }
-        return new StepResult(Status.SHOWING, snapshot(sceneChanged), report, choiceAchievements,
+        return new StepResult(Status.SHOWING, publishShown(snapshot(sceneChanged, newChapter)), report, choiceAchievements,
                 dialogueAchievements, null, null);
+    }
+
+    private DialogueSnapshot publishShown(DialogueSnapshot snapshot) {
+        events.publish(new DialogueShown(snapshot));
+        return snapshot;
+    }
+
+    private void publishConsequences(ConsequenceReport report) {
+        events.publish(new ChoiceApplied(report));
+        if (!report.getChanges(ConsequenceReport.Kind.ENERGY).isEmpty()
+                || !report.getChanges(ConsequenceReport.Kind.MONEY).isEmpty()) {
+            events.publish(new StatsChanged(player.getEnergy(), player.getMoney()));
+        }
+        if (!report.getChanges(ConsequenceReport.Kind.ITEM_GAINED).isEmpty()
+                || !report.getChanges(ConsequenceReport.Kind.ITEM_USED).isEmpty()) {
+            events.publish(new InventoryChanged(player.getInventory().getItemNames()));
+        }
+    }
+
+    /** Menor capítulo registrado com número maior que o atual, ou nulo. */
+    private Chapter nextChapter() {
+        for (int number : catalog.numbers()) {
+            if (number > chapter.getChapterNumber()) return catalog.get(number);
+        }
+        return null;
     }
 
     private StepResult finish(Status status, ConsequenceReport report, List<Achievement> choiceAchievements,
@@ -198,6 +275,10 @@ public class GameSession {
     }
 
     private DialogueSnapshot snapshot(boolean sceneChanged) {
+        return snapshot(sceneChanged, false);
+    }
+
+    private DialogueSnapshot snapshot(boolean sceneChanged, boolean newChapter) {
         List<ChoiceView> views = new ArrayList<>();
         List<Choice> choices = currentDialogue.getChoices();
         for (int i = 0; i < choices.size(); i++) {
@@ -206,7 +287,7 @@ public class GameSession {
         }
         String speaker = currentDialogue.getSpeaker();
         return new DialogueSnapshot(
-                chapter.getChapterNumber(), chapter.getTitle(),
+                chapter.getChapterNumber(), chapter.getTitle(), newChapter,
                 currentScene.getTitle(), currentScene.getDescription(), sceneChanged,
                 assets.background(currentScene).orElse(null),
                 currentDialogue.getId(), speaker, currentDialogue.getExpression(),

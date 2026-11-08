@@ -66,4 +66,12 @@ public class AssetResolverTest {
         assertEquals("/images/items/default.png", with("/images/items/default.png").itemImage(item).orElseThrow());
         assertTrue(with().itemImage(item).isEmpty());
     }
+
+    @Test
+    public void protagonistSpriteIsAlwaysEmilyEvenWhenScriptSaysPlayer() {
+        AssetResolver resolver = with("/images/characters/emily/cansada.png");
+
+        assertEquals("/images/characters/emily/cansada.png", resolver.sprite("Player", "Cansada").orElseThrow());
+        assertEquals("/images/characters/emily/cansada.png", resolver.sprite("Emily", "Cansada").orElseThrow());
+    }
 }

@@ -1,6 +1,7 @@
 package service;
 
 import model.Item;
+import model.Protagonist;
 import model.StoryScene;
 
 import java.text.Normalizer;
@@ -23,6 +24,7 @@ import java.util.function.Predicate;
  *
  * Nomes viram "slug": minúsculas, sem acentos, qualquer sequência fora de a-z/0-9 vira "_"
  * ("Sala de Estar" → sala_de_estar; "Emily" + "Surpresa" → characters/emily/surpresa.png).
+ * A protagonista é sempre "emily", mesmo quando o roteiro a chama de "Player".
  * Extensões aceitas: png, jpg, jpeg.
  */
 public final class AssetResolver {
@@ -55,7 +57,7 @@ public final class AssetResolver {
     /** Sprite do personagem para a expressão; o narrador e a expressão "Nada" não têm sprite. */
     public Optional<String> sprite(String speaker, String expression) {
         if (speaker == null || speaker.isBlank() || NARRATOR.equalsIgnoreCase(speaker)) return Optional.empty();
-        String dir = CHARACTERS + slug(speaker) + "/";
+        String dir = CHARACTERS + slug(Protagonist.canonicalName(speaker)) + "/";
         if (expression != null && !expression.isBlank() && !"Nada".equalsIgnoreCase(expression)) {
             Optional<String> exact = firstExisting(dir, slug(expression));
             if (exact.isPresent()) return exact;

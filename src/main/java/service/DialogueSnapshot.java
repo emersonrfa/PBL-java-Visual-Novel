@@ -10,6 +10,7 @@ import java.util.List;
 public record DialogueSnapshot(
         int chapterNumber,
         String chapterTitle,
+        boolean chapterChanged,
         String sceneTitle,
         String sceneDescription,
         boolean sceneChanged,

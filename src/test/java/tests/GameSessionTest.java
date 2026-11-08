@@ -9,7 +9,9 @@ import model.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import event.Observer;
 import repository.AchievementRepository;
+import repository.ChapterCatalog;
 import repository.EndingRepository;
 import repository.StateRepository;
 import repository.StoryBuilder;
@@ -19,12 +21,15 @@ import service.AchievementService;
 import service.AffinityTracker;
 import service.AssetResolver;
 import service.EndingService;
+import service.GameEvent;
 import service.GameSession;
 import service.PlayerService;
 import service.StepResult;
 import service.StepResult.Status;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,11 +48,17 @@ public class GameSessionTest {
     }
 
     private GameSession session(Chapter chapter, boolean autoSave, Set<String> existingAssets) {
+        ChapterCatalog catalog = new ChapterCatalog().register(chapter.getChapterNumber(), () -> chapter);
+        return session(catalog, chapter.getChapterNumber(), false, autoSave, existingAssets);
+    }
+
+    private GameSession session(ChapterCatalog catalog, int number, boolean campaign, boolean autoSave,
+                                Set<String> existingAssets) {
         String dir = tempDir.toString();
         AchievementService achievements = new AchievementService(new AchievementRepository(),
                 new UnlockedAchievementsRepository(dir));
         EndingService endings = new EndingService(new EndingRepository(), new UnlockedEndingsRepository(dir), achievements);
-        return new GameSession(chapter, player, new AffinityTracker(), new GameConfig(0, 1, false, autoSave, false),
+        return new GameSession(catalog, number, campaign, player, new AffinityTracker(), new GameConfig(0, 1, false, autoSave, false),
                 states, achievements, endings, new PlayerService(), new AssetResolver(existingAssets::contains));
     }
 
@@ -244,5 +255,133 @@ public class GameSessionTest {
         GameStates slot = states.loadStateFromSlot(2);
         assertEquals("a3", slot.getCurrentDialogId());
         assertEquals("Sala de Estar", slot.getCurrentSceneId());
+    }
+
+    // ------------------------------------------------------------ capítulos encadeados
+
+    private ChapterCatalog twoChapters() {
+        Chapter one = StoryBuilder.chapter(1, "Um").scene("A", "a").narrateEnd("u1", "fim do um").build();
+        Chapter two = StoryBuilder.chapter(2, "Dois").scene("B", "b").narrate("v1", "começo do dois").narrateEnd("v2", "fim").build();
+        return new ChapterCatalog().register(1, () -> one).register(2, () -> two);
+    }
+
+    @Test
+    public void campaignModeContinuesIntoTheNextChapter() {
+        GameSession session = session(twoChapters(), 1, true, true, Set.of());
+        session.start("u1");
+
+        StepResult step = session.advance();
+
+        assertEquals(Status.SHOWING, step.status());
+        assertEquals(2, step.snapshot().chapterNumber());
+        assertEquals("Dois", step.snapshot().chapterTitle());
+        assertTrue(step.snapshot().chapterChanged());
+        assertTrue(step.snapshot().sceneChanged());
+        assertEquals("v1", step.snapshot().dialogueId());
+        assertEquals(2, states.getCurrentStates().getCurrentChapterId());
+        assertFalse(session.advance().snapshot().chapterChanged());
+    }
+
+    @Test
+    public void singleChapterModeStopsAtTheEndOfTheChapter() {
+        GameSession session = session(twoChapters(), 1, false, false, Set.of());
+        session.start("u1");
+
+        assertEquals(Status.CHAPTER_END, session.advance().status());
+    }
+
+    @Test
+    public void lastChapterEndsTheCampaign() {
+        GameSession session = session(twoChapters(), 2, true, false, Set.of());
+        session.start("v2");
+
+        assertEquals(Status.CHAPTER_END, session.advance().status());
+    }
+
+    @Test
+    public void resumingMidChapterTwoStillContinuesAfterIt() {
+        GameSession session = session(twoChapters(), 2, true, false, Set.of());
+        assertEquals("v1", session.start("v1").snapshot().dialogueId());
+        assertTrue(session.start("v1").snapshot().chapterChanged());
+    }
+
+    // ------------------------------------------------------------ Observer
+
+    private List<GameEvent> record(GameSession session) {
+        List<GameEvent> events = new ArrayList<>();
+        session.addObserver(events::add);
+        return events;
+    }
+
+    @Test
+    public void observersReceiveEventsInOrder() {
+        GameSession session = session(story(), false, Set.of());
+        List<GameEvent> events = record(session);
+        player.setEnergy(50);
+
+        session.start("a3");
+        session.choose(0);
+
+        assertTrue(events.get(0) instanceof GameEvent.ChapterStarted);
+        assertTrue(events.get(1) instanceof GameEvent.DialogueShown);
+        assertTrue(events.get(2) instanceof GameEvent.ChoiceApplied);
+        assertTrue(events.get(3) instanceof GameEvent.StatsChanged);
+        assertTrue(events.get(4) instanceof GameEvent.DialogueShown);
+        assertEquals("b1", ((GameEvent.DialogueShown) events.get(4)).snapshot().dialogueId());
+    }
+
+    @Test
+    public void achievementAndEndingEventsArePublished() {
+        GameSession session = session(story(), false, Set.of());
+        List<GameEvent> events = record(session);
+
+        session.start("a3");
+        session.choose(2); // FINAL_VAMPIRA
+
+        assertTrue(events.stream().anyMatch(e -> e instanceof GameEvent.AchievementUnlocked));
+        assertTrue(events.stream().anyMatch(e -> e instanceof GameEvent.EndingReached));
+    }
+
+    @Test
+    public void savingPublishesGameSaved() throws GamePersistenceException {
+        GameSession session = session(story(), false, Set.of());
+        session.start("a1");
+        List<GameEvent> events = record(session);
+
+        session.saveToSlot(3);
+
+        assertEquals(3, ((GameEvent.GameSaved) events.get(0)).slot());
+    }
+
+    @Test
+    public void removedObserverStopsReceivingAndFailingObserverDoesNotBreakOthers() {
+        GameSession session = session(story(), false, Set.of());
+        List<GameEvent> received = new ArrayList<>();
+        Observer<GameEvent> listener = received::add;
+        Observer<GameEvent> faulty = e -> { throw new IllegalStateException("tela quebrada"); };
+        session.addObserver(faulty);
+        session.addObserver(listener);
+
+        session.start("a1");
+        int afterStart = received.size();
+        assertTrue(afterStart > 0);
+
+        session.removeObserver(listener);
+        session.advance();
+        assertEquals(afterStart, received.size());
+    }
+
+    /** Regressão: carregar o save na última fala do Cap. 1 e apertar ENTER caía no menu em vez do Cap. 2. */
+    @Test
+    public void resumingAtTheLastLineOfChapterOneGoesOnToChapterTwo() {
+        ChapterCatalog catalog = new repository.StoryRepository().buildCatalog();
+        GameSession session = session(catalog, 1, true, true, Set.of());
+
+        assertEquals("dFIM.2", session.start("dFIM.2").snapshot().dialogueId());
+        StepResult next = session.advance();
+
+        assertEquals(Status.SHOWING, next.status());
+        assertEquals(2, next.snapshot().chapterNumber());
+        assertEquals("d1.1", next.snapshot().dialogueId());
     }
 }

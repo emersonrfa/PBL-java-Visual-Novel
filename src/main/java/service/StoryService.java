@@ -21,13 +21,6 @@ public class StoryService {
 
     // metodo utilizado para procurar a proxima cena pelo id do proximo dialogo
     public static StoryScene findSceneByDialogueId(Chapter chapter, String dialogueId) {
-        if (dialogueId == null) return null;
-
-        for (StoryScene scene : chapter.getScenes()) {
-            if (findDialogueById(scene, dialogueId) != null) {
-                return scene;
-            }
-        }
-        return null;
+        return chapter.findSceneByDialogueId(dialogueId);
     }
 }
