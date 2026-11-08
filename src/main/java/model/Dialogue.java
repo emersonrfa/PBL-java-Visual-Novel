@@ -46,4 +46,7 @@ public class Dialogue {
     public String getSpeaker() { return speaker; }
     public String getText() { return text; }
     public boolean hasChoices() { return !options.isEmpty(); }
+
+    /** Diálogo linear: uma única escolha "..." (o jogador só avança, sem decidir nada). */
+    public boolean isLinear() { return options.size() == 1 && options.get(0).isContinue(); }
 }

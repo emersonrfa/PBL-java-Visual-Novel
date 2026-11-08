@@ -7,6 +7,7 @@ public class StoryScene {
     private String title;
     private String description;
     private List<Dialogue> dialogues;
+    private String backgroundId; // opcional: nome da imagem de fundo (sem extensão); padrão = título da cena
 
     public StoryScene(String title, String description) {
         this.title = title;
@@ -46,4 +47,9 @@ public class StoryScene {
     public String getDescription() { return description; }
     public List<Dialogue> getDialogues() { return dialogues; }
 
+
+    /** Id da imagem de fundo definido no roteiro, ou {@code null} para usar o título da cena. */
+    public String getBackgroundId() { return backgroundId; }
+
+    public void setBackgroundId(String backgroundId) { this.backgroundId = backgroundId; }
 }

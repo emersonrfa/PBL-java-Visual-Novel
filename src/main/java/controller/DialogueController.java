@@ -5,32 +5,39 @@ import model.*;
 import repository.StateRepository;
 import service.AchievementService;
 import service.AffinityTracker;
+import service.AssetResolver;
+import service.DialogueSnapshot;
+import service.GameSession;
+import service.StepResult;
 import service.ConsequenceReport;
 import service.PlayerService;
-import service.StoryService;
 import view.AchievementView;
 import view.DialogueView;
 import view.MenuView;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Camada de console por cima do {@link GameSession}: lê o teclado, imprime e delega todas as
+ * regras (escolhas, consequências, conquistas, finais, autosave) à sessão. Uma tela JavaFX faz o
+ * mesmo papel trocando apenas as entradas/saídas.
+ */
 public class DialogueController {
-    private InputManager inputManager;
-    private Player player;
-    private AffinityTracker affinityTracker;
-    private DialogueView view;
-    private MenuView menuView;
-    private AchievementView achievementView;
-    private PlayerService playerService;
-    private AchievementService achievementService;
-    private EndingManager endingManager;
-    private GameConfig config;
-    private StateRepository stateRepository;
+    private final InputManager inputManager;
+    private final Player player;
+    private final AffinityTracker affinityTracker;
+    private final DialogueView view;
+    private final MenuView menuView;
+    private final AchievementView achievementView;
+    private final PlayerService playerService;
+    private final AchievementService achievementService;
+    private final EndingManager endingManager;
+    private final GameConfig config;
+    private final StateRepository stateRepository;
+    private final AssetResolver assets = new AssetResolver();
+    private GameSession session;
     private boolean returnToMenuRequested = false;
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public DialogueController(Player player, InputManager inputManager,
                               AffinityTracker affinityTracker, GameConfig config,
@@ -50,228 +57,128 @@ public class DialogueController {
         this.stateRepository = stateRepository;
     }
 
-    private void handleExitToMenuPrompt(String currentDialogId, String currentSceneTitle, int chapterNumber) {
+    public void playChapter(Chapter chapter) {
+        playChapter(chapter, null);
+    }
+
+    /** Joga o capítulo a partir de {@code startingDialogueId} (nulo = primeiro diálogo). */
+    public void playChapter(Chapter chapter, String startingDialogueId) {
+        returnToMenuRequested = false;
+        session = new GameSession(chapter, player, affinityTracker, config, stateRepository,
+                achievementService, endingManager.getService(), playerService, assets);
+
+        StepResult step = session.start(startingDialogueId);
+        while (step != null) {
+            printStep(step);
+            if (!step.isShowing() || returnToMenuRequested) {
+                break;
+            }
+            DialogueSnapshot snapshot = step.snapshot();
+            step = snapshot.linear() ? advanceDialogue(snapshot) : processInput(snapshot);
+            if (returnToMenuRequested) {
+                break;
+            }
+        }
+    }
+
+    /** Mostra o diálogo do passo (com cabeçalho de cena e conquistas) e os avisos de fim. */
+    private void printStep(StepResult step) {
+        DialogueSnapshot snapshot = step.snapshot();
+        if (snapshot != null) {
+            if (snapshot.sceneChanged()) {
+                view.printSceneHeader(snapshot.sceneTitle(), snapshot.sceneDescription());
+            }
+            view.printDialogue(snapshot.speaker(), snapshot.text(), config.getTextSpeedMs());
+            step.dialogueAchievements().forEach(achievementView::printAchievementBanner);
+        }
+        switch (step.status()) {
+            case ENDING -> endingManager.print(step.ending());
+            case ERROR -> view.printDebugWarning(step.message());
+            default -> { }
+        }
+    }
+
+    /** Espera ENTER ("S" salva, "MENU" sai) e avança; devolve nulo se o jogador voltou ao menu. */
+    public StepResult advanceDialogue(DialogueSnapshot snapshot) {
+        while (true) {
+            String command = inputManager.waitEnterOrCommand();
+
+            if (command != null && command.equalsIgnoreCase("S")) {
+                handleManualSave();
+                view.printDialogue(snapshot.speaker(), snapshot.text(), 0);
+            } else if (command != null && command.equalsIgnoreCase("MENU")) {
+                handleExitToMenuPrompt();
+                return null;
+            } else {
+                return session.advance();
+            }
+        }
+    }
+
+    /** Mostra as opções, lê a escolha e a aplica; devolve nulo se o jogador voltou ao menu. */
+    public StepResult processInput(DialogueSnapshot snapshot) {
+        view.printOptionsHeader();
+        var options = snapshot.choices();
+
+        for (DialogueSnapshot.ChoiceView option : options) {
+            view.printOption(option.index(), option.text(), option.blockReason());
+        }
+
+        while (true) {
+            int choice = inputManager.readChoiceOrCommand(1, options.size());
+
+            if (choice == -99) { // Comando MENU
+                handleExitToMenuPrompt();
+                return null;
+            }
+            if (choice == -98) { // Comando S (Salvar)
+                handleManualSave();
+                continue;
+            }
+
+            DialogueSnapshot.ChoiceView chosen = options.get(choice - 1);
+
+            if (!chosen.available()) {
+                view.printRequirementWarning();
+                continue;
+            }
+            if (config != null && config.isConfirmChoices()) {
+                menuView.printMessage("Confirmar escolha \"" + chosen.text() + "\"? (Digite 'S' para confirmar ou outra tecla para cancelar):");
+                String confirm = inputManager.readString().trim();
+                if (!confirm.equalsIgnoreCase("S")) {
+                    menuView.printMessage("Escolha cancelada. Selecione novamente.");
+                    continue;
+                }
+            }
+
+            StepResult result = session.choose(chosen.index());
+            if (result.report() != null) {
+                result.report().messages().forEach(view::printConsequence);
+            }
+            result.choiceAchievements().forEach(achievementView::printAchievementBanner);
+            return result;
+        }
+    }
+
+    private void handleExitToMenuPrompt() {
         menuView.printMessage("\nDeseja salvar o jogo antes de voltar ao Menu Principal? (Digite 'S' para Sim ou 'N' para Não):");
         System.out.print("> ");
         String confirm = inputManager.readString().trim();
         if (confirm.equalsIgnoreCase("S")) {
-            handleManualSave(currentDialogId, currentSceneTitle, chapterNumber);
+            handleManualSave();
         }
         menuView.printMessage("\nVoltando ao Menu Principal...");
-        this.returnToMenuRequested = true;
+        returnToMenuRequested = true;
     }
 
-    public void advanceDialogue(Dialogue currentDialogue, StoryScene currentScene, int chapterNumber) {
-        boolean waitingAdvance = true;
-        String sceneTitle = (currentScene != null) ? currentScene.getTitle() : "Cena";
-
-        while (waitingAdvance) {
-            String command = inputManager.waitEnterOrCommand();
-
-            if (command != null && command.equalsIgnoreCase("S")) {
-                handleManualSave(currentDialogue.getId(), sceneTitle, chapterNumber);
-                view.printDialogue(currentDialogue, 0);
-            } else if (command != null && command.equalsIgnoreCase("MENU")) {
-                handleExitToMenuPrompt(currentDialogue.getId(), sceneTitle, chapterNumber);
-                waitingAdvance = false;
-            } else {
-                waitingAdvance = false;
-            }
-        }
-    }
-
-    public void playChapter(Chapter chapter) {
-        playChapter(chapter, "d1.1");
-    }
-
-    public void playChapter(Chapter chapter, String startingDialogueId) {
-        this.returnToMenuRequested = false;
-        String currentId = (startingDialogueId != null && !startingDialogueId.isEmpty())
-                ? startingDialogueId
-                : "d1.1";
-
-        StoryScene currentScene = null;
-
-        while (currentId != null && !currentId.isEmpty() && !this.returnToMenuRequested) {
-            if (endingManager.isEndingCode(currentId)) {
-                endingManager.triggerEnding(currentId);
-                break;
-            }
-
-            StoryScene nextScene = StoryService.findSceneByDialogueId(chapter, currentId);
-
-            if (nextScene == null) {
-                view.printDebugWarning("JOGO ENCERRADO POR NÃO TER ACHADO ID DE PRÓXIMA CENA (" + currentId + ")");
-                break;
-            }
-
-            if (currentScene != nextScene) {
-                currentScene = nextScene;
-                view.printSceneHeader(currentScene);
-            }
-
-            Dialogue current = currentScene.getDialogueById(currentId);
-
-            triggerAutoSave(chapter.getChapterNumber(), currentScene.getTitle(), current.getId());
-
-            view.printDialogue(current, config.getTextSpeedMs());
-
-            Achievement unlockedByDialogue = achievementService.evaluateDialogueTrigger(current.getId());
-            if (unlockedByDialogue != null) {
-                achievementView.printAchievementBanner(unlockedByDialogue);
-            }
-
-            if (current.getChoices().isEmpty()) {
-                view.printDebugWarning("JOGO ENCERRADO POR NÃO TER ACHADO NENHUMA OPÇÃO DE DIÁLOGO (" + currentId + ")");
-                break;
-            }
-
-            if (current.getChoices().size() == 1 && current.getChoices().get(0).getText().equals("...")) {
-                advanceDialogue(current, currentScene, chapter.getChapterNumber());
-                if (this.returnToMenuRequested) {
-                    break;
-                }
-                currentId = current.getChoices().get(0).getNextDialogueId();
-            } else {
-                int choiceIndex = processinput(current, currentScene, chapter.getChapterNumber());
-                if (this.returnToMenuRequested || choiceIndex < 0) {
-                    break;
-                }
-                currentId = current.getChoices().get(choiceIndex).getNextDialogueId();
-            }
-        }
-    }
-
-    private boolean isAffinityValid(Choice opt) {
-        if (opt.getTargetNpc() != null) {
-            if (affinityTracker.getAffinity(opt.getTargetNpc()) < opt.getRequiredAffinity()) {
-                return false;
-            }
-            if (affinityTracker.getSuspicion(opt.getTargetNpc()) > opt.getMaxSuspicionAllowed()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public int processinput(Dialogue currentDialogue, StoryScene currentScene, int chapterNumber) {
-        view.printOptionsHeader();
-        var options = currentDialogue.getChoices();
-        String sceneTitle = (currentScene != null) ? currentScene.getTitle() : "Cena";
-
-        for (int i = 0; i < options.size(); i++) {
-            Choice opt = options.get(i);
-
-            boolean validPlayer = playerService.validatePlayerRequirements(player, opt);
-            boolean validAffinity = isAffinityValid(opt);
-
-            if (validPlayer && validAffinity) {
-                view.printOption(i, opt.getText(), null);
-            } else {
-                String motivo = "";
-
-                if (opt.getMoneyChange() < 0 && player.getMoney() < Math.abs(opt.getMoneyChange())) {
-                    motivo = "[Trocos insuficientes]";
-                } else if (opt.getRequiredFlag() != null && !player.getFlag(opt.getRequiredFlag())) {
-                    motivo = "[???]";
-                } else if (opt.getEnergyChange() < 0 && player.getEnergy() < Math.abs(opt.getEnergyChange())) {
-                    motivo = "[Energia Insuficiente]";
-                } else if (opt.getRequiredItemName() != null && !player.getInventory().hasItem(opt.getRequiredItemName())) {
-                    motivo = "[Requer: " + opt.getRequiredItemName() + "]";
-                } else if (opt.getTargetNpc() != null) {
-                    if (affinityTracker.getAffinity(opt.getTargetNpc()) < opt.getRequiredAffinity())
-                        motivo = "[Afinidade Insuficiente com " + opt.getTargetNpc() + "]";
-                    else if (affinityTracker.getSuspicion(opt.getTargetNpc()) > opt.getMaxSuspicionAllowed())
-                        motivo = "[Você é suspeita demais para esta opção]";
-                }
-
-                view.printOption(i, opt.getText(), motivo);
-            }
-        }
-
-        int choice = -1;
-        boolean validChoice = false;
-
-        while (!validChoice) {
-            choice = inputManager.readChoiceOrCommand(1, options.size());
-
-            if (choice == -99) { // Comando MENU
-                handleExitToMenuPrompt(currentDialogue.getId(), sceneTitle, chapterNumber);
-                return -1;
-            }
-            if (choice == -98) { // Comando S (Salvar)
-                handleManualSave(currentDialogue.getId(), sceneTitle, chapterNumber);
-                continue;
-            }
-
-            Choice chosenOption = options.get(choice - 1);
-
-            if (!playerService.validatePlayerRequirements(player, chosenOption) || !isAffinityValid(chosenOption)) {
-                view.printRequirementWarning();
-            } else {
-                if (config != null && config.isConfirmChoices()) {
-                    menuView.printMessage("Confirmar escolha \"" + chosenOption.getText() + "\"? (Digite 'S' para confirmar ou outra tecla para cancelar):");
-                    String confirm = inputManager.readString().trim();
-                    if (!confirm.equalsIgnoreCase("S")) {
-                        menuView.printMessage("Escolha cancelada. Selecione novamente.");
-                        continue;
-                    }
-                }
-                validChoice = true;
-            }
-        }
-
-        int chosenIndex = choice - 1;
-        Choice chosenOption = options.get(chosenIndex);
-
-        ConsequenceReport report = playerService.applyChoiceConsequences(player, chosenOption, affinityTracker);
-        for (String msg : report.messages()) {
-            view.printConsequence(msg);
-        }
-
-        if (chosenOption.getTargetNpc() != null) {
-            int currentAff = affinityTracker.getAffinity(chosenOption.getTargetNpc());
-            Achievement unlockedAff = achievementService.evaluateAffinityTrigger(chosenOption.getTargetNpc(), currentAff);
-            if (unlockedAff != null) {
-                achievementView.printAchievementBanner(unlockedAff);
-            }
-        }
-
-        if (chosenOption.getFlagToSet() != null && !chosenOption.getFlagToSet().trim().isEmpty()) {
-            Achievement unlockedFlag = achievementService.evaluateFlagTrigger(chosenOption.getFlagToSet());
-            if (unlockedFlag != null) {
-                achievementView.printAchievementBanner(unlockedFlag);
-            }
-        }
-
-        return chosenIndex;
-    }
-
-    private void triggerAutoSave(int chapterId, String sceneTitle, String dialogId) {
-        if (stateRepository != null) {
-            GameStates state = stateRepository.getCurrentStates();
-
-            state.setCurrentChapterId(chapterId);
-            state.setCurrentSceneId(sceneTitle);
-            state.setCurrentDialogId(dialogId);
-            state.setSaveTimestamp(LocalDateTime.now().format(DATE_FORMATTER));
-
-            playerService.populateStateFromPlayer(state, this.player, this.affinityTracker);
-
-            if (config != null && config.isTurnAutoSave()) {
-                stateRepository.saveState(state);
-            }
-        }
-    }
-
-    public void handleManualSave(String currentDialogId, String currentSceneId, int currentChapterId) {
+    public void handleManualSave() {
         Map<Integer, GameStates> slotsMap = new HashMap<>();
         for (int i = 1; i <= 4; i++) {
-            slotsMap.put(i, this.stateRepository.loadStateFromSlot(i));
+            slotsMap.put(i, stateRepository.loadStateFromSlot(i));
         }
 
         menuView.displayManualSaveMenu(slotsMap);
-        int choice = this.inputManager.readValidChoice(0, 4);
+        int choice = inputManager.readValidChoice(0, 4);
 
         if (choice == 0) {
             menuView.printMessage("\nSalvamento cancelado.");
@@ -280,33 +187,25 @@ public class DialogueController {
 
         if (stateRepository.slotExists(choice)) {
             menuView.printOverwriteConfirmation(choice);
-            String confirmation = this.inputManager.readString().trim();
+            String confirmation = inputManager.readString().trim();
 
             if (!confirmation.equalsIgnoreCase("S")) {
                 menuView.printMessage("\n[Cancelado] O save do Slot " + choice + " não foi modificado.");
                 menuView.printMessage("[Pressione ENTER para continuar]");
-                this.inputManager.waitEnter();
+                inputManager.waitEnter();
                 return;
             }
         }
 
-        GameStates manualState = new GameStates();
-        manualState.setCurrentChapterId(currentChapterId);
-        manualState.setCurrentSceneId(currentSceneId);
-        manualState.setCurrentDialogId(currentDialogId);
-        manualState.setSaveTimestamp(LocalDateTime.now().format(DATE_FORMATTER));
-
-        playerService.populateStateFromPlayer(manualState, this.player, this.affinityTracker);
-
         try {
-            stateRepository.saveStateToSlotChecked(manualState, choice);
+            session.saveToSlot(choice);
             menuView.printMessage("\n[Sucesso] Jogo salvo no Slot " + choice + "!");
         } catch (GamePersistenceException e) {
             menuView.printMessage("\n[Erro de Gravação] " + e.getMessage());
         }
 
         menuView.printMessage("[Pressione ENTER para continuar]");
-        this.inputManager.waitEnter();
+        inputManager.waitEnter();
     }
 
     public boolean isReturnToMenuRequested() {

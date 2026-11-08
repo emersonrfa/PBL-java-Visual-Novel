@@ -1,6 +1,9 @@
 package model;
 
 public class Choice {
+    /** Texto reservado das escolhas "apenas avançar" (diálogo linear). */
+    public static final String CONTINUE_TEXT = "...";
+
     private String text;
     private String nextDialogueId;
 
@@ -35,7 +38,7 @@ public class Choice {
 
     // Construtor para apenas avançar texto
     public Choice(String nextDialogueId) {
-        this("...", nextDialogueId);
+        this(CONTINUE_TEXT, nextDialogueId);
     }
 
     // setters e getters
@@ -121,6 +124,9 @@ public class Choice {
     public double getMoneyChange() { return moneyChange; }
 
     public String getText() { return text; }
+
+    /** Verdadeiro para a escolha "apenas avançar" criada por {@link #Choice(String)}. */
+    public boolean isContinue() { return CONTINUE_TEXT.equals(text); }
 
     public String getNextDialogueId() { return nextDialogueId; }
 

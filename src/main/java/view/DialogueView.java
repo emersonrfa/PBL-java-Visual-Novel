@@ -6,19 +6,26 @@ import model.StoryScene;
 public class DialogueView {
 
     public void printSceneHeader(StoryScene scene) {
+        printSceneHeader(scene.getTitle(), scene.getDescription());
+    }
+
+    public void printSceneHeader(String title, String description) {
         System.out.println("\n<--------------------------->");
-        System.out.println("  CENA: " + scene.getTitle().toUpperCase());
-        System.out.println("  DESCRIÇÃO: " + scene.getDescription());
+        System.out.println("  CENA: " + title.toUpperCase());
+        System.out.println("  DESCRIÇÃO: " + description);
         System.out.println("<--------------------------->");
     }
 
     public void printDialogue(Dialogue dialogue, int textSpeedMs) {
+        printDialogue(dialogue.getSpeaker(), dialogue.getText(), textSpeedMs);
+    }
+
+    public void printDialogue(String speaker, String text, int textSpeedMs) {
         System.out.println("\n--------------------------------------------------");
-        if (!dialogue.getSpeaker().equals("Narrador")) {
-            System.out.println("[" + dialogue.getSpeaker() + "]:");
+        if (!speaker.equals("Narrador")) {
+            System.out.println("[" + speaker + "]:");
         }
 
-        String text = dialogue.getText();
         if (textSpeedMs <= 0) {
             System.out.println(text);
         } else {

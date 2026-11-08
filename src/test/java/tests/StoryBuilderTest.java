@@ -114,4 +114,20 @@ public class StoryBuilderTest {
 
         assertEquals(Set.of("d9.1", "d9.2"), chapter.getPendingDialogueIds());
     }
+
+    @Test
+    public void backgroundIsStoredOnTheCurrentSceneOnly() {
+        Chapter chapter = StoryBuilder.chapter(1, "T")
+                .scene("A", "a").background("fundo_a").narrate("x", "um", "y")
+                .scene("B", "b").narrateEnd("y", "dois")
+                .build();
+
+        assertEquals("fundo_a", chapter.getScenes().get(0).getBackgroundId());
+        assertNull(chapter.getScenes().get(1).getBackgroundId());
+    }
+
+    @Test
+    public void backgroundNeedsAScene() {
+        assertThrows(IllegalStateException.class, () -> StoryBuilder.chapter(1, "T").background("x"));
+    }
 }

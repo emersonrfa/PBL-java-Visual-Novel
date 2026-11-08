@@ -29,6 +29,8 @@ import java.util.Set;
  *     .build();
  * </pre>
  *
+ * Fundo opcional: {@code .scene("Cozinha", "...").background("cozinha_noite")}.
+ *
  * Regras checadas em {@link #build()}: ids únicos no capítulo, cenas não vazias e toda linha linear
  * com próximo definido (explícito, o seguinte da cena, ou fim declarado com {@code ...End}).
  * Se o próximo apontar para um id inexistente, quem acusa é o {@link service.StoryValidator}.
@@ -41,6 +43,7 @@ public final class StoryBuilder {
     private static final class SceneDraft {
         final String title;
         final String description;
+        String background;
         final List<Line> lines = new ArrayList<>();
 
         SceneDraft(String title, String description) {
@@ -70,6 +73,18 @@ public final class StoryBuilder {
     public StoryBuilder scene(String title, String description) {
         current = new SceneDraft(title, description);
         scenes.add(current);
+        return this;
+    }
+
+    /**
+     * Imagem de fundo da cena atual (nome do arquivo sem extensão, em images/backgrounds).
+     * Opcional: sem ela o jogo procura uma imagem com o nome do título da cena.
+     */
+    public StoryBuilder background(String backgroundId) {
+        if (current == null) {
+            throw new IllegalStateException("Declare uma cena com scene(...) antes de definir o fundo.");
+        }
+        current.background = backgroundId;
         return this;
     }
 
@@ -141,6 +156,7 @@ public final class StoryBuilder {
                 throw new IllegalStateException("A cena '" + draft.title + "' não tem diálogos.");
             }
             StoryScene scene = new StoryScene(draft.title, draft.description);
+            scene.setBackgroundId(draft.background);
 
             for (int i = 0; i < draft.lines.size(); i++) {
                 Line line = draft.lines.get(i);

@@ -5,15 +5,18 @@ import model.Ending;
 import repository.EndingRepository;
 import repository.UnlockedEndingsRepository;
 import service.AchievementService;
+import service.EndingService;
 import view.AchievementView;
 import view.EndingView;
 
 import java.util.List;
 
+/**
+ * Apresentação de finais no console: delega as regras ao {@link EndingService} e imprime o resultado.
+ * Uma tela JavaFX usa o EndingService diretamente.
+ */
 public class EndingManager {
-    private final EndingRepository endingRepo;
-    private final UnlockedEndingsRepository unlockedEndingsRepo;
-    private final AchievementService achievementService;
+    private final EndingService service;
     private final EndingView view = new EndingView();
     private final AchievementView achievementView = new AchievementView();
 
@@ -21,39 +24,34 @@ public class EndingManager {
     public EndingManager(EndingRepository endingRepo,
                          UnlockedEndingsRepository unlockedEndingsRepo,
                          AchievementService achievementService) {
-        this.endingRepo = endingRepo;
-        this.unlockedEndingsRepo = unlockedEndingsRepo;
-        this.achievementService = achievementService;
+        this.service = new EndingService(endingRepo, unlockedEndingsRepo, achievementService);
+    }
+
+    public EndingService getService() {
+        return service;
     }
 
     public boolean isEndingCode(String dialogueId) {
-        return dialogueId != null && dialogueId.startsWith(Ending.CODE_PREFIX);
+        return service.isEndingCode(dialogueId);
     }
 
     public void triggerEnding(String endingId) {
-        Ending ending = endingRepo.getEnding(endingId);
+        print(service.reach(endingId));
+    }
 
-        if (ending != null) {
-            unlockedEndingsRepo.unlockEnding(endingId);
-            view.printEnding(ending);
-
-            Achievement firstEnd = achievementService.checkAndUnlock("ACH_PRIMEIRO_FIM");
-            if (firstEnd != null) {
-                achievementView.printAchievementBanner(firstEnd);
-            }
-
-            if (unlockedEndingsRepo.getUnlockedKeys().size() >= endingRepo.getAllEndings().size()) {
-                Achievement allEnds = achievementService.checkAndUnlock("ACH_MESTRE_FALA");
-                if (allEnds != null) {
-                    achievementView.printAchievementBanner(allEnds);
-                }
-            }
-        } else {
-            view.printEndingNotFoundWarning(endingId);
+    /** Imprime um final já processado (usado quando o GameSession o desbloqueou). */
+    public void print(EndingService.EndingOutcome outcome) {
+        if (!outcome.found()) {
+            view.printEndingNotFoundWarning(outcome.endingId());
+            return;
+        }
+        view.printEnding(outcome.ending());
+        for (Achievement achievement : outcome.newAchievements()) {
+            achievementView.printAchievementBanner(achievement);
         }
     }
 
     public List<Ending> getAllEndings() {
-        return endingRepo.getAllEndings();
+        return service.getAllEndings();
     }
 }
