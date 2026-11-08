@@ -25,10 +25,15 @@
         </dependency>
 
         <!-- JavaFX (interface gráfica). O org.openjfx traz os binários nativos do seu sistema operacional.
-             Quando precisar: javafx-fxml (telas em FXML), javafx-media (música/efeitos). -->
+             javafx-fxml carrega as telas .fxml. Quando precisar: javafx-media (música/efeitos). -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
 
