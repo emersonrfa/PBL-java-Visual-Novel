@@ -30,3 +30,6 @@ bin/
 .DS_Store
 ### Maven ###
 target/
+
+### Dados do jogador gerados em execução ###
+data/

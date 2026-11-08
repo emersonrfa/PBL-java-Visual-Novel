@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ConfigRepository {
-    private static final String FILE_PATH = "config.json";
+    private static final String FILE_PATH = GamePaths.CONFIG_FILE;
     private final ObjectMapper objectMapper;
     private GameConfig currentConfig;
 
@@ -42,6 +42,9 @@ public class ConfigRepository {
     public void saveConfig(GameConfig config) {
         File file = new File(FILE_PATH);
         try {
+            if (file.getParentFile() != null) {
+                file.getParentFile().mkdirs();
+            }
             objectMapper.writeValue(file, config);
             this.currentConfig = config;
         }

@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class UnlockedAchievementsRepository {
-    private static final String DEFAULT_SAVES_DIR = "saves";
+    private static final String DEFAULT_SAVES_DIR = GamePaths.DATA_DIR; // progresso do jogador, fora de saves/
 
     private final String savesDir;
     private final String filePath;

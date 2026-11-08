@@ -25,7 +25,7 @@ public class StateRepository {
     private final ObjectMapper mapper;
 
     public StateRepository() {
-        this("saves");
+        this(GamePaths.SAVES_DIR);
     }
 
     public StateRepository(String savesDir) {

@@ -5,12 +5,14 @@ import controller.EndingManager;
 import controller.GameManager;
 import controller.InputManager;
 import controller.MenuController;
+import model.GameConfig;
 import model.GameStates;
 import model.Player;
 import repository.AchievementRepository;
 import repository.ChapterCatalog;
 import repository.ConfigRepository;
 import repository.EndingRepository;
+import repository.GamePaths;
 import repository.ItemRepository;
 import repository.StateRepository;
 import repository.StoryRepository;
@@ -18,6 +20,8 @@ import repository.UnlockedAchievementsRepository;
 import repository.UnlockedEndingsRepository;
 import service.AchievementService;
 import service.AffinityTracker;
+import service.AssetResolver;
+import service.GameSession;
 import service.PlayerService;
 
 /**
@@ -29,6 +33,9 @@ import service.PlayerService;
  * Controllers e Views não conhecem esta classe: recebem as dependências pelo construtor.
  */
 public final class AppContext {
+    // roda antes dos campos abaixo: leva arquivos de versões antigas para data/
+    { GamePaths.migrateLegacyFiles(); }
+
     private final StateRepository stateRepository = new StateRepository();
     private final ConfigRepository configRepository = new ConfigRepository();
     private final ItemRepository itemRepository = new ItemRepository();
@@ -47,6 +54,23 @@ public final class AppContext {
 
     public ItemRepository getItemRepository() {
         return itemRepository;
+    }
+
+    public GameConfig getConfig() {
+        return configRepository.getCurrentConfig();
+    }
+
+    /**
+     * Cria a partida (modo campanha) para uma interface gráfica. Se {@code restoreFrom} não for
+     * nulo, as afinidades são restauradas dele; quem chama inicia com {@code session.start(dialogId)}.
+     */
+    public GameSession createGameSession(Player player, int chapterNumber, GameStates restoreFrom) {
+        AffinityTracker tracker = new AffinityTracker();
+        if (restoreFrom != null) {
+            playerService.restoreAffinityFromState(restoreFrom, tracker);
+        }
+        return new GameSession(chapterCatalog, chapterNumber, true, player, tracker, configRepository.getCurrentConfig(),
+                stateRepository, achievementService, endingManager.getService(), playerService, new AssetResolver());
     }
 
     public PlayerService getPlayerService() {
