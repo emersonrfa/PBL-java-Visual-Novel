@@ -6,9 +6,9 @@
   "storyFlags" : { },
   "npcAffinities" : { },
   "npcSuspicions" : { },
-  "playerBloodType" : "A+",
+  "playerBloodType" : "A-",
   "playerMoney" : 20.0,
   "playerEnergy" : 100,
   "playerInventoryItems" : [ ],
-  "saveTimestamp" : "24/10/2026 15:03:42"
+  "saveTimestamp" : "16/11/2026 19:54:09"
 }
