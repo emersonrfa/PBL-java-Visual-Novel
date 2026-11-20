@@ -1,43 +1,213 @@
 /* Estilo de todas as telas. Cada regra .nome vale para os elementos com styleClass="nome" nos FXML.
-   Cores principais no topo (.root) para trocar o tema inteiro de uma vez. */
+   Paleta e fontes ficam no topo (.root): trocar ali muda o jogo inteiro.
+
+   Fontes (carregadas por ui/effects/UiEffects.java, arquivos em resources/fonts):
+     UnifrakturCook  -> título do jogo (gótica)
+     Metamorphous    -> botões, títulos de tela, nome de quem fala
+     Almendra        -> texto corrido e diálogos
+*/
 
 .root {
-    -cor-fundo: #141420;
-    -cor-painel: #1d1d33;
-    -cor-texto: #ffffff;
-    -cor-destaque: #ffd479;
-    -cor-apagado: #9a9ab0;
-    -fx-font-size: 16px;
+    /* paleta: preto avermelhado, vinho, carmesim */
+    -cor-fundo: #0b0406;
+    -cor-fundo-claro: #230a10;
+    -cor-painel: #1a0a0e;
+    -cor-borda: #7d1523;
+    -cor-borda-viva: #ff4d5e;
+    -cor-botao-a: #3d0d16;
+    -cor-botao-b: #1f060a;
+    -cor-botao-hover-a: #86111f;
+    -cor-botao-hover-b: #4d0a14;
+    -cor-brilho: rgba(232, 40, 59, 0.55);
+    -cor-texto: #f2e2d9;
+    -cor-destaque: #ff7b86;
+    -cor-apagado: #a98d89;
+
+    -fx-font-family: "Almendra";
+    -fx-font-size: 17px;
 }
 
 /* ---------- telas de menu ---------- */
-.screen { -fx-background-color: -cor-fundo; -fx-padding: 24; }
-.title { -fx-text-fill: -cor-texto; -fx-font-size: 40px; -fx-font-weight: bold; }
-.title-small { -fx-text-fill: -cor-texto; -fx-font-size: 24px; -fx-font-weight: bold; }
-.text { -fx-text-fill: -cor-texto; -fx-font-size: 16px; }
-.text-muted { -fx-text-fill: -cor-apagado; -fx-font-size: 16px; }
-.status { -fx-text-fill: -cor-destaque; }
-.panel { -fx-background-color: -cor-painel; -fx-padding: 24; }
-.menu-button { -fx-font-size: 18px; -fx-padding: 10 24 10 24; }
-.check-box { -fx-text-fill: -cor-texto; }
+.screen {
+    -fx-background-color: radial-gradient(center 50% 35%, radius 85%, -cor-fundo-claro 0%, -cor-fundo 100%);
+    -fx-padding: 24;
+}
+
+/* título gigante do menu inicial */
+.game-title {
+    -fx-font-family: "UnifrakturCook";
+    -fx-font-size: 96px;
+    -fx-font-weight: bold;
+    -fx-text-fill: linear-gradient(to bottom, #ffb3ba 0%, #e8283b 55%, #8c0f1c 100%);
+    -fx-text-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(232, 40, 59, 0.75), 28, 0.35, 0, 0);
+}
+.game-subtitle {
+    -fx-font-family: "Metamorphous";
+    -fx-font-size: 15px;
+    -fx-text-fill: -cor-apagado;
+}
+.divider {
+    -fx-background-color: linear-gradient(to right, transparent, -cor-borda-viva, transparent);
+    -fx-min-height: 2px; -fx-pref-height: 2px; -fx-max-height: 2px;
+    -fx-opacity: 0.8;
+}
+
+.title {
+    -fx-font-family: "Metamorphous";
+    -fx-text-fill: -cor-texto;
+    -fx-font-size: 36px;
+    -fx-effect: dropshadow(gaussian, -cor-brilho, 14, 0.25, 0, 0);
+}
+.title-small {
+    -fx-font-family: "Metamorphous";
+    -fx-text-fill: -cor-destaque;
+    -fx-font-size: 24px;
+}
+.text { -fx-text-fill: -cor-texto; -fx-font-size: 17px; }
+.text-muted { -fx-text-fill: -cor-apagado; -fx-font-size: 17px; }
+.status { -fx-text-fill: -cor-destaque; -fx-font-family: "Metamorphous"; }
+
+.panel {
+    -fx-background-color: -cor-borda, -cor-painel;
+    -fx-background-insets: 0, 1.5;
+    -fx-background-radius: 12, 11;
+    -fx-padding: 28;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 30, 0.2, 0, 8);
+}
+
+.row {
+    -fx-background-color: rgba(125, 21, 35, 0.22);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(255, 77, 94, 0.25);
+    -fx-border-radius: 8;
+    -fx-padding: 12;
+}
+.row-title { -fx-text-fill: -cor-destaque; -fx-font-family: "Metamorphous"; -fx-font-size: 18px; }
+.row-title-locked { -fx-text-fill: -cor-apagado; -fx-font-family: "Metamorphous"; -fx-font-size: 18px; }
+
+/* ---------- botões (todos): contorno vinho, brilho e destaque ao passar o mouse ---------- */
+.button {
+    -fx-font-family: "Metamorphous";
+    -fx-font-size: 16px;
+    -fx-text-fill: -cor-texto;
+    -fx-cursor: hand;
+    -fx-background-color: -cor-borda, linear-gradient(to bottom, -cor-botao-a, -cor-botao-b);
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 9, 7;
+    -fx-padding: 9 22 9 22;
+    -fx-effect: dropshadow(gaussian, rgba(232, 40, 59, 0.28), 10, 0.15, 0, 0);
+}
+.button:hover {
+    -fx-text-fill: white;
+    -fx-background-color: -cor-borda-viva, linear-gradient(to bottom, -cor-botao-hover-a, -cor-botao-hover-b);
+    -fx-effect: dropshadow(gaussian, rgba(255, 77, 94, 0.85), 22, 0.35, 0, 0);
+}
+.button:focused {
+    -fx-background-color: -cor-borda-viva, linear-gradient(to bottom, -cor-botao-a, -cor-botao-b);
+}
+.button:pressed {
+    -fx-background-color: -cor-borda-viva, linear-gradient(to bottom, #35070f, #170407);
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.9), 12, 0.3, 0, 2);
+    -fx-padding: 10 22 8 22;
+}
+.button:disabled {
+    -fx-opacity: 0.45;
+    -fx-cursor: default;
+    -fx-effect: none;
+}
+
+.menu-button { -fx-font-size: 19px; -fx-padding: 11 28 11 28; }
+.hud-button { -fx-font-size: 14px; -fx-padding: 6 16 6 16; }
+.choice-button {
+    -fx-font-family: "Almendra";
+    -fx-font-size: 18px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-text-alignment: LEFT;
+    -fx-padding: 10 20 10 20;
+}
+
+/* ---------- controles de formulário ---------- */
+.check-box { -fx-text-fill: -cor-texto; -fx-cursor: hand; }
+.check-box .box {
+    -fx-background-color: -cor-borda, #12060a;
+    -fx-background-insets: 0, 1.5;
+    -fx-background-radius: 4, 3;
+}
+.check-box:hover .box { -fx-background-color: -cor-borda-viva, #12060a; }
+.check-box:selected .mark { -fx-background-color: -cor-borda-viva; }
+
+.choice-box {
+    -fx-font-family: "Metamorphous";
+    -fx-background-color: -cor-borda, #12060a;
+    -fx-background-insets: 0, 1.5;
+    -fx-background-radius: 7, 6;
+    -fx-cursor: hand;
+}
+.choice-box .label { -fx-text-fill: -cor-texto; }
+.choice-box .open-button .arrow { -fx-background-color: -cor-borda-viva; }
+.choice-box:hover { -fx-background-color: -cor-borda-viva, #12060a; }
+.context-menu {
+    -fx-background-color: -cor-borda, #12060a;
+    -fx-background-insets: 0, 1;
+}
+.menu-item .label { -fx-text-fill: -cor-texto; -fx-font-family: "Metamorphous"; }
+.menu-item:focused { -fx-background-color: #6d101c; }
+.menu-item:focused .label { -fx-text-fill: white; }
+
 .scroll { -fx-background: transparent; -fx-background-color: transparent; }
 .scroll > .viewport { -fx-background-color: transparent; }
-.row { -fx-background-color: rgba(255,255,255,0.06); -fx-padding: 10; }
-.row-title { -fx-text-fill: -cor-destaque; -fx-font-size: 18px; -fx-font-weight: bold; }
-.row-title-locked { -fx-text-fill: -cor-apagado; -fx-font-size: 18px; -fx-font-weight: bold; }
+.scroll-bar { -fx-background-color: transparent; }
+.scroll-bar .track { -fx-background-color: rgba(255,255,255,0.05); -fx-background-radius: 6; }
+.scroll-bar .thumb { -fx-background-color: -cor-borda; -fx-background-radius: 6; }
+.scroll-bar .thumb:hover { -fx-background-color: -cor-borda-viva; }
+.scroll-bar .increment-button, .scroll-bar .decrement-button { -fx-padding: 0; -fx-background-color: transparent; }
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow { -fx-padding: 0; -fx-shape: ""; }
 
 /* ---------- tela do jogo ---------- */
 .game-root { -fx-background-color: -cor-fundo; }
-.hud { -fx-background-color: rgba(0,0,0,0.45); -fx-padding: 12 20 12 20; }
-.hud-text { -fx-text-fill: -cor-texto; -fx-font-size: 16px; }
-.hud-button { -fx-font-size: 14px; }
-.dialogue-box { -fx-background-color: rgba(10,10,20,0.85); -fx-padding: 20 40 24 40; }
-.speaker { -fx-text-fill: -cor-destaque; -fx-font-size: 20px; -fx-font-weight: bold; }
-.dialogue-text { -fx-text-fill: -cor-texto; -fx-font-size: 20px; }
-.hint { -fx-text-fill: #cccccc; -fx-font-size: 14px; }
-.choice-button { -fx-font-size: 16px; }
-.chapter-banner { -fx-text-fill: white; -fx-font-size: 36px; -fx-font-weight: bold;
-                  -fx-background-color: rgba(0,0,0,0.6); -fx-padding: 18 36 18 36; -fx-text-alignment: center; }
-.toast { -fx-text-fill: white; -fx-background-color: rgba(30,30,60,0.92); -fx-padding: 8 14 8 14; }
-.modal-layer { -fx-background-color: rgba(0,0,0,0.7); }
-.item-placeholder { -fx-background-color: rgba(255,255,255,0.12); }
+.hud {
+    -fx-background-color: linear-gradient(to bottom, rgba(11,4,6,0.92), rgba(11,4,6,0.35));
+    -fx-padding: 12 22 16 22;
+    -fx-border-color: transparent transparent rgba(255,77,94,0.35) transparent;
+}
+.hud-text { -fx-text-fill: -cor-texto; -fx-font-family: "Metamorphous"; -fx-font-size: 16px; }
+
+.dialogue-box {
+    -fx-background-color: linear-gradient(to bottom, rgba(26,8,12,0.88), rgba(8,3,5,0.95));
+    -fx-padding: 20 48 26 48;
+    -fx-border-color: -cor-borda-viva transparent transparent transparent;
+    -fx-border-width: 2 0 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(232,40,59,0.35), 24, 0.1, 0, -4);
+}
+.speaker {
+    -fx-text-fill: -cor-destaque;
+    -fx-font-family: "Metamorphous";
+    -fx-font-size: 22px;
+    -fx-effect: dropshadow(gaussian, rgba(232,40,59,0.6), 8, 0.2, 0, 0);
+}
+.dialogue-text { -fx-text-fill: -cor-texto; -fx-font-family: "Almendra"; -fx-font-size: 22px; -fx-line-spacing: 3px; }
+.hint { -fx-text-fill: -cor-apagado; -fx-font-family: "Metamorphous"; -fx-font-size: 13px; }
+
+.chapter-banner {
+    -fx-font-family: "UnifrakturCook";
+    -fx-text-fill: linear-gradient(to bottom, #ffb3ba, #e8283b);
+    -fx-font-size: 52px;
+    -fx-background-color: radial-gradient(center 50% 50%, radius 100%, rgba(60,8,16,0.85), rgba(0,0,0,0.75));
+    -fx-border-color: -cor-borda-viva transparent -cor-borda-viva transparent;
+    -fx-border-width: 2 0 2 0;
+    -fx-padding: 22 60 22 60;
+    -fx-text-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(232,40,59,0.6), 22, 0.3, 0, 0);
+}
+.toast {
+    -fx-text-fill: -cor-texto;
+    -fx-font-family: "Almendra";
+    -fx-background-color: -cor-borda-viva, rgba(34,8,14,0.96);
+    -fx-background-insets: 0, 1.5;
+    -fx-background-radius: 8, 7;
+    -fx-padding: 9 16 9 16;
+    -fx-effect: dropshadow(gaussian, rgba(232,40,59,0.5), 14, 0.2, 0, 0);
+}
+.modal-layer { -fx-background-color: rgba(5, 1, 2, 0.8); }
+.item-placeholder { -fx-background-color: rgba(125, 21, 35, 0.35); -fx-background-radius: 6; }

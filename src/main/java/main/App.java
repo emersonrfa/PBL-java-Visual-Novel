@@ -3,6 +3,7 @@ package main;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import ui.effects.UiEffects;
 import ui.game.GameController;
 import ui.game.GameRequest;
 import ui.navigation.NavigationModel;
@@ -33,6 +34,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
+        UiEffects.loadFonts();
         context = new AppContext();
         ScreenNavigator navigator = new ScreenNavigator(new NavigationModel());
 
@@ -53,7 +55,9 @@ public class App extends Application {
             scene.getStylesheets().add(stylesheet.toExternalForm());
         }
 
-        stage.setTitle("Visual Novel");
+        UiEffects.install(scene); // fontes já carregadas; som e animação dos botões
+
+        stage.setTitle("Emily e o Ritual Sombrio");
         stage.setScene(scene);
         stage.show();
         navigator.goTo(ScreenId.MAIN_MENU);
