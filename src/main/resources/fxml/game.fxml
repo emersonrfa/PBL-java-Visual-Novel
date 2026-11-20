@@ -20,7 +20,7 @@
            styleClass="game-root">
 
     <!-- 1. Fundo da cena (preenche a janela inteira) -->
-    <ImageView fx:id="background" preserveRatio="false" mouseTransparent="true"/>
+    <ImageView fx:id="background" preserveRatio="false" mouseTransparent="true" managed="false"/>
 
     <!-- 2. Sprite de quem está falando (altura = altura da janela, centralizado embaixo) -->
     <ImageView fx:id="sprite" preserveRatio="true" mouseTransparent="true" StackPane.alignment="BOTTOM_CENTER"/>

@@ -1,14 +1,16 @@
 {
   "saveName" : "Emily",
-  "currentChapterId" : 1,
-  "currentDialogId" : "d1.1",
-  "currentSceneId" : "Quarto",
-  "storyFlags" : { },
+  "currentChapterId" : 2,
+  "currentDialogId" : "d4.3",
+  "currentSceneId" : "No Mural da Rua",
+  "storyFlags" : {
+    "NOTICIAS" : true
+  },
   "npcAffinities" : { },
   "npcSuspicions" : { },
-  "playerBloodType" : "A-",
+  "playerBloodType" : "A+",
   "playerMoney" : 20.0,
   "playerEnergy" : 100,
-  "playerInventoryItems" : [ ],
-  "saveTimestamp" : "16/11/2026 19:54:09"
+  "playerInventoryItems" : [ "Casaco Simples", "Chave de Casa" ],
+  "saveTimestamp" : "19/11/2026 23:51:36"
 }

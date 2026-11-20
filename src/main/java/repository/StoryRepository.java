@@ -27,7 +27,7 @@ public class StoryRepository {
 
                 //--------------------------------------------------------------------------------------------------//
                 // INTRODUÇÃO
-                .scene("Quarto", "Um quarto bagunçado. Porém aconchegante.")
+                .scene("Quarto", "Um quarto bagunçado. Porém aconchegante.").background("quarto_baguncado")
                 .narrate("d1.1", "Você sente o vento frio balançando as cortinas do seu quarto.")
                 .narrate("d1.2", "Sua janela aberta permite a entrada tanto da brisa constante da" +
                         " noite quanto da suave luz da lua.")
@@ -39,7 +39,7 @@ public class StoryRepository {
 
                 //--------------------------------------------------------------------------------------------------//
                 // OLHANDO O CELULAR
-                .scene("Averiguando o celular", "Olhando para a tela de um celular ainda deitada na cama.")
+                .scene("Averiguando o celular", "Olhando para a tela de um celular ainda deitada na cama.").background("celular_com_as_notas")
                 .narrate("d2.1", "Você se esforça um pouco para pegar seu celular em sua mesa, " +
                         "próxima a cama. Ao ligá-lo, percebe que já é tarde da noite.")
                 .narrate("d2.2", "Você abre suas anotações e lê algumas coisas que escreveu durante" +
@@ -52,7 +52,7 @@ public class StoryRepository {
 
                 //--------------------------------------------------------------------------------------------------//
                 // OLHANDO EMAILS
-                .scene("Emails do celular", "Ainda no celular, abre a caixa de emails, repleta de mensagens.")
+                .scene("Emails do celular", "Ainda no celular, abre a caixa de emails, repleta de mensagens.").background("celular_com_emails")
                 .narrate("d3.1", "Ao abrir sua caixa de email, nota-se algumas mensagens " +
                         "supérfluas e alguns spams. Porém, você visualiza uma mensagem favoritada há algumas semanas atrás." +
                         " É uma proposta de emprego para uma organização aparentemente não muito confiável.")
@@ -67,7 +67,7 @@ public class StoryRepository {
 
                 //--------------------------------------------------------------------------------------------------//
                 // OLHANDO JANELA
-                .scene("Janela de Emily", "Olhando através da janela de seu quarto, você vislumbra uma paisagem distante de Nova Iorque.")
+                .scene("Janela de Emily", "Olhando através da janela de seu quarto, você vislumbra uma paisagem distante de Nova Iorque.").background("janela_aberta")
                 .narrate("d4.1", "Você se levanta e abre sua janela. O céu está bonito, a vista de" +
                         " Nova Iorque se destaca na paisagem. Sua cidade, à esta hora, é silenciosa e calma. Você visualiza a " +
                         "lua e se encanta com sua beleza.")
@@ -79,14 +79,14 @@ public class StoryRepository {
 
                 //--------------------------------------------------------------------------------------------------//
                 // DORMIR DIRETO
-                .scene("Indo dormir", "O travesseiro de sua cama lhe conforta como nunca.")
+                .scene("Indo dormir", "O travesseiro de sua cama lhe conforta como nunca.").background("quarto_baguncado")
                 .narrate("d5.1", "Você ignora suas anotações e se despede de seu celular. Ao se" +
                         " ajeitar para dormir e cobrir-se com seu lençol, você se sente próxima de seu sono, e espontâneamente" +
                         " começa a pensar sobre sua vida e seu passado antes de dormir…", "dLORE.1")
 
                 //--------------------------------------------------------------------------------------------------//
                 // EXPLICAÇÃO DA LORE
-                .scene("Vislumbre do passado", "Uma onda de pensamentos passa por sua cabeça.")
+                .scene("Vislumbre do passado", "Uma onda de pensamentos passa por sua cabeça.").background("pensamentos")
                 .narrate("dLORE.1", "O mundo em que você vive é um mundo tanto quanto exótico." +
                         " Pessoas detém uma força mágica dentro de si desde que nascem, elas podem ser aperfeiçoadas em" +
                         " escolas ou com o talento para fazer qualquer coisa que imaginar. Todavia, são poucas as que conseguem" +
@@ -108,7 +108,7 @@ public class StoryRepository {
 
                 //--------------------------------------------------------------------------------------------------//
                 // DESFECHO PRÓLOGO
-                .scene("Enfim, o sono", "O travesseiro de sua cama lhe conforta como nunca.")
+                .scene("Enfim, o sono", "O travesseiro de sua cama lhe conforta como nunca.").background("quarto_baguncado")
                 .narrate("dFIM.1", "“Acho que era… Alvorada da Pratânia? Que nome esquisito…" +
                         " Amanhã eu tenho que procurar sobre.”\n\nSeus olhos tremem de cansaço, você se despede de seu celular" +
                         " e se ajeita em sua cama para dormir.")
@@ -125,7 +125,7 @@ public class StoryRepository {
 
                 //--------------------------------------------------------------------------------------------------//
                 // AMANHECER
-                .scene("Amanhecer no quarto", "A luz do sol atinge sua janela")
+                .scene("Amanhecer no quarto", "A luz do sol atinge sua janela").background("quarto_baguncado")
                 .narrate("d1.1", "O dia amanheceu, você escuta o canto do pássaros vindos de lá de fora.")
                 .say("d1.2", "Emily", "Cansada", "* Boceja e se espreguiça" +
                         " ainda na cama, após um sono tranquilo *")
@@ -138,7 +138,7 @@ public class StoryRepository {
 
                 //--------------------------------------------------------------------------------------------------//
                 // TOMANDO OU NÃO CAFÉ
-                .scene("Cozinha", "Uma cozinha simples mas suficiente para suas necessidades")
+                .scene("Cozinha", "Uma cozinha simples mas suficiente para suas necessidades").background("cozinha")
                 .narrate("d2.1.1", "Você checa sua cafeteira, ainda tem um pouco de café." +
                         " Então você o esquenta novamente e o toma com leite e açúcar.", "d2.2")
                 .narrate("d2.1.2", "Você procura por um pedaço de pão que deixou no outro dia" +
@@ -166,7 +166,7 @@ public class StoryRepository {
                 //--------------------------------------------------------------------------------------------------//
                 // FORA DO APARTAMENTO
                 .scene("Frente do Apartamento", "Uma rua residencial de baixa classe, um" +
-                        "pouco movimentada.")
+                        "pouco movimentada.").background("na_rua")
                 .narrate("d3.1", "Emily desce as escadas de seu apartamento, observando" +
                         " como as coisas estão todas no mesmo lugar.")
                 .say("d3.2", "Emily", "Normal", "Parece que nada muda muito nessa parte da cidade.")
@@ -176,7 +176,7 @@ public class StoryRepository {
                 //--------------------------------------------------------------------------------------------------//
                 // MURAL
                 .scene("No Mural da Rua", "Um mural com vários papéis pendurados com" +
-                        " objetivos diferentes.")
+                        " objetivos diferentes.").background("mural")
                 .narrate("d4.1", "Ao se aproximar do mural da rua, antes mesmo de você conseguir " +
                         "ler uma palavra sequer do que está pendurado hoje, você nota uma pessoa familiar.")
                 .say("d4.2", "Arthur", "Normal", "Oooh, Oi Emily!! *diz enquanto " +
