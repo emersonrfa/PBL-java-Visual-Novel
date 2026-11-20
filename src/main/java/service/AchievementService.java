@@ -34,6 +34,18 @@ public class AchievementService {
         if ("JANELAARTHUR".equalsIgnoreCase(flagName)) {
             return checkAndUnlock("ACH_CURIOSA");
         }
+        if ("MISSAO_ACEITA".equalsIgnoreCase(flagName)) {
+            return checkAndUnlock("ACH_CONTRATADA");
+        }
+        if ("FLERTOU_PEDRO".equalsIgnoreCase(flagName)) {
+            return checkAndUnlock("ACH_GALANTEADORA");
+        }
+        if ("CONVITE_MANSAO_OBTIDO".equalsIgnoreCase(flagName)) {
+            return checkAndUnlock("ACH_DISFARCE_PERFEITO");
+        }
+        if ("MANSAO_EXPLORADA".equalsIgnoreCase(flagName)) {
+            return checkAndUnlock("ACH_HOSPEDE_NOBILIS");
+        }
         return null;
     }
 

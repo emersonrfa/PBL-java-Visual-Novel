@@ -84,6 +84,18 @@ public class PlayerService {
             report.addSuspicion(npc, suspicionBefore, tracker.getSuspicion(npc));
         }
 
+        if (tracker != null) {
+            for (Choice.NpcEffect effect : choice.getExtraNpcEffects()) {
+                int affBefore = tracker.getAffinity(effect.npc());
+                tracker.modifyAffinity(effect.npc(), effect.affinityChange());
+                report.addAffinity(effect.npc(), affBefore, tracker.getAffinity(effect.npc()));
+
+                int susBefore = tracker.getSuspicion(effect.npc());
+                tracker.modifySuspicion(effect.npc(), effect.suspicionChange());
+                report.addSuspicion(effect.npc(), susBefore, tracker.getSuspicion(effect.npc()));
+            }
+        }
+
         return report;
     }
 
