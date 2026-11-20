@@ -22,6 +22,9 @@ public class AchievementRepository {
         achievements.put("ACH_BOM_DIA", new Achievement("ACH_BOM_DIA",
                 "Pronta para o Dia", "Tomou café da manhã e preparou-se para sair de casa."));
 
+        achievements.put("ACH_CONTRATADA", new Achievement("ACH_CONTRATADA",
+                "Agente de Santa Prata", "Sobreviveu à entrevista com Santo Pedro e aceitou a missão."));
+
         // Conquistas de Relacionamento e Diálogo
         achievements.put("ACH_AMIGO_VELHO", new Achievement("ACH_AMIGO_VELHO",
                 "Reencontro Amigável", "Tratou Arthur cordialmente no mural da rua."));
@@ -29,7 +32,13 @@ public class AchievementRepository {
         achievements.put("ACH_CURIOSA", new Achievement("ACH_CURIOSA",
                 "Aparências Noturnas", "Observou a vizinhança pela janela durante a noite."));
 
+        achievements.put("ACH_DISFARCE_PERFEITO", new Achievement("ACH_DISFARCE_PERFEITO",
+                "Filha da Noite", "Convenceu Gabriel e Cassian no Bar Eclipse e recebeu o convite da mansão."));
+
         // Conquistas de Finais e Segredos
+        achievements.put("ACH_GALANTEADORA", new Achievement("ACH_GALANTEADORA",
+                "Charme Perigoso", "Flertou com o coordenador Santo Pedro durante a entrevista de emprego.", true));
+
         achievements.put("ACH_PRIMEIRO_FIM", new Achievement("ACH_PRIMEIRO_FIM",
                 "Destino Selado", "Descobriu o seu primeiro desfecho na história."));
 

@@ -20,13 +20,18 @@ public class NpcRepository {
                 "Cabelo cacheado, bigode fino, moreno. Meio desajeitado, já é um amigo de Emily de longa" +
                         " data, apesar de nunca terem se aproximado tanto. Por ser vizinho de Emily é bem acessível" +
                         " no começo do jogo. Caso ganhe atenção suficiente no começo, ele poderá ser útil no futuro.",
-                        "Masculino", 22));
+                "Masculino", 22));
 
         npcs.put("Santo Pedro", new NPC("Coordenador de Santa Prata", "Sede de Santa Prata",
                 "Santo Pedro", "Coordenador geral da organização que caça criaturas das trevas." +
                 " Um homem grande, forte, mais velho e que dá uma sensação de caçador. Ele é bruto e pode ser rude" +
                 " às vezes. Branco de cabelo meio grisalho, barba um pouco grande.",
                 "Masculino", 54));
+
+        npcs.put("Clara", new NPC("Atendente da Conveniência", "Loja de Conveniência",
+                "Clara", "Jovem de expressão entediada que trabalha no balcão da loja de conveniência " +
+                "que serve de fachada para a Ordem de Santa Prata.",
+                "Feminino", 24));
 
         // Vampiros
 
@@ -50,6 +55,16 @@ public class NpcRepository {
         gabriel.addBloodPreference("B-");
         gabriel.addBloodPreference("A+");
         gabriel.setSuspicionThreshold(80);
+
+        Vampire cassian = new Vampire("O Teatral", "Bar Eclipse", "Cassian Umbra",
+                "Cassian Umbra é um vampiro de 212 anos que leva a estética gótica a sério até demais. " +
+                        "Embora tente posar como um predador implacável ao lado de Gabriel, vive se atrapalhando " +
+                        "com o próprio sobretudo e com a burocracia do programa de refugiados da casa Nobilis.",
+                "Masculino", 212);
+        cassian.addBloodPreference("B-");
+        cassian.addBloodPreference("O-");
+        cassian.addBloodPreference("AB-");
+        cassian.setSuspicionThreshold(75);
 
         Vampire miguel = new Vampire("O Comandante", "Salão Principal", "Miguel Tointoskv",
                 "Miguel ou Toin, podendo ser chamado das duas maneiras, é o segundo vampiro mais velho da " +
@@ -85,6 +100,7 @@ public class NpcRepository {
 
         npcs.put("Raphael", raphael);
         npcs.put("Gabriel", gabriel);
+        npcs.put("Cassian", cassian);
         npcs.put("Miguel", miguel);
         npcs.put("Lilith", lilith);
         npcs.put("Luna", luna);

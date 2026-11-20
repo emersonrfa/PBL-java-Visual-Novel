@@ -22,6 +22,13 @@ public class EndingRepository {
                         "aceitar como uma nova integrante, seu crime é tão grande que você é banida deste mundo.",
                 "Consumida pelo Ritual Sombrio."));
 
+        endings.put("FINAL_MORTE_BAR_VAMP", new Ending("FINAL_MORTE_BAR_VAMP",
+                " Nos fundos escuros do Bar Eclipse, Emily deixou escapar uma falha fatal em seu disfarce." +
+                        " Gabriel e Cassian perceberam o bater acelerado de seu coração humano antes mesmo que ela pudesse" +
+                        " alcançar a porta. Sem o respaldo da organização e cercada nas sombras, sua infiltração" +
+                        " terminou antes sequer de chegar aos portões da mansão.",
+                "Desmascarada nas Sombras."));
+
         endings.put("FINAL_VAMPIRA", new Ending("FINAL_VAMPIRA", " Desde o princípio seu destino estava " +
                 "selado, Emily apenas não sabia ainda. Sua curiosidade e emocional criado pelos vampiros da côrte " +
                 "resultou-lhe uma maldição eterna, sua pele torna-se pálida, seu sangue ferve com o menor raio solar," +
