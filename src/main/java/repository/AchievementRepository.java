@@ -25,6 +25,9 @@ public class AchievementRepository {
         achievements.put("ACH_CONTRATADA", new Achievement("ACH_CONTRATADA",
                 "Agente de Santa Prata", "Sobreviveu à entrevista com Santo Pedro e aceitou a missão."));
 
+        achievements.put("ACH_HOSPEDE_NOBILIS", new Achievement("ACH_HOSPEDE_NOBILIS",
+                "Hóspede da Corte", "Conheceu todos os moradores da Mansão Nobilis e conquistou seu próprio quarto."));
+
         // Conquistas de Relacionamento e Diálogo
         achievements.put("ACH_AMIGO_VELHO", new Achievement("ACH_AMIGO_VELHO",
                 "Reencontro Amigável", "Tratou Arthur cordialmente no mural da rua."));
@@ -37,7 +40,7 @@ public class AchievementRepository {
 
         // Conquistas de Finais e Segredos
         achievements.put("ACH_GALANTEADORA", new Achievement("ACH_GALANTEADORA",
-                "Charme Perigoso", "Flertou com o coordenador Santo Pedro durante a entrevista de emprego.", true));
+                "Charme Perigoso", "Deixou Santo Pedro sem jeito durante a entrevista de emprego.", true));
 
         achievements.put("ACH_PRIMEIRO_FIM", new Achievement("ACH_PRIMEIRO_FIM",
                 "Destino Selado", "Descobriu o seu primeiro desfecho na história."));
