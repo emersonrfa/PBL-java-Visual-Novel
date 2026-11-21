@@ -55,6 +55,7 @@ public class GameScreenPresenterTest {
         public void showChoices(List<ChoiceView> c) { choices = c; }
         public void showHud(int e, double m) { log.add("hud:" + e + ":" + (int) m); }
         public void showToast(String m) { log.add("toast:" + m); }
+        public void showAchievement(String t, String d) { log.add("achievement:" + t); }
         public void showInventory(List<InventoryEntry> e) { inventory = e; }
         public void hideInventory() { inventory = null; }
         public void showSaveSlots(List<String> l) { slots = l; }
@@ -156,7 +157,7 @@ public class GameScreenPresenterTest {
         presenter.begin("a3");
         presenter.onChoice(2);
         assertTrue(view.log.contains("ending:FINAL_VAMPIRA"));
-        assertTrue(view.log.stream().anyMatch(l -> l.startsWith("toast:Conquista desbloqueada")));
+        assertTrue(view.log.stream().anyMatch(l -> l.startsWith("achievement:")));
 
         view.log.clear();
         presenter.onContinue();

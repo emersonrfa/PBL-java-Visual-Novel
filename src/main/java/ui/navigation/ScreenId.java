@@ -4,7 +4,8 @@ package ui.navigation;
 public enum ScreenId {
     MAIN_MENU,
     PLAY,          // escolha entre Novo Jogo e Carregar Save
-    NEW_GAME,      // slot + tipo sanguíneo
+    NEW_GAME,      // escolha do slot
+    BLOOD_TYPE,    // tipo sanguíneo em círculo; depois dele começa o capítulo 1
     LOAD_SAVE,
     SETTINGS,
     ACHIEVEMENTS,

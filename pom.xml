@@ -37,6 +37,13 @@
             <version>${javafx.version}</version>
         </dependency>
 
+        <!-- Efeitos sonoros dos botões (javafx.scene.media.AudioClip) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
         <!-- Suporte para JUnit 5 (org.junit.jupiter.api.Test) -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

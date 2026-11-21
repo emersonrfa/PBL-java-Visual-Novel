@@ -3,12 +3,16 @@ package main;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import ui.effects.MusicPlayer;
+import ui.effects.UiEffects;
 import ui.game.GameController;
 import ui.game.GameRequest;
 import ui.navigation.NavigationModel;
 import ui.navigation.ScreenId;
 import ui.navigation.ScreenNavigator;
 import ui.screens.AchievementsController;
+import ui.screens.BloodTypeController;
+import ui.screens.BloodTypeRequest;
 import ui.screens.CreditsController;
 import ui.screens.EndingsController;
 import ui.screens.LoadSaveController;
@@ -33,7 +37,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
+        UiEffects.loadFonts();
         context = new AppContext();
+        MusicPlayer.apply(context.getConfig().isTurnMusic());
         ScreenNavigator navigator = new ScreenNavigator(new NavigationModel());
 
         navigator.register(ScreenId.MAIN_MENU, () -> MainMenuController.create(navigator, context))
@@ -44,6 +50,8 @@ public class App extends Application {
                 .register(ScreenId.ACHIEVEMENTS, () -> AchievementsController.create(navigator, context))
                 .register(ScreenId.ENDINGS, () -> EndingsController.create(navigator, context))
                 .register(ScreenId.CREDITS, () -> CreditsController.create(navigator, context))
+                .registerWithArgument(ScreenId.BLOOD_TYPE,
+                        request -> BloodTypeController.create(navigator, context, (BloodTypeRequest) request))
                 .registerWithArgument(ScreenId.GAME,
                         request -> GameController.create(navigator, context, (GameRequest) request));
 
@@ -53,7 +61,9 @@ public class App extends Application {
             scene.getStylesheets().add(stylesheet.toExternalForm());
         }
 
-        stage.setTitle("Visual Novel");
+        UiEffects.install(scene); // fontes já carregadas; som e animação dos botões
+
+        stage.setTitle("Emily e o Ritual Sombrio");
         stage.setScene(scene);
         stage.show();
         navigator.goTo(ScreenId.MAIN_MENU);

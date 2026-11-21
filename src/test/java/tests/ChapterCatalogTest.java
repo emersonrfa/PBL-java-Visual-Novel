@@ -63,8 +63,9 @@ public class ChapterCatalogTest {
     public void storyRepositoryCatalogHasTheCurrentChapters() {
         ChapterCatalog catalog = new StoryRepository().buildCatalog();
 
-        assertEquals(List.of(1, 2), List.copyOf(catalog.numbers()));
-        assertEquals(1, catalog.get(1).getChapterNumber());
-        assertEquals(2, catalog.get(2).getChapterNumber());
+        assertEquals(List.of(1, 2, 3, 4), List.copyOf(catalog.numbers()));
+        for (int number : catalog.numbers()) {
+            assertEquals(number, catalog.get(number).getChapterNumber());
+        }
     }
 }

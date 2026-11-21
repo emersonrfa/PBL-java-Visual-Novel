@@ -53,19 +53,33 @@
         </StackPane.margin>
     </VBox>
 
+    <!-- 5b. Banners de conquista (topo, centralizado; um por conquista) -->
+    <VBox fx:id="achievementBox" spacing="8" alignment="TOP_CENTER" mouseTransparent="true"
+          StackPane.alignment="TOP_CENTER" maxWidth="-Infinity" maxHeight="-Infinity">
+        <StackPane.margin>
+            <Insets top="74"/>
+        </StackPane.margin>
+    </VBox>
+
     <!-- 6. Título do capítulo (aparece e some sozinho) -->
     <Label fx:id="chapterBanner" styleClass="chapter-banner" visible="false" mouseTransparent="true"
            maxWidth="-Infinity" maxHeight="-Infinity"/>
 
     <!-- 7. Janelas por cima de tudo (começam invisíveis) -->
     <StackPane fx:id="inventoryOverlay" styleClass="modal-layer" visible="false">
-        <VBox spacing="16" styleClass="panel" maxWidth="640" maxHeight="-Infinity">
-            <Label text="Inventário" styleClass="title-small"/>
-            <ScrollPane fitToWidth="true" prefHeight="360" styleClass="scroll">
-                <VBox fx:id="inventoryList" spacing="12"/>
-            </ScrollPane>
-            <Button text="Fechar" onAction="#onCloseInventory" styleClass="menu-button"/>
-        </VBox>
+        <!-- Mochila de couro marrom (estilos .bag-* em css/style.css); fivela dourada no topo -->
+        <StackPane maxWidth="680" maxHeight="-Infinity" styleClass="bag-wrap">
+            <VBox spacing="14" styleClass="bag-panel" alignment="TOP_CENTER">
+                <Label text="Mochila de Emily" styleClass="bag-title"/>
+                <Region styleClass="bag-divider" maxWidth="420"/>
+                <ScrollPane fitToWidth="true" prefHeight="360" styleClass="bag-scroll">
+                    <VBox fx:id="inventoryList" spacing="10"/>
+                </ScrollPane>
+                <Button text="Fechar mochila" onAction="#onCloseInventory" styleClass="menu-button, bag-close"/>
+            </VBox>
+            <Region styleClass="bag-buckle" StackPane.alignment="TOP_CENTER" maxWidth="-Infinity" maxHeight="-Infinity"
+                    mouseTransparent="true"/>
+        </StackPane>
     </StackPane>
 
     <StackPane fx:id="saveOverlay" styleClass="modal-layer" visible="false">

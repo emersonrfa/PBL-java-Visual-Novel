@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import ui.effects.ParticleField?>
 
-<!-- MENU INICIAL. Comportamento dos botões: ui/screens/MainMenuController.java -->
+<!-- MENU INICIAL. Comportamento dos botões: ui/screens/MainMenuController.java
+     O título fica centralizado no topo (fonte gótica, classe .game-title em css/style.css). -->
 <StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="ui.screens.MainMenuController"
            styleClass="screen">
+
+    <!-- Fundo animado: partículas vermelhas subindo do canto inferior esquerdo (ui/effects/ParticleField.java) -->
+    <ParticleField/>
+
+    <!-- Título e subtítulo no alto da tela -->
+    <VBox alignment="TOP_CENTER" spacing="6" maxWidth="1180" maxHeight="-Infinity"
+          StackPane.alignment="TOP_CENTER" mouseTransparent="true">
+        <StackPane.margin>
+            <Insets top="26"/>
+        </StackPane.margin>
+        <Label text="Emily e o Ritual Sombrio" styleClass="game-title" wrapText="true" textAlignment="CENTER"/>
+        <Label text="UMA HISTÓRIA DE VAMPIROS E SEGREDOS" styleClass="game-subtitle"/>
+        <Region styleClass="divider" maxWidth="620"/>
+    </VBox>
+
+    <!-- Botões, no centro (um pouco abaixo do título) -->
     <VBox alignment="CENTER" spacing="14" maxWidth="360" maxHeight="-Infinity">
-        <Label text="Visual Novel" styleClass="title"/>
+        <StackPane.margin>
+            <Insets top="170"/>
+        </StackPane.margin>
         <Button text="Jogar" onAction="#onPlay" styleClass="menu-button" maxWidth="Infinity"/>
         <Button text="Galeria de Finais" onAction="#onEndings" styleClass="menu-button" maxWidth="Infinity"/>
         <Button text="Galeria de Conquistas" onAction="#onAchievements" styleClass="menu-button" maxWidth="Infinity"/>

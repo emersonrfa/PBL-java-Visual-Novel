@@ -373,7 +373,7 @@ public class StoryRepository {
                 .say("d1.4.2", "Arthur", "Normal",
                         "Ah, sem problemas! Fica à vontade no sofá mesmo assim, faz tempo que não colocamos o papo em dia.", "d1.5")
                 .say("d1.5", "Arthur", "Normal",
-                        "E então, como foi aquela entrevista misteriosa ontem? Conseguiu a vaga?")
+                        "E então, Emily, como anda a busca por emprego? Ontem você saiu tão cedo... Conseguiu alguma coisa?")
                 .ask("d1.6", "Emily", "Pensando", "Como comentar sobre o emprego?",
                         new Choice("“Consegui! E olha... o coordenador é enorme, forte e bem impressionante.”", "d1.7.1")
                                 .setRequiredFlag("FLERTOU_PEDRO")
@@ -418,7 +418,7 @@ public class StoryRepository {
                 .narrate("d2.4", "Neste mundo, vampiros carregam marcas evidentes como olhos vermelhos e presas alongadas — " +
                         "e, por uma herança mágica própria, pessoas negras transformadas mantêm sua melanina, apenas suavizando levemente o tom. " +
                         "Com os feitiços e lentes de Santo Pedro ajustados, nenhum traço humano denuncia Emily à primeira vista.")
-                .ask("d2.5", "Emily", "Seria", "Tudo pronto. Hora de sair.",
+                .ask("d2.5", "Emily", "Serio", "Tudo pronto. Hora de sair.",
                         new Choice("Puxar o capuz sobre o rosto e seguir para o Bar Eclipse (-15 Energia)", "d3.1")
                                 .setEnergyChange(-15))
 
@@ -591,8 +591,7 @@ public class StoryRepository {
                         new Choice("“Na verdade, estou fascinada pela arquitetura antiga desta mansão.”", "d2.6.3")
                                 .setTargetNpc("Luna")
                                 .setAffinityChange(5)
-                                .setTargetNpc("Miguel")
-                                .setSuspicionChange(10))
+                                .alsoAffect("Miguel", 0, 10))
                 .say("d2.6.1", "Luna", "Sorrindo",
                         "Palavras sensatas. Esta casa sobreviveu por séculos graças à lealdade mútua.", "d2.7")
                 .say("d2.6.2", "Miguel", "Normal",
@@ -848,8 +847,7 @@ public class StoryRepository {
                         new Choice("“Se vocês discutirem assim numa luta real, os caçadores nem precisam se esforçar.”", p + "5.3")
                                 .setTargetNpc("Gabriel")
                                 .setAffinityChange(5)
-                                .setTargetNpc("Cassian")
-                                .setAffinityChange(5))
+                                .alsoAffect("Cassian", 5, 0))
                 .say(p + "5.1", "Gabriel", "Animado",
                         "HA! Viu só, Cassian?! Alguém entende a minha visão artística!", nextId)
                 .say(p + "5.2", "Cassian", "Sorrindo",

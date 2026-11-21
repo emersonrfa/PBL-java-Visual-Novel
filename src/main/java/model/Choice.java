@@ -26,7 +26,9 @@ public class Choice {
     private boolean consumeRequiredItem = false;
 
     // atributos pros relacionamentos
-    private int requiredAffinity = 0;
+    /** Sem exigência por padrão: afinidade negativa não pode bloquear escolhas comuns (evita travar a história). */
+    public static final int NO_AFFINITY_REQUIREMENT = Integer.MIN_VALUE;
+    private int requiredAffinity = NO_AFFINITY_REQUIREMENT;
     private int maxSuspicionAllowed = 100;
     private int suspicionChange = 0;
 
@@ -78,6 +80,18 @@ public class Choice {
         }
         return this;
     }
+
+    /** Efeito extra sobre OUTRO personagem (uma escolha pode agradar/alertar mais de um NPC). */
+    public record NpcEffect(String npc, int affinityChange, int suspicionChange) {}
+
+    private final java.util.List<NpcEffect> extraNpcEffects = new java.util.ArrayList<>();
+
+    public Choice alsoAffect(String npcName, int affinityChange, int suspicionChange) {
+        this.extraNpcEffects.add(new NpcEffect(npcName, affinityChange, suspicionChange));
+        return this;
+    }
+
+    public java.util.List<NpcEffect> getExtraNpcEffects() { return extraNpcEffects; }
 
     public String getTargetNpc() { return targetNpc; } // GET NPC AFETADO
 

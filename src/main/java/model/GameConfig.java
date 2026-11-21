@@ -15,7 +15,7 @@ public class GameConfig {
         this.textSize = 12;
         this.confirmChoices = false;
         this.turnAutoSave = false;
-        this.turnMusic = false;
+        this.turnMusic = true;
     }
 
     public GameConfig(int textSpeedMs, int textSize, boolean confirmChoices, boolean turnAutoSave, boolean turnMusic) {

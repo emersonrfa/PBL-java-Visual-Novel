@@ -101,7 +101,7 @@ public class GameScreenPresenter implements Observer<GameEvent> {
         if (event instanceof GameEvent.StatsChanged stats) {
             view.showHud(stats.energy(), stats.money());
         } else if (event instanceof GameEvent.AchievementUnlocked unlocked) {
-            view.showToast("Conquista desbloqueada: " + unlocked.achievement().getTitle());
+            view.showAchievement(unlocked.achievement().getTitle(), unlocked.achievement().getDescription());
         } else if (event instanceof GameEvent.ChoiceApplied applied) {
             applied.report().messages().forEach(view::showToast);
         } else if (event instanceof GameEvent.GameSaved saved) {

@@ -32,6 +32,9 @@ public interface GameScreenView {
     /** Aviso rápido (conquista, consequência, escolha bloqueada, jogo salvo...). */
     void showToast(String message);
 
+    /** Conquista desbloqueada: banner de destaque (com som próprio), diferente do aviso rápido. */
+    void showAchievement(String title, String description);
+
     void showInventory(List<InventoryEntry> entries);
 
     void hideInventory();
