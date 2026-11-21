@@ -101,13 +101,17 @@ public class GameScreenPresenter implements Observer<GameEvent> {
     }
 
     /** Salva no slot (1–4); o aviso de sucesso vem pelo evento GameSaved. */
-    public void onSaveToSlot(int slot) {
+    /** @return {@code true} se salvou (o "Salvar e sair" só sai depois de salvar de verdade). */
+    public boolean onSaveToSlot(int slot) {
+        boolean saved = true;
         try {
             session.saveToSlot(slot);
         } catch (GamePersistenceException e) {
+            saved = false;
             view.showToast("Erro ao salvar: " + e.getMessage());
         }
         view.hideSaveSlots();
+        return saved;
     }
 
     public void onExitToMenu() {

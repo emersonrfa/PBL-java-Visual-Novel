@@ -30,6 +30,7 @@ import service.InventoryService.InventoryEntry;
 import service.StatusService.MissionStatus;
 import service.StatusService.NpcStatus;
 import service.StatusService.PlayerStatus;
+import ui.effects.ConfirmDialog;
 import ui.effects.Sounds;
 import ui.navigation.ScreenId;
 import ui.navigation.ScreenNavigator;
@@ -78,6 +79,7 @@ public class GameController extends ScreenController implements GameScreenView {
     private final String startDialogueId;
     private final int textSpeedMs;
     private GameScreenPresenter presenter;
+    private boolean leaveAfterSave;   // "Salvar e sair": depois de salvar com sucesso, volta ao menu
 
     private Timeline typing;
     private String fullText = "";
@@ -183,7 +185,15 @@ public class GameController extends ScreenController implements GameScreenView {
     }
 
     @FXML
+    private void onSaveAndLeave() {
+        confirmOverlay.setVisible(false);
+        leaveAfterSave = true;
+        presenter.onOpenSave();
+    }
+
+    @FXML
     private void onCloseSave() {
+        leaveAfterSave = false;
         presenter.onCloseSave();
     }
 
@@ -479,7 +489,18 @@ public class GameController extends ScreenController implements GameScreenView {
             Button button = new Button(slotLabels.get(i));
             button.getStyleClass().add("menu-button");
             button.setMaxWidth(Double.MAX_VALUE);
-            button.setOnAction(e -> presenter.onSaveToSlot(slot));
+            boolean occupied = !slotLabels.get(i).endsWith("vazio");
+            button.setOnAction(e -> {
+                if (occupied && !ConfirmDialog.ask(root, "Sobrescrever o Slot " + slot + "?",
+                        "O save atual desse slot será substituído.", "Sobrescrever")) {
+                    return;
+                }
+                boolean saved = presenter.onSaveToSlot(slot);
+                if (saved && leaveAfterSave) {
+                    leaveAfterSave = false;
+                    onLeave();
+                }
+            });
             saveSlotsBox.getChildren().add(button);
         }
         saveOverlay.setVisible(true);

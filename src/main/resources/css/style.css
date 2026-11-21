@@ -358,3 +358,54 @@
     -fx-padding: 0;
 }
 
+
+/* ======================================================================================
+   JANELAS DE CONFIRMAÇÃO (excluir slot, sobrescrever, sair) — ui/effects/ConfirmDialog.java
+   ====================================================================================== */
+.confirm-dialog { -fx-background-color: -cor-borda, -cor-painel; -fx-background-insets: 0, 1.5; }
+.confirm-dialog .header-panel { -fx-background-color: transparent; }
+.confirm-dialog .header-panel .label { -fx-text-fill: -cor-destaque; -fx-font-size: 22px; }
+.confirm-dialog .content.label { -fx-text-fill: -cor-texto; -fx-font-size: 17px; }
+.confirm-dialog .button {
+    -fx-background-color: -cor-borda, rgba(60, 8, 16, 0.95);
+    -fx-background-insets: 0, 1.5;
+    -fx-background-radius: 8, 7;
+    -fx-text-fill: -cor-texto;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+}
+.confirm-dialog .button:hover { -fx-background-color: -cor-destaque, rgba(110, 18, 32, 1); }
+
+/* ======================================================================================
+   GALERIA DE PERSONAGENS (fxml/characters.fxml)
+   ====================================================================================== */
+.nav-arrow {
+    -fx-background-color: -cor-borda, rgba(40, 6, 12, 0.9);
+    -fx-background-insets: 0, 1.5;
+    -fx-background-radius: 30, 29;
+    -fx-text-fill: -cor-destaque;
+    -fx-font-size: 26px;
+    -fx-min-width: 60;
+    -fx-min-height: 60;
+    -fx-cursor: hand;
+}
+.nav-arrow:hover { -fx-background-color: -cor-destaque, rgba(110, 18, 32, 1); -fx-text-fill: -cor-texto; }
+.nav-arrow:disabled { -fx-opacity: 0.35; }
+.portrait-frame {
+    -fx-background-color: -cor-borda, rgba(20, 5, 9, 0.85);
+    -fx-background-insets: 0, 1.5;
+    -fx-background-radius: 14, 13;
+    -fx-padding: 6;
+}
+.gallery-role { -fx-text-fill: -cor-destaque; -fx-font-size: 19px; }
+.sprite-chip {
+    -fx-background-color: -cor-borda, rgba(40, 6, 12, 0.9);
+    -fx-background-insets: 0, 1.2;
+    -fx-background-radius: 14, 13;
+    -fx-text-fill: -cor-texto;
+    -fx-font-size: 14px;
+    -fx-padding: 4 12 4 12;
+    -fx-cursor: hand;
+}
+.sprite-chip:hover { -fx-background-color: -cor-destaque, rgba(90, 14, 26, 1); }
+.sprite-chip-selected { -fx-background-color: -cor-destaque, rgba(130, 22, 40, 1); }

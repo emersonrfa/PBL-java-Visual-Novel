@@ -12,6 +12,7 @@ import ui.navigation.ScreenId;
 import ui.navigation.ScreenNavigator;
 import ui.screens.AchievementsController;
 import ui.screens.BloodTypeController;
+import ui.screens.CharacterGalleryController;
 import ui.screens.BloodTypeRequest;
 import ui.screens.CreditsController;
 import ui.screens.EndingsController;
@@ -48,6 +49,7 @@ public class App extends Application {
                 .register(ScreenId.SETTINGS, () -> SettingsController.create(navigator, context))
                 .register(ScreenId.ACHIEVEMENTS, () -> AchievementsController.create(navigator, context))
                 .register(ScreenId.ENDINGS, () -> EndingsController.create(navigator, context))
+                .register(ScreenId.CHARACTERS, () -> CharacterGalleryController.create(navigator, context))
                 .register(ScreenId.CREDITS, () -> CreditsController.create(navigator, context))
                 .registerWithArgument(ScreenId.BLOOD_TYPE,
                         request -> BloodTypeController.create(navigator, context, (BloodTypeRequest) request))

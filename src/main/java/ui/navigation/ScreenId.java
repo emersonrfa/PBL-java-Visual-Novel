@@ -10,6 +10,7 @@ public enum ScreenId {
     SETTINGS,
     ACHIEVEMENTS,
     ENDINGS,
+    CHARACTERS,    // galeria de personagens
     CREDITS,
     GAME           // a tela única de diálogo/capítulos
 }

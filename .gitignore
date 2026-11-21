@@ -33,3 +33,7 @@ target/
 
 ### Dados do jogador gerados em execução ###
 data/
+
+### Saves e configuração do jogador (gerados ao jogar) ###
+saves/
+config.json

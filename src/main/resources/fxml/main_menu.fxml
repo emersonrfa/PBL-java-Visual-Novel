@@ -33,6 +33,7 @@
         </StackPane.margin>
         <Button text="Jogar" onAction="#onPlay" styleClass="menu-button" maxWidth="Infinity"/>
         <Button text="Galeria de Finais" onAction="#onEndings" styleClass="menu-button" maxWidth="Infinity"/>
+        <Button text="Galeria de Personagens" onAction="#onCharacters" styleClass="menu-button" maxWidth="Infinity"/>
         <Button text="Galeria de Conquistas" onAction="#onAchievements" styleClass="menu-button" maxWidth="Infinity"/>
         <Button text="Configurações" onAction="#onSettings" styleClass="menu-button" maxWidth="Infinity"/>
         <Button text="Créditos" onAction="#onCredits" styleClass="menu-button" maxWidth="Infinity"/>

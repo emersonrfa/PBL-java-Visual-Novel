@@ -15,4 +15,8 @@ public class GameCharacter {
     }
 
     public String getName() { return name; }
+
+    public String getDescription() { return description; }
+
+    public int getAge() { return age; }
 }

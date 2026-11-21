@@ -3,6 +3,7 @@ package ui.screens;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import main.AppContext;
+import ui.effects.ConfirmDialog;
 import ui.navigation.ScreenId;
 import ui.navigation.ScreenNavigator;
 
@@ -28,6 +29,11 @@ public class MainMenuController extends ScreenController {
     }
 
     @FXML
+    private void onCharacters() {
+        navigator.goTo(ScreenId.CHARACTERS);
+    }
+
+    @FXML
     private void onAchievements() {
         navigator.goTo(ScreenId.ACHIEVEMENTS);
     }
@@ -44,6 +50,10 @@ public class MainMenuController extends ScreenController {
 
     @FXML
     private void onQuit() {
+        if (!ConfirmDialog.ask(view(), "Sair do jogo?",
+                "Partidas não salvas em um slot só ficam guardadas pelo autosave (se estiver ligado).", "Sair")) {
+            return;
+        }
         Platform.exit(); // o arquivamento do autosave acontece em App.stop()
     }
 }

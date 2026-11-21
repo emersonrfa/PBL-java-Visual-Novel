@@ -12,6 +12,7 @@ import main.AppContext;
 import service.SaveService;
 import service.SaveService.LoadedGame;
 import service.SaveService.SlotSummary;
+import ui.effects.ConfirmDialog;
 import ui.game.GameRequest;
 import ui.navigation.ScreenId;
 import ui.navigation.ScreenNavigator;
@@ -78,6 +79,10 @@ public class LoadSaveController extends ScreenController {
     }
 
     private void deleteSlot(int slot) {
+        if (!ConfirmDialog.ask(slotsBox, "Excluir o Slot " + slot + "?",
+                "O save será apagado e não poderá ser recuperado.", "Excluir")) {
+            return;
+        }
         statusLabel.setText(saveService.delete(slot) ? "Slot " + slot + " excluído." : "Não foi possível excluir o slot " + slot + ".");
         refresh();
     }
