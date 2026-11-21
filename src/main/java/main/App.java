@@ -3,6 +3,7 @@ package main;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import ui.effects.Music;
 import ui.effects.UiEffects;
 import ui.game.GameController;
 import ui.game.GameRequest;
@@ -64,6 +65,9 @@ public class App extends Application {
         stage.setTitle("Emily e o Ritual Sombrio");
         stage.setScene(scene);
         stage.show();
+        if (context.getConfig().isTurnMusic()) {
+            Music.play("/music/tema.mp3", 0.4);
+        }
         navigator.goTo(ScreenId.MAIN_MENU);
     }
 

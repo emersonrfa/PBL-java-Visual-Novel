@@ -1,17 +1,14 @@
 {
   "saveName" : "Emily",
-  "currentChapterId" : 2,
-  "currentDialogId" : "d2.2",
-  "currentSceneId" : "Cozinha",
-  "storyFlags" : {
-    "JANELAARTHUR" : true,
-    "NOTICIAS" : false
-  },
+  "currentChapterId" : 1,
+  "currentDialogId" : "d1.1",
+  "currentSceneId" : "Quarto",
+  "storyFlags" : { },
   "npcAffinities" : { },
   "npcSuspicions" : { },
-  "playerBloodType" : "O-",
+  "playerBloodType" : "A+",
   "playerMoney" : 20.0,
   "playerEnergy" : 100,
   "playerInventoryItems" : [ ],
-  "saveTimestamp" : ""
+  "saveTimestamp" : "20/11/2026 22:34:28"
 }
