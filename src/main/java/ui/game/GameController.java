@@ -1,7 +1,6 @@
 package ui.game;
 
 import javafx.animation.FadeTransition;
-import javafx.beans.binding.Bindings;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -73,9 +72,6 @@ public class GameController extends ScreenController implements GameScreenView {
     @FXML private Label endText;
     @FXML private StackPane confirmOverlay;
 
-    private static final double SPRITE_HEIGHT_RATIO = 0.82;
-    private static final double SPRITE_WIDTH_RATIO = 0.55;
-
     private final String startDialogueId;
     private final int textSpeedMs;
     private GameScreenPresenter presenter;
@@ -111,12 +107,7 @@ public class GameController extends ScreenController implements GameScreenView {
     private void initialize() {
         background.fitWidthProperty().bind(root.widthProperty());
         background.fitHeightProperty().bind(root.heightProperty());
-        // Os sprites novos são bustos em 2000x1116: com a altura da janela inteira cobriam a tela.
-        // O tamanho é limitado nos dois sentidos e nunca chega a 0 (fit 0 = tamanho natural da imagem).
-        sprite.fitHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> Math.max(1, root.getHeight() * SPRITE_HEIGHT_RATIO), root.heightProperty()));
-        sprite.fitWidthProperty().bind(Bindings.createDoubleBinding(
-                () -> Math.max(1, root.getWidth() * SPRITE_WIDTH_RATIO), root.widthProperty()));
+        sprite.fitHeightProperty().bind(root.heightProperty());
 
         continueHint.setVisible(false);
         root.setFocusTraversable(true);

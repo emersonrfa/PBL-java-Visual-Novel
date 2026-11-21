@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
@@ -110,14 +111,14 @@
     </StackPane>
 
     <StackPane fx:id="confirmOverlay" styleClass="modal-layer" visible="false">
-        <VBox spacing="16" styleClass="panel" maxWidth="640" maxHeight="-Infinity">
+        <VBox spacing="16" styleClass="panel" maxWidth="900" maxHeight="-Infinity">
             <Label text="Voltar ao menu?" styleClass="title-small"/>
             <Label text="O progresso não salvo será perdido. Quer salvar antes de sair?" styleClass="text" wrapText="true"/>
-            <HBox spacing="10">
-                <Button text="Salvar e sair" onAction="#onSaveAndLeave" styleClass="menu-button"/>
-                <Button text="Continuar jogando" onAction="#onStay" styleClass="menu-button"/>
-                <Button text="Sair para o menu" onAction="#onLeave" styleClass="menu-button"/>
-            </HBox>
+            <FlowPane hgap="10" vgap="10">
+                <Button text="Salvar e sair" onAction="#onSaveAndLeave" styleClass="menu-button" minWidth="-Infinity"/>
+                <Button text="Continuar jogando" onAction="#onStay" styleClass="menu-button" minWidth="-Infinity"/>
+                <Button text="Sair para o menu" onAction="#onLeave" styleClass="menu-button" minWidth="-Infinity"/>
+            </FlowPane>
         </VBox>
     </StackPane>
 </StackPane>
