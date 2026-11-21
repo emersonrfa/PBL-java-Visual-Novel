@@ -3,6 +3,7 @@ package ui.game;
 import model.Ending;
 import service.DialogueSnapshot.ChoiceView;
 import service.InventoryService.InventoryEntry;
+import service.StatusService.PlayerStatus;
 
 import java.util.List;
 
@@ -38,6 +39,11 @@ public interface GameScreenView {
     void showInventory(List<InventoryEntry> entries);
 
     void hideInventory();
+
+    /** Tela de status: atributos, relações com os NPCs, missões e decisões. */
+    void showStatus(PlayerStatus status);
+
+    void hideStatus();
 
     void showSaveSlots(List<String> slotLabels);
 

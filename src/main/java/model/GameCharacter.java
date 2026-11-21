@@ -14,6 +14,5 @@ public class GameCharacter {
         this.gender=gender;
     }
 
-
-
+    public String getName() { return name; }
 }

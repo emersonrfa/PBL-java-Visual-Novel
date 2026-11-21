@@ -12,4 +12,6 @@ public class NPC extends GameCharacter {
         this.defaultLocation=defaultLocation;
         this.role=role;
     }
+
+    public String getRole() { return role; }
 }

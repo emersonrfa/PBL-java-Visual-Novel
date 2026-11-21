@@ -325,3 +325,36 @@
     -fx-effect: dropshadow(gaussian, rgba(255, 120, 130, 1.0), 34, 0.5, 0, 0);
 }
 .blood-selected { -fx-font-family: "Metamorphous"; -fx-font-size: 26px; -fx-text-fill: -cor-destaque; }
+
+/* ======================================================================================
+   TELA DE STATUS e janelas de confirmação
+   ====================================================================================== */
+.status-section {
+    -fx-text-fill: -cor-destaque;
+    -fx-font-size: 22px;
+    -fx-padding: 14 0 2 0;
+    -fx-border-color: transparent transparent rgba(176, 38, 56, 0.6) transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.status-stat { -fx-text-fill: -cor-apagado; -fx-font-size: 15px; }
+.status-done { -fx-text-fill: #c9a44c; -fx-font-size: 17px; }
+.status-npc { -fx-padding: 4 0 6 0; }
+.affinity-bar, .suspicion-bar { -fx-pref-height: 14; }
+.affinity-bar > .track, .suspicion-bar > .track {
+    -fx-background-color: rgba(0, 0, 0, 0.55);
+    -fx-background-radius: 7;
+    -fx-background-insets: 0;
+}
+.affinity-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #8c1d2b, #e0405a);
+    -fx-background-radius: 7;
+    -fx-background-insets: 1;
+    -fx-padding: 0;
+}
+.suspicion-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #6b5a1c, #d9b43a);
+    -fx-background-radius: 7;
+    -fx-background-insets: 1;
+    -fx-padding: 0;
+}
+

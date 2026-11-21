@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -25,6 +26,9 @@ import model.GameConfig;
 import service.DialogueSnapshot.ChoiceView;
 import service.GameSession;
 import service.InventoryService.InventoryEntry;
+import service.StatusService.MissionStatus;
+import service.StatusService.NpcStatus;
+import service.StatusService.PlayerStatus;
 import ui.effects.Sounds;
 import ui.navigation.ScreenId;
 import ui.navigation.ScreenNavigator;
@@ -32,6 +36,7 @@ import ui.screens.ScreenController;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A tela única do jogo ({@code game.fxml}). Não decide nada sobre a história: o
@@ -57,6 +62,8 @@ public class GameController extends ScreenController implements GameScreenView {
     @FXML private Label chapterBanner;
     @FXML private StackPane inventoryOverlay;
     @FXML private VBox inventoryList;
+    @FXML private StackPane statusOverlay;
+    @FXML private VBox statusContent;
     @FXML private StackPane saveOverlay;
     @FXML private VBox saveSlotsBox;
     @FXML private StackPane endOverlay;
@@ -136,6 +143,16 @@ public class GameController extends ScreenController implements GameScreenView {
     }
 
     @FXML
+    private void onStatus() {
+        presenter.onOpenStatus();
+    }
+
+    @FXML
+    private void onCloseStatus() {
+        presenter.onCloseStatus();
+    }
+
+    @FXML
     private void onCloseInventory() {
         presenter.onCloseInventory();
     }
@@ -176,7 +193,7 @@ public class GameController extends ScreenController implements GameScreenView {
     }
 
     private boolean anyOverlayVisible() {
-        return inventoryOverlay.isVisible() || saveOverlay.isVisible()
+        return inventoryOverlay.isVisible() || statusOverlay.isVisible() || saveOverlay.isVisible()
                 || endOverlay.isVisible() || confirmOverlay.isVisible();
     }
 
@@ -348,6 +365,89 @@ public class GameController extends ScreenController implements GameScreenView {
     @Override
     public void hideInventory() {
         inventoryOverlay.setVisible(false);
+        root.requestFocus();
+    }
+
+    @Override
+    public void showStatus(PlayerStatus status) {
+        statusContent.getChildren().clear();
+
+        Label attrs = new Label(String.format(Locale.forLanguageTag("pt-BR"),
+                "Capítulo %d   •   Energia %d/100   •   R$ %.2f   •   Sangue %s",
+                status.chapter(), status.energy(), status.money(), status.bloodType()));
+        attrs.getStyleClass().add("text");
+        statusContent.getChildren().add(attrs);
+
+        addStatusSection("Relações");
+        for (NpcStatus npc : status.npcs()) {
+            statusContent.getChildren().add(npcRow(npc));
+        }
+
+        addStatusSection("Missões");
+        for (MissionStatus mission : status.missions()) {
+            Label label = new Label((mission.done() ? "✔  " : "○  ") + mission.title());
+            label.getStyleClass().add(mission.done() ? "status-done" : "text");
+            statusContent.getChildren().add(label);
+        }
+
+        addStatusSection("Decisões");
+        if (status.decisions().isEmpty()) {
+            Label none = new Label("Nenhuma decisão marcante ainda.");
+            none.getStyleClass().add("text-muted");
+            statusContent.getChildren().add(none);
+        }
+        for (String decision : status.decisions()) {
+            Label label = new Label("•  " + decision);
+            label.getStyleClass().add("text");
+            statusContent.getChildren().add(label);
+        }
+
+        if (!statusOverlay.isVisible()) {
+            Sounds.play(Sounds.Effect.CLICK);
+        }
+        statusOverlay.setVisible(true);
+    }
+
+    private void addStatusSection(String title) {
+        Label label = new Label(title);
+        label.getStyleClass().add("status-section");
+        statusContent.getChildren().add(label);
+    }
+
+    /** Uma linha de NPC: nome + papel, barra de afinidade (−20..100) e, nos vampiros, barra de suspeita. */
+    private VBox npcRow(NpcStatus npc) {
+        Label name = new Label(npc.name() + "  —  " + npc.role());
+        name.getStyleClass().add(npc.known() ? "text" : "text-muted");
+        VBox box = new VBox(4, name);
+        if (npc.known()) {
+            box.getChildren().add(statBar("Afinidade", (npc.affinity() + 20) / 120.0,
+                    String.format("%+d", npc.affinity()), "affinity-bar"));
+            if (npc.vampire()) {
+                box.getChildren().add(statBar("Suspeita", npc.suspicion() / (double) Math.max(1, npc.suspicionLimit()),
+                        npc.suspicion() + "/" + npc.suspicionLimit(), "suspicion-bar"));
+            }
+        }
+        box.getStyleClass().add("status-npc");
+        return box;
+    }
+
+    private HBox statBar(String title, double fraction, String value, String styleClass) {
+        Label label = new Label(title);
+        label.getStyleClass().add("status-stat");
+        label.setMinWidth(80);
+        ProgressBar bar = new ProgressBar(Math.max(0, Math.min(1, fraction)));
+        bar.getStyleClass().add(styleClass);
+        bar.setPrefWidth(300);
+        Label number = new Label(value);
+        number.getStyleClass().add("status-stat");
+        HBox row = new HBox(10, label, bar, number);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    @Override
+    public void hideStatus() {
+        statusOverlay.setVisible(false);
         root.requestFocus();
     }
 

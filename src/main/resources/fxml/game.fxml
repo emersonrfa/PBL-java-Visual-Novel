@@ -31,6 +31,7 @@
         <Label fx:id="energyLabel" styleClass="hud-text"/>
         <Label fx:id="moneyLabel" styleClass="hud-text"/>
         <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Status" onAction="#onStatus" styleClass="hud-button"/>
         <Button text="Inventário" onAction="#onInventory" styleClass="hud-button"/>
         <Button text="Salvar" onAction="#onSave" styleClass="hud-button"/>
         <Button text="Menu" onAction="#onMenu" styleClass="hud-button"/>
@@ -80,6 +81,16 @@
             <Region styleClass="bag-buckle" StackPane.alignment="TOP_CENTER" maxWidth="-Infinity" maxHeight="-Infinity"
                     mouseTransparent="true"/>
         </StackPane>
+    </StackPane>
+
+    <StackPane fx:id="statusOverlay" styleClass="modal-layer" visible="false">
+        <VBox spacing="14" styleClass="panel" maxWidth="760" maxHeight="-Infinity">
+            <Label text="Status de Emily" styleClass="title-small"/>
+            <ScrollPane fitToWidth="true" prefHeight="420" styleClass="bag-scroll">
+                <VBox fx:id="statusContent" spacing="8"/>
+            </ScrollPane>
+            <Button text="Fechar" onAction="#onCloseStatus" styleClass="menu-button"/>
+        </VBox>
     </StackPane>
 
     <StackPane fx:id="saveOverlay" styleClass="modal-layer" visible="false">

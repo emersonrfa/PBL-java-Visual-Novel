@@ -9,7 +9,9 @@ import service.DialogueSnapshot;
 import service.GameEvent;
 import service.GameSession;
 import service.InventoryService;
+import service.StatusService;
 import service.StepResult;
+import repository.NpcRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,9 @@ public class GameScreenPresenter implements Observer<GameEvent> {
     private final GameSession session;
     private final GameScreenView view;
     private final StateRepository stateRepository;
+    private final StatusService statusService = new StatusService(new NpcRepository());
     private boolean inventoryOpen;
+    private boolean statusOpen;
     private boolean finished;
 
     public GameScreenPresenter(GameSession session, GameScreenView view, StateRepository stateRepository) {
@@ -46,13 +50,13 @@ public class GameScreenPresenter implements Observer<GameEvent> {
 
     /** Clique/ENTER num diálogo linear. */
     public void onContinue() {
-        if (finished || session.isOver() || inventoryOpen) return;
+        if (finished || session.isOver() || inventoryOpen || statusOpen) return;
         render(session.advance());
     }
 
     /** Clique numa opção (índice base 0). */
     public void onChoice(int index) {
-        if (finished || session.isOver() || inventoryOpen) return;
+        if (finished || session.isOver() || inventoryOpen || statusOpen) return;
         render(session.choose(index));
     }
 
@@ -65,6 +69,22 @@ public class GameScreenPresenter implements Observer<GameEvent> {
     public void onCloseInventory() {
         inventoryOpen = false;
         view.hideInventory();
+    }
+
+    public void onOpenStatus() {
+        if (finished) return;
+        statusOpen = true;
+        view.showStatus(currentStatus());
+    }
+
+    public void onCloseStatus() {
+        statusOpen = false;
+        view.hideStatus();
+    }
+
+    private StatusService.PlayerStatus currentStatus() {
+        return statusService.build(session.getPlayer(), session.getAffinityTracker(),
+                session.getChapter().getChapterNumber());
     }
 
     public void onOpenSave() {

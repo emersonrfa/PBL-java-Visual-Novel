@@ -2,14 +2,14 @@ package repository;
 
 import model.NPC;
 import model.Vampire;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class NpcRepository {
     private Map<String, NPC> npcs;
 
     public NpcRepository() {
-        this.npcs = new HashMap<>();
+        this.npcs = new LinkedHashMap<>();
         loadNpcs();
     }
 
@@ -104,6 +104,11 @@ public class NpcRepository {
         npcs.put("Miguel", miguel);
         npcs.put("Lilith", lilith);
         npcs.put("Luna", luna);
+    }
+
+    /** Todos os NPCs, na ordem em que foram cadastrados (mortais primeiro, depois os vampiros). */
+    public Map<String, NPC> getAllNpcs() {
+        return java.util.Collections.unmodifiableMap(npcs);
     }
 
     public NPC getNpc(String key) {

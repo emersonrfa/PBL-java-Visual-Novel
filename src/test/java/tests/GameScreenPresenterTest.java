@@ -23,6 +23,7 @@ import service.DialogueSnapshot.ChoiceView;
 import service.EndingService;
 import service.GameSession;
 import service.InventoryService.InventoryEntry;
+import service.StatusService;
 import service.PlayerService;
 import ui.game.GameScreenPresenter;
 import ui.game.GameScreenView;
@@ -44,6 +45,7 @@ public class GameScreenPresenterTest {
         List<ChoiceView> choices;
         List<InventoryEntry> inventory;
         List<String> slots;
+        StatusService.PlayerStatus status;
         boolean continuePrompt;
         String lastSprite = "?";
 
@@ -58,6 +60,8 @@ public class GameScreenPresenterTest {
         public void showAchievement(String t, String d) { log.add("achievement:" + t); }
         public void showInventory(List<InventoryEntry> e) { inventory = e; }
         public void hideInventory() { inventory = null; }
+        public void showStatus(StatusService.PlayerStatus s) { status = s; }
+        public void hideStatus() { status = null; }
         public void showSaveSlots(List<String> l) { slots = l; }
         public void hideSaveSlots() { slots = null; }
         public void showEnding(Ending e) { log.add("ending:" + e.getId()); }
@@ -178,6 +182,26 @@ public class GameScreenPresenterTest {
         presenter.begin("nao_existe");
 
         assertTrue(view.log.stream().anyMatch(l -> l.startsWith("error:") && l.contains("nao_existe")));
+    }
+
+    @Test
+    public void statusScreenShowsPlayerAndBlocksGameInputWhileOpen() {
+        presenter.begin("a2");
+
+        presenter.onOpenStatus();
+        assertNotNull(view.status);
+        assertEquals(player.getBloodType(), view.status.bloodType());
+        assertEquals(player.getEnergy(), view.status.energy());
+        assertEquals(1, view.status.chapter());
+
+        view.log.clear();
+        presenter.onContinue(); // ignorado com o status aberto
+        assertTrue(view.log.isEmpty());
+
+        presenter.onCloseStatus();
+        assertNull(view.status);
+        presenter.onContinue();
+        assertFalse(view.log.isEmpty());
     }
 
     @Test
