@@ -6,6 +6,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import main.AppContext;
 import model.GameConfig;
+import ui.effects.MusicDirector;
 import ui.navigation.ScreenNavigator;
 
 import java.util.List;
@@ -49,6 +50,7 @@ public class SettingsController extends ScreenController {
         config.setTurnAutoSave(autoSaveBox.isSelected());
         config.setTurnMusic(musicBox.isSelected());
         context.getConfigRepository().saveConfig(config);
+        MusicDirector.setEnabled(config.isTurnMusic());   // para ou volta a tocar assim que salva
         statusLabel.setText("Configurações salvas.");
     }
 
