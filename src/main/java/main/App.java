@@ -3,6 +3,7 @@ package main;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import ui.effects.MusicPlayer;
 import ui.effects.UiEffects;
 import ui.game.GameController;
 import ui.game.GameRequest;
@@ -38,6 +39,7 @@ public class App extends Application {
     public void start(Stage stage) {
         UiEffects.loadFonts();
         context = new AppContext();
+        MusicPlayer.apply(context.getConfig().isTurnMusic());
         ScreenNavigator navigator = new ScreenNavigator(new NavigationModel());
 
         navigator.register(ScreenId.MAIN_MENU, () -> MainMenuController.create(navigator, context))
