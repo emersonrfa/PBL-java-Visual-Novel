@@ -1,7 +1,10 @@
 package ui.navigation;
 
 import event.Observer;
+import javafx.animation.FadeTransition;
+import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 import ui.navigation.NavigationModel.NavigationEvent;
 
 import java.util.EnumMap;
@@ -31,6 +34,13 @@ public class ScreenNavigator {
     private final Observer<NavigationEvent> onNavigation = this::show;
     private Screen shown;
     private Object pendingArgument;
+
+    // fade entre telas: a tela antiga some, a nova aparece
+    private static final Duration FADE_OUT = Duration.millis(140);
+    private static final Duration FADE_IN = Duration.millis(260);
+    private FadeTransition fadeOut;
+    private NavigationEvent waitingEvent;   // destino mais recente pedido durante o fade
+    private Object waitingArgument;
 
     public ScreenNavigator(NavigationModel model) {
         this.model = model;
@@ -93,14 +103,50 @@ public class ScreenNavigator {
         }
     }
 
+    /**
+     * Mostra a tela pedida com fade: a atual some rapidamente e a nova surge suavemente. Se outra
+     * navegação chegar no meio do fade, vale só a mais recente (a tela do meio nunca é criada).
+     */
     private void show(NavigationEvent event) {
+        waitingEvent = event;
+        waitingArgument = pendingArgument;
+        pendingArgument = null;
+
+        if (fadeOut != null) {
+            return; // já está sumindo; ao terminar mostra o destino mais recente
+        }
+        Node old = root.getChildren().isEmpty() ? null : root.getChildren().get(0);
+        if (old == null) {
+            swapToWaiting();
+            return;
+        }
+        old.setMouseTransparent(true); // sem cliques na tela que está saindo
+        fadeOut = new FadeTransition(FADE_OUT, old);
+        fadeOut.setToValue(0);
+        fadeOut.setOnFinished(e -> {
+            fadeOut = null;
+            swapToWaiting();
+        });
+        fadeOut.play();
+    }
+
+    private void swapToWaiting() {
+        NavigationEvent event = waitingEvent;
+        Object argument = waitingArgument;
+        waitingEvent = null;
+        waitingArgument = null;
+        if (event == null) return;
+
         if (shown != null) {
             shown.onHide();
         }
-        Object argument = pendingArgument;
-        pendingArgument = null;
         shown = factories.get(event.to()).apply(argument);
-        root.getChildren().setAll(shown.view());
+        Node view = shown.view();
+        view.setOpacity(0);
+        root.getChildren().setAll(view);
         shown.onShow();
+        FadeTransition fadeIn = new FadeTransition(FADE_IN, view);
+        fadeIn.setToValue(1);
+        fadeIn.play();
     }
 }

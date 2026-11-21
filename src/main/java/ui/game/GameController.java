@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 import main.AppContext;
 import model.Ending;
@@ -24,6 +25,7 @@ import model.GameConfig;
 import service.DialogueSnapshot.ChoiceView;
 import service.GameSession;
 import service.InventoryService.InventoryEntry;
+import ui.effects.Sounds;
 import ui.navigation.ScreenId;
 import ui.navigation.ScreenNavigator;
 import ui.screens.ScreenController;
@@ -51,6 +53,7 @@ public class GameController extends ScreenController implements GameScreenView {
     @FXML private Label continueHint;
     @FXML private VBox choicesBox;
     @FXML private VBox toastBox;
+    @FXML private VBox achievementBox;
     @FXML private Label chapterBanner;
     @FXML private StackPane inventoryOverlay;
     @FXML private VBox inventoryList;
@@ -258,11 +261,58 @@ public class GameController extends ScreenController implements GameScreenView {
     }
 
     @Override
+    public void showAchievement(String title, String description) {
+        Polygon star = new Polygon();
+        for (int i = 0; i < 10; i++) { // estrela de 5 pontas desenhada em código (sem depender de fonte)
+            double r = i % 2 == 0 ? 17 : 7.5;
+            double a = Math.toRadians(-90 + i * 36);
+            star.getPoints().addAll(20 + r * Math.cos(a), 20 + r * Math.sin(a));
+        }
+        star.getStyleClass().add("achievement-star");
+        StackPane badge = new StackPane(star);
+        badge.setMinSize(46, 46);
+        badge.setMaxSize(46, 46);
+        badge.getStyleClass().add("achievement-badge");
+
+        Label kicker = new Label("CONQUISTA DESBLOQUEADA");
+        kicker.getStyleClass().add("achievement-kicker");
+        Label name = new Label(title);
+        name.getStyleClass().add("achievement-title");
+        Label detail = new Label(description == null ? "" : description);
+        detail.getStyleClass().add("achievement-text");
+        detail.setWrapText(true);
+        detail.setMaxWidth(340);
+
+        HBox banner = new HBox(14, badge, new VBox(2, kicker, name, detail));
+        banner.setAlignment(Pos.CENTER_LEFT);
+        banner.getStyleClass().add("achievement-banner");
+        banner.setMaxWidth(Region.USE_PREF_SIZE);
+        banner.setOpacity(0);
+        banner.setTranslateY(-30);
+        achievementBox.getChildren().add(banner);
+        Sounds.play(Sounds.Effect.ACHIEVEMENT);
+
+        // entra deslizando, fica um tempo e some
+        FadeTransition in = new FadeTransition(Duration.millis(350), banner);
+        in.setToValue(1);
+        javafx.animation.TranslateTransition slide = new javafx.animation.TranslateTransition(Duration.millis(350), banner);
+        slide.setToY(0);
+        PauseTransition hold = new PauseTransition(Duration.seconds(4.2));
+        FadeTransition out = new FadeTransition(Duration.millis(600), banner);
+        out.setToValue(0);
+        out.setOnFinished(e -> achievementBox.getChildren().remove(banner));
+        new javafx.animation.SequentialTransition(new javafx.animation.ParallelTransition(in, slide), hold, out).play();
+    }
+
+    @Override
     public void showInventory(List<InventoryEntry> entries) {
+        if (!inventoryOverlay.isVisible()) {
+            Sounds.play(Sounds.Effect.BAG_OPEN); // só ao abrir (não toca quando a lista é atualizada)
+        }
         inventoryList.getChildren().clear();
         if (entries.isEmpty()) {
-            Label empty = new Label("Nenhum item no inventário.");
-            empty.getStyleClass().add("text");
+            Label empty = new Label("A mochila está vazia.");
+            empty.getStyleClass().add("bag-item-text");
             inventoryList.getChildren().add(empty);
         }
         for (InventoryEntry entry : entries) {
@@ -270,10 +320,12 @@ public class GameController extends ScreenController implements GameScreenView {
             Image image = loadImage(entry.imagePath());
             if (image != null) {
                 ImageView view = new ImageView(image);
-                view.setFitWidth(64);
-                view.setFitHeight(64);
+                view.setFitWidth(60);
+                view.setFitHeight(60);
                 view.setPreserveRatio(true);
-                icon = view;
+                view.setSmooth(true);
+                icon = new StackPane(view);
+                icon.getStyleClass().add("item-slot");
             } else {
                 Region placeholder = new Region();
                 placeholder.setMinSize(64, 64);
@@ -281,11 +333,12 @@ public class GameController extends ScreenController implements GameScreenView {
                 icon = placeholder;
             }
             Label name = new Label(entry.name());
-            name.getStyleClass().add("row-title");
+            name.getStyleClass().add("bag-item-name");
             Label description = new Label(entry.description());
-            description.getStyleClass().add("text");
+            description.getStyleClass().add("bag-item-text");
             description.setWrapText(true);
             HBox row = new HBox(14, icon, new VBox(4, name, description));
+            row.getStyleClass().add("bag-row");
             row.setAlignment(Pos.CENTER_LEFT);
             inventoryList.getChildren().add(row);
         }
@@ -368,6 +421,9 @@ public class GameController extends ScreenController implements GameScreenView {
         typing = new Timeline(new KeyFrame(Duration.millis(textSpeedMs), e -> {
             shown[0]++;
             textLabel.setText(fullText.substring(0, shown[0]));
+            if (!Character.isWhitespace(fullText.charAt(shown[0] - 1))) {
+                Sounds.typeTick(55); // tique grave e baixo, no máximo ~18 por segundo
+            }
         }));
         typing.setCycleCount(text.length());
         typing.setOnFinished(e -> finishTyping());

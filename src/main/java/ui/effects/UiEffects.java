@@ -6,7 +6,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.media.AudioClip;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
@@ -29,9 +28,6 @@ public final class UiEffects {
     };
     private static final double HOVER_SCALE = 1.04;
 
-    private static AudioClip hoverSound;
-    private static AudioClip clickSound;
-
     private UiEffects() {}
 
     /** Carrega as fontes empacotadas; deve ser chamado antes de criar a primeira tela. */
@@ -46,13 +42,12 @@ public final class UiEffects {
 
     /** Liga som e animação de hover/clique a todos os botões da cena (atuais e futuros). */
     public static void install(Scene scene) {
-        hoverSound = loadClip("/sounds/hover.wav", 0.35);
-        clickSound = loadClip("/sounds/click.wav", 0.6);
+        Sounds.load();
 
         scene.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, event -> {
             ButtonBase button = buttonOf(event.getTarget());
             if (button != null && !button.isDisabled() && button == event.getTarget()) {
-                play(hoverSound);
+                Sounds.play(Sounds.Effect.HOVER);
                 scaleTo(button, HOVER_SCALE);
             }
         });
@@ -64,7 +59,7 @@ public final class UiEffects {
         });
         scene.addEventFilter(ActionEvent.ACTION, event -> {
             if (event.getTarget() instanceof ButtonBase) {
-                play(clickSound);
+                Sounds.play(Sounds.Effect.CLICK);
             }
         });
     }
@@ -78,24 +73,5 @@ public final class UiEffects {
         transition.setToX(scale);
         transition.setToY(scale);
         transition.play();
-    }
-
-    private static AudioClip loadClip(String path, double volume) {
-        try {
-            URL url = UiEffects.class.getResource(path);
-            if (url == null) return null;
-            AudioClip clip = new AudioClip(url.toExternalForm());
-            clip.setVolume(volume);
-            return clip;
-        } catch (RuntimeException e) { // sem áudio no sistema, formato recusado etc.
-            System.err.println("[UI] Som não carregado (" + path + "): " + e.getMessage());
-            return null;
-        }
-    }
-
-    private static void play(AudioClip clip) {
-        if (clip != null) {
-            clip.play();
-        }
     }
 }
