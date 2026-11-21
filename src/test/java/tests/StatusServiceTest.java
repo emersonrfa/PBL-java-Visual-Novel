@@ -36,6 +36,16 @@ public class StatusServiceTest {
     }
 
     @Test
+    public void listsInventoryItems() {
+        Player player = new Player("A+");
+        assertTrue(service.build(player, new AffinityTracker(), 1).items().isEmpty());
+
+        player.getInventory().addItem(new repository.ItemRepository().findByName("Chave de Casa"));
+
+        assertEquals(List.of("Chave de Casa"), service.build(player, new AffinityTracker(), 1).items());
+    }
+
+    @Test
     public void listsAffinityAndSuspicionOfKnownNpcs() {
         AffinityTracker tracker = new AffinityTracker();
         tracker.modifyAffinity("Arthur", 15);

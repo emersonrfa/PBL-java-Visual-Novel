@@ -25,7 +25,8 @@ public class StatusService {
     public record MissionStatus(String title, boolean done) {}
 
     public record PlayerStatus(int chapter, int energy, double money, String bloodType,
-                               List<NpcStatus> npcs, List<MissionStatus> missions, List<String> decisions) {}
+                               List<String> items, List<NpcStatus> npcs, List<MissionStatus> missions,
+                               List<String> decisions) {}
 
     /** Flag → texto da decisão (na ordem em que aparecem na história). */
     private static final Map<String, String> DECISIONS = new LinkedHashMap<>();
@@ -52,7 +53,7 @@ public class StatusService {
 
     public PlayerStatus build(Player player, AffinityTracker affinity, int chapter) {
         return new PlayerStatus(chapter, player.getEnergy(), player.getMoney(), player.getBloodType(),
-                npcs(affinity), missions(player), decisions(player));
+                player.getInventory().getItemNames(), npcs(affinity), missions(player), decisions(player));
     }
 
     private List<NpcStatus> npcs(AffinityTracker affinity) {

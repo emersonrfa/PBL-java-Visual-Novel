@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import main.AppContext;
 import service.SaveService;
 import service.SaveService.SlotSummary;
+import ui.effects.ConfirmDialog;
 import ui.navigation.ScreenId;
 import ui.navigation.ScreenNavigator;
 
@@ -18,7 +19,6 @@ public class NewGameController extends ScreenController {
 
     private final SaveService saveService;
     private List<SlotSummary> slots;
-    private boolean overwriteArmed;
 
     private NewGameController(ScreenNavigator navigator, AppContext context) {
         super(navigator, context);
@@ -38,7 +38,6 @@ public class NewGameController extends ScreenController {
         }
         slotChoice.getSelectionModel().selectFirst();
         slotChoice.getSelectionModel().selectedIndexProperty().addListener((obs, old, now) -> {
-            overwriteArmed = false;
             statusLabel.setText("");
         });
     }
@@ -51,9 +50,9 @@ public class NewGameController extends ScreenController {
             return;
         }
         SlotSummary slot = slots.get(index);
-        if (!slot.empty() && !overwriteArmed) {
-            overwriteArmed = true;
-            statusLabel.setText("Esse slot já tem um save. Clique em Continuar de novo para sobrescrevê-lo.");
+        if (!slot.empty() && !ConfirmDialog.ask(slotChoice, "Sobrescrever o Slot " + slot.slot() + "?",
+                "Esse slot já tem um save. Começar um novo jogo aqui vai substituí-lo.", "Sobrescrever")) {
+            statusLabel.setText("Novo jogo cancelado: o save do slot foi mantido.");
             return;
         }
         navigator.goTo(ScreenId.BLOOD_TYPE, new BloodTypeRequest(slot.slot()));

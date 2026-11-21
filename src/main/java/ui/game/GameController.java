@@ -399,6 +399,12 @@ public class GameController extends ScreenController implements GameScreenView {
         attrs.getStyleClass().add("text");
         statusContent.getChildren().add(attrs);
 
+        addStatusSection("Inventário");
+        Label items = new Label(status.items().isEmpty() ? "Bolsa vazia." : String.join(", ", status.items()));
+        items.getStyleClass().add(status.items().isEmpty() ? "text-muted" : "text");
+        items.setWrapText(true);
+        statusContent.getChildren().add(items);
+
         addStatusSection("Relações");
         for (NpcStatus npc : status.npcs()) {
             statusContent.getChildren().add(npcRow(npc));
