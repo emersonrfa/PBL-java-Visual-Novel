@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -9,8 +12,32 @@
            styleClass="screen">
     <VBox alignment="CENTER" spacing="14" maxWidth="640" maxHeight="-Infinity">
         <Label text="Créditos" styleClass="title"/>
+        <Label text="Feito por:" styleClass="text"/>
+
+        <HBox alignment="CENTER" spacing="40">
+            <VBox alignment="CENTER" spacing="8">
+                <ImageView fitWidth="160" fitHeight="160" preserveRatio="true">
+                    <image>
+                        <Image url="@/images/ui/emerson.jpg"/>
+                    </image>
+                </ImageView>
+                <Label text="Emerson Rodrigues Farias de Araújo" styleClass="text"
+                       wrapText="true" maxWidth="220" textAlignment="CENTER"/>
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="8">
+                <ImageView fitWidth="160" fitHeight="160" preserveRatio="true">
+                    <image>
+                        <Image url="@/images/ui/daniel.jpg"/>
+                    </image>
+                </ImageView>
+                <Label text="Daniel Fontes Aguiar Oliveira" styleClass="text"
+                       wrapText="true" maxWidth="220" textAlignment="CENTER"/>
+            </VBox>
+        </HBox>
+
         <Label styleClass="text" wrapText="true" textAlignment="CENTER"
-               text="Feito por:&#10;Emerson Rodrigues Farias de Araújo&#10;Daniel Fontes Aguiar&#10;&#10;Projeto PBL da matéria de MI - Algoritmos de Programação II."/>
+               text="Projeto PBL da matéria de MI - Algoritmos de Programação II."/>
         <Button text="Voltar" onAction="#onBack" styleClass="menu-button"/>
     </VBox>
 </StackPane>
